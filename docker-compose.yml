@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agent_api
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - sqlite_data:/app/data
+    env_file:
+      - .env
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - PERSIST_DIR=data
+      - LOG_LEVEL=INFO
+    depends_on:
+      - worker
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agent_worker
+    restart: always
+    command: python core/worker.py --concurrency 2
+    volumes:
+      - sqlite_data:/app/data
+    env_file:
+      - .env
+    environment:
+      - PERSIST_DIR=data
+      - LOG_LEVEL=INFO
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: agent_dashboard
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NODE_ENV=production
+    depends_on:
+      - api
+
+volumes:
+  sqlite_data:
+    driver: local
