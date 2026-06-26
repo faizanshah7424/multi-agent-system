@@ -1,0 +1,1611 @@
+2026-06-25 22:49:48 [INFO] [API_App] FastAPI application instance created successfully.
+2026-06-25 22:49:48 [INFO] [Memory] [system] Workflow session status changed to 'running'
+2026-06-25 22:49:48 [INFO] [Memory] [workflow] Starting workflow execution for task: 'Write a python file named hello.py that prints hello world and verify it'
+2026-06-25 22:49:48 [INFO] [Memory] [Project Planner] Planning project steps for task: 'Write a python file named hello.py that prints hello world and verify it'
+2026-06-25 22:49:48 [ERROR] [ProjectPlanner] Failed to generate project plan: name 'ask_llm' is not defined
+2026-06-25 22:49:48 [INFO] [Memory] [system] Memory key 'plan' updated.
+2026-06-25 22:49:48 [INFO] [Memory] [system] Memory key 'structured_plan' updated.
+2026-06-25 22:49:48 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:49:48 [INFO] [Memory] [workflow] Plan generated: Fallback Execution Plan. Total steps: 3
+2026-06-25 22:49:48 [INFO] [Memory] [workflow] Beginning Step 1: 'Initial Research' -> Assigned to researcher
+2026-06-25 22:49:48 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:49:48 [INFO] [Memory] [Research Specialist] Running task: Please conduct research to solve or understand this task:
+Overall Goal: Write a python file named hello.py that prints hello world and verify it
+Your specific subtask: Gather details regarding the task: Write a python file named hello.py that prints hello world and verify it
+Carry out this subtask using your tools and context.
+Use the directory scanner, file reader, and web search to collect necessary information. Examine any relevant codebase files to understand the project structure.
+2026-06-25 22:49:51 [INFO] [Memory] [Research Specialist] Thought (Step 1): The user wants to write a Python file and verify it. My first step is to understand the current project structure or environment. I will use the `dir_scanner` tool to list files and subdirectories in the current directory. This will help me determine if there's an existing Python project, a preferred location for new files, or any other relevant context.
+2026-06-25 22:49:51 [INFO] [Memory] [Research Specialist] Calling tool 'dir_scanner' with arguments: {'directory_path': '.', 'recursive': False}
+2026-06-25 22:49:51 [INFO] [DirScannerTool] Scanning directory (recursive=False): E:\multi-agent-system
+2026-06-25 22:49:57 [INFO] [Memory] [Research Specialist] Thought (Step 2): I have scanned the directory, which provides context about existing files, though it's not directly relevant to the specific subtask of gathering details for creating a simple hello.py file. The task requires me to gather details about creating a Python file named `hello.py` that prints 'hello world' and how to verify it. This is a straightforward Python task.
+
+Details gathered:
+1.  **File Naming**: The file should be named `hello.py`.
+2.  **Content**: The file should contain a single line of Python code: `print("hello world")`.
+3.  **Verification**: To verify the file, it would typically be executed from the command line using `python hello.py`. The expected output on standard output would be `hello world`.
+
+Since the current tools do not allow me to directly create or execute files, my role here is to provide the 'details' of how such a task would be accomplished and verified. I have collected all necessary information regarding the task requirements.
+2026-06-25 22:49:57 [INFO] [Memory] [Research Specialist] Task completed successfully.
+2026-06-25 22:49:57 [INFO] [Memory] [system] Memory key 'research' updated.
+2026-06-25 22:49:57 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:49:57 [INFO] [Memory] [workflow] Step 1 completed successfully.
+2026-06-25 22:49:57 [INFO] [Memory] [workflow] Beginning Step 2: 'Implementation' -> Assigned to developer
+2026-06-25 22:49:57 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:49:57 [INFO] [Memory] [Senior Software Engineer] Running task: Objective: Write production-ready code files to complete the task: 'Overall Goal: Write a python file named hello.py that prints hello world and verify it
+Your specific subtask: Develop and write the required code or files.
+Carry out this subtask using your tools and context.'
+Refer to the project plan:
+Fallback Plan: Research -> Develop -> Review
+
+Here is the research summary gathered:
+Details gathered for the task 'Write a python file named hello.py that prints hello world and verify it':
+
+1.  **File Creation**: A new file named `hello.py` needs to be created in the desired directory.
+2.  **File Content**: The `hello.py` file should contain the following Python code:
+    ```python
+    print("hello world")
+    ```
+3.  **Verification Steps**: To verify that the file works correctly:
+    *   Execute the Python file from the command line using a Python interpreter: `python hello.py`
+    *   Check the standard output. The expected output should be the string "hello world".
+
+Your tasks:
+1. Write the source code files to the filesystem using the 'file_writer' tool.
+2. Verify and test the written scripts using 'python_executor' to ensure they run successfully.
+3. If any runtime or import error occurs, read the files, fix the issues, and write them back.
+4. Provide a detailed summary of the implemented modules and code structure as your final answer.
+2026-06-25 22:49:58 [INFO] [Memory] [Senior Software Engineer] Thought (Step 1): The first step is to write the `hello.py` file with the specified content. I will use the `file_writer` tool for this.
+2026-06-25 22:49:58 [INFO] [Memory] [Senior Software Engineer] Calling tool 'file_writer' with arguments: {'file_path': 'hello.py', 'content': 'print("hello world")'}
+2026-06-25 22:49:58 [INFO] [FileWriterTool] Writing to file: E:\multi-agent-system\hello.py
+2026-06-25 22:50:00 [INFO] [Memory] [Senior Software Engineer] Thought (Step 2): The `hello.py` file has been written. Now, I need to execute it using `python_executor` to verify its functionality as described in the verification steps of the research summary.
+2026-06-25 22:50:00 [INFO] [Memory] [Senior Software Engineer] Calling tool 'python_executor' with arguments: {'code': "import subprocess\nresult = subprocess.run(['python', 'hello.py'], capture_output=True, text=True)\nprint(result.stdout.strip())"}
+2026-06-25 22:50:00 [INFO] [PythonExecutorTool] Executing Python code block...
+2026-06-25 22:50:01 [ERROR] [LLM] Gemini API Error (status_code=503): This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.
+2026-06-25 22:50:01 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 1)
+2026-06-25 22:50:05 [INFO] [Memory] [Senior Software Engineer] Thought (Step 3): The file `hello.py` has been created and verified to print 'hello world'. The task is complete, and now I need to provide a detailed summary of the implemented modules and code structure.
+2026-06-25 22:50:05 [INFO] [Memory] [Senior Software Engineer] Task completed successfully.
+2026-06-25 22:50:05 [INFO] [Memory] [system] Memory key 'code' updated.
+2026-06-25 22:50:05 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:50:05 [INFO] [Memory] [workflow] Step 2 completed successfully.
+2026-06-25 22:50:05 [INFO] [Memory] [workflow] Beginning Step 3: 'Code Review' -> Assigned to reviewer
+2026-06-25 22:50:05 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:50:05 [INFO] [Memory] [Principal Reviewer] Running task: Objective: Review the code implementation for the task: 'Overall Goal: Write a python file named hello.py that prints hello world and verify it
+Your specific subtask: Validate the code and check for issues.
+Carry out this subtask using your tools and context.'
+Here is the developer's summary:
+## Implemented Modules and Code Structure:
+
+**File:** `hello.py`
+
+**Description:** This file contains a simple Python script that prints the string "hello world" to the standard output.
+
+**Code Structure:**
+
+```python
+print("hello world")
+```
+
+**Summary:**
+The project consists of a single Python file, `hello.py`. This file contains one line of code: a `print()` function call that outputs the literal string "hello world". There are no external dependencies, complex modules, or intricate data structures involved. The script is designed to be a minimal and straightforward demonstration of Python's basic output functionality.
+
+Using the directory scanner and file reader, find and inspect the written files.
+Assess the following criteria:
+1. Functional correctness (logical errors, edge cases).
+2. Software architecture and SOLID principles.
+3. Proper exception handling and logging.
+4. Code quality (docstrings, typing, styling).
+
+If code quality is lacking, describe exactly what changes are needed. If code is excellent, give a clear approval. Return your review report as the final answer.
+2026-06-25 22:50:05 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash
+Please retry in 54.04527447s.
+2026-06-25 22:50:05 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 1)
+2026-06-25 22:50:10 [INFO] [Memory] [Principal Reviewer] Thought (Step 1): I need to review the `hello.py` file. First, I will use `dir_scanner` to find the file, then `file_reader` to inspect its content.
+2026-06-25 22:50:10 [INFO] [Memory] [Principal Reviewer] Calling tool 'dir_scanner' with arguments: {'directory_path': '.'}
+2026-06-25 22:50:10 [INFO] [DirScannerTool] Scanning directory (recursive=False): E:\multi-agent-system
+2026-06-25 22:50:11 [INFO] [Memory] [Principal Reviewer] Thought (Step 2): I have scanned the directory and found `hello.py`. Now I need to read its content to perform the code review.
+2026-06-25 22:50:11 [INFO] [Memory] [Principal Reviewer] Calling tool 'file_reader' with arguments: {'file_path': 'hello.py'}
+2026-06-25 22:50:11 [INFO] [FileReaderTool] Reading file: E:\multi-agent-system\hello.py
+2026-06-25 22:50:11 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash
+Please retry in 48.213379375s.
+2026-06-25 22:50:11 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 1)
+2026-06-25 22:50:14 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash
+Please retry in 45.853860998s.
+2026-06-25 22:50:14 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 2)
+2026-06-25 22:50:16 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash
+Please retry in 43.622452096s.
+2026-06-25 22:50:16 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 3)
+2026-06-25 22:50:20 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash
+Please retry in 39.033782749s.
+2026-06-25 22:50:20 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 4)
+2026-06-25 22:50:29 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash
+Please retry in 30.390009854s.
+2026-06-25 22:50:29 [ERROR] [PrincipalReviewer] Unexpected error in agent execution step: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\nPlease retry in 30.390009854s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '5'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '30s'}]}}
+2026-06-25 22:50:29 [INFO] [Memory] [Principal Reviewer] Unexpected error in agent execution step: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\nPlease retry in 30.390009854s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '5'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '30s'}]}}
+2026-06-25 22:50:29 [INFO] [Memory] [system] Memory key 'review' updated.
+2026-06-25 22:50:29 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:50:29 [INFO] [Memory] [workflow] Step 3 completed successfully.
+2026-06-25 22:50:29 [INFO] [Memory] [system] Workflow session status changed to 'completed'
+2026-06-25 22:50:29 [INFO] [Memory] [workflow] All workflow steps completed successfully.
+2026-06-25 22:50:34 [INFO] [API_App] FastAPI application instance created successfully.
+2026-06-25 22:50:35 [INFO] [Memory] [system] Workflow session status changed to 'running'
+2026-06-25 22:50:35 [INFO] [Memory] [system] Queuing background task execution: 'Create a dummy file called check.txt with text 'Validated API' inside.'
+2026-06-25 22:50:35 [INFO] [Memory] Restored memory session 'api_test_session' from disk.
+2026-06-25 22:50:35 [INFO] [Memory] [system] Workflow session status changed to 'running'
+2026-06-25 22:50:35 [INFO] [Memory] [workflow] Starting workflow execution for task: 'Create a dummy file called check.txt with text 'Validated API' inside.'
+2026-06-25 22:50:35 [INFO] [Memory] [Project Planner] Planning project steps for task: 'Create a dummy file called check.txt with text 'Validated API' inside.'
+2026-06-25 22:50:35 [ERROR] [ProjectPlanner] Failed to generate project plan: name 'ask_llm' is not defined
+2026-06-25 22:50:35 [INFO] [Memory] [system] Memory key 'plan' updated.
+2026-06-25 22:50:35 [INFO] [Memory] [system] Memory key 'structured_plan' updated.
+2026-06-25 22:50:35 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:50:35 [INFO] [Memory] [workflow] Plan generated: Fallback Execution Plan. Total steps: 3
+2026-06-25 22:50:35 [INFO] [Memory] [workflow] Beginning Step 1: 'Initial Research' -> Assigned to researcher
+2026-06-25 22:50:35 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:50:35 [INFO] [Memory] [Research Specialist] Running task: Please conduct research to solve or understand this task:
+Overall Goal: Create a dummy file called check.txt with text 'Validated API' inside.
+Your specific subtask: Gather details regarding the task: Create a dummy file called check.txt with text 'Validated API' inside.
+Carry out this subtask using your tools and context.
+Use the directory scanner, file reader, and web search to collect necessary information. Examine any relevant codebase files to understand the project structure.
+2026-06-25 22:50:36 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash
+Please retry in 23.685318166s.
+2026-06-25 22:50:36 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 1)
+2026-06-25 22:50:38 [INFO] [Memory] Restored memory session 'api_test_session' from disk.
+2026-06-25 22:50:38 [INFO] [Memory] Restored memory session 'api_test_session' from disk.
+2026-06-25 22:50:38 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash
+Please retry in 21.442474205s.
+2026-06-25 22:50:38 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 2)
+2026-06-25 22:54:39 [INFO] [API_App] FastAPI application instance created successfully.
+2026-06-25 22:54:39 [INFO] [Memory] [system] Workflow session status changed to 'running'
+2026-06-25 22:54:39 [INFO] [Memory] [system] Queuing background task execution: 'Create a dummy file called check.txt with text 'Validated API' inside.'
+2026-06-25 22:54:39 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:54:39 [INFO] [Memory] [system] Workflow session status changed to 'running'
+2026-06-25 22:54:39 [INFO] [Memory] [workflow] Starting workflow execution for task: 'Create a dummy file called check.txt with text 'Validated API' inside.'
+2026-06-25 22:54:39 [INFO] [Memory] [Project Planner] Planning project steps for task: 'Create a dummy file called check.txt with text 'Validated API' inside.'
+2026-06-25 22:54:44 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:54:44 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:54:44 [INFO] [Memory] [system] Memory key 'plan' updated.
+2026-06-25 22:54:44 [INFO] [Memory] [system] Memory key 'structured_plan' updated.
+2026-06-25 22:54:44 [INFO] [Memory] [Project Planner] Project plan created successfully.
+2026-06-25 22:54:44 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:54:44 [INFO] [Memory] [workflow] Plan generated: Create Dummy API Validation File. Total steps: 2
+2026-06-25 22:54:44 [INFO] [Memory] [workflow] Beginning Step 1: 'Create check.txt with specified content' -> Assigned to developer
+2026-06-25 22:54:44 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:54:44 [INFO] [Memory] [Senior Software Engineer] Running task: Objective: Write production-ready code files to complete the task: 'Overall Goal: Create a dummy file called check.txt with text 'Validated API' inside.
+Your specific subtask: Write a script or command to create a new file named 'check.txt' in the current working directory and insert the exact text 'Validated API' into it.
+Carry out this subtask using your tools and context.'
+Refer to the project plan:
+Plan: Create Dummy API Validation File
+1. [DEVELOPER] Create check.txt with specified content: Write a script or command to create a new file named 'check.txt' in the current working directory and insert the exact text 'Validated API' into it.
+2. [REVIEWER] Verify file existence and content: Inspect the file system to confirm that 'check.txt' exists in the expected location and its content is precisely 'Validated API'.
+
+
+Here is the research summary gathered:
+No research context available.
+
+Your tasks:
+1. Write the source code files to the filesystem using the 'file_writer' tool.
+2. Verify and test the written scripts using 'python_executor' to ensure they run successfully.
+3. If any runtime or import error occurs, read the files, fix the issues, and write them back.
+4. Provide a detailed summary of the implemented modules and code structure as your final answer.
+2026-06-25 22:54:46 [INFO] [Memory] [Senior Software Engineer] Thought (Step 1): I need to create a file named `check.txt` with the content 'Validated API'. I can achieve this directly using the `file_writer` tool.
+2026-06-25 22:54:46 [INFO] [Memory] [Senior Software Engineer] Calling tool 'file_writer' with arguments: {'file_path': 'check.txt', 'content': 'Validated API'}
+2026-06-25 22:54:46 [INFO] [FileWriterTool] Writing to file: E:\multi-agent-system\check.txt
+2026-06-25 22:54:48 [INFO] [Memory] [Senior Software Engineer] Thought (Step 2): I have successfully created the `check.txt` file with the content 'Validated API' in the previous step. Now, I need to verify its existence and content to ensure the first part of the task is complete. I will use the `file_reader` tool to read the content of `check.txt`.
+2026-06-25 22:54:48 [INFO] [Memory] [Senior Software Engineer] Calling tool 'file_reader' with arguments: {'file_path': 'check.txt'}
+2026-06-25 22:54:48 [INFO] [FileReaderTool] Reading file: E:\multi-agent-system\check.txt
+2026-06-25 22:54:49 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:54:49 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:54:52 [INFO] [Memory] [Senior Software Engineer] Thought (Step 3): The file 'check.txt' has been created with the specified content 'Validated API' and its existence and content have been verified. There were no scripts to execute with `python_executor`, as the task involved direct file creation. Thus, the subtask and the overall goal are complete.
+2026-06-25 22:54:52 [INFO] [Memory] [Senior Software Engineer] Task completed successfully.
+2026-06-25 22:54:52 [INFO] [Memory] [system] Memory key 'code' updated.
+2026-06-25 22:54:52 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:54:52 [INFO] [Memory] [workflow] Step 1 completed successfully.
+2026-06-25 22:54:52 [INFO] [Memory] [workflow] Beginning Step 2: 'Verify file existence and content' -> Assigned to reviewer
+2026-06-25 22:54:52 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:54:52 [INFO] [Memory] [Principal Reviewer] Running task: Objective: Review the code implementation for the task: 'Overall Goal: Create a dummy file called check.txt with text 'Validated API' inside.
+Your specific subtask: Inspect the file system to confirm that 'check.txt' exists in the expected location and its content is precisely 'Validated API'.
+Carry out this subtask using your tools and context.'
+Here is the developer's summary:
+The file `check.txt` was successfully created with the content 'Validated API'. No modules or complex code structure were required for this task, as it involved direct file manipulation using the `file_writer` tool and subsequent verification with the `file_reader` tool.
+
+Using the directory scanner and file reader, find and inspect the written files.
+Assess the following criteria:
+1. Functional correctness (logical errors, edge cases).
+2. Software architecture and SOLID principles.
+3. Proper exception handling and logging.
+4. Code quality (docstrings, typing, styling).
+
+If code quality is lacking, describe exactly what changes are needed. If code is excellent, give a clear approval. Return your review report as the final answer.
+2026-06-25 22:54:53 [INFO] [Memory] [Principal Reviewer] Thought (Step 1): The objective is to confirm the existence and content of 'check.txt'. I will start by using `dir_scanner` to list files in the current directory to locate `check.txt`.
+2026-06-25 22:54:53 [INFO] [Memory] [Principal Reviewer] Calling tool 'dir_scanner' with arguments: {'directory_path': '.', 'recursive': False}
+2026-06-25 22:54:53 [INFO] [DirScannerTool] Scanning directory (recursive=False): E:\multi-agent-system
+2026-06-25 22:54:54 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:54:54 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:54:55 [ERROR] [LLM] Gemini API Error (status_code=503): This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.
+2026-06-25 22:54:55 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 1)
+2026-06-25 22:54:59 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:54:59 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:54:59 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash
+Please retry in 302.366236ms.
+2026-06-25 22:54:59 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 2)
+2026-06-25 22:55:04 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:04 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:05 [INFO] [Memory] [Principal Reviewer] Thought (Step 2): The objective is to confirm that 'check.txt' exists and its content is 'Validated API'.
+Step 1 confirmed that 'check.txt' exists in the current directory.
+Now, I need to read the content of 'check.txt' to verify it contains 'Validated API'.
+I will use the `file_reader` tool for this purpose.
+2026-06-25 22:55:05 [INFO] [Memory] [Principal Reviewer] Calling tool 'file_reader' with arguments: {'file_path': 'check.txt'}
+2026-06-25 22:55:05 [INFO] [FileReaderTool] Reading file: E:\multi-agent-system\check.txt
+2026-06-25 22:55:05 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash
+Please retry in 54.494896425s.
+2026-06-25 22:55:05 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 1)
+2026-06-25 22:55:09 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:09 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:10 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash
+Please retry in 50.188982697s.
+2026-06-25 22:55:10 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 2)
+2026-06-25 22:55:14 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:14 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:14 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash
+Please retry in 45.712442989s.
+2026-06-25 22:55:14 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 3)
+2026-06-25 22:55:19 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:19 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:24 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:24 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:25 [ERROR] [LLM] Gemini API Error (status_code=503): This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.
+2026-06-25 22:55:25 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 4)
+2026-06-25 22:55:29 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:29 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:34 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:34 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:39 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:39 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:44 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:44 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:48 [INFO] [Memory] [Principal Reviewer] Thought (Step 3): The objective was to review the code implementation for the task: 'Inspect the file system to confirm that 'check.txt' exists in the expected location and its content is precisely 'Validated API'.'
+
+Based on the observations:
+- Step 1: `dir_scanner` confirmed that `check.txt` exists in the current directory.
+- Step 2: `file_reader` confirmed that the content of `check.txt` is precisely 'Validated API'.
+
+The developer's summary stated that `check.txt` was successfully created with the content 'Validated API' and verified. My inspection using the `dir_scanner` and `file_reader` tools confirmed this.
+
+Assessing the criteria:
+1.  **Functional correctness:** The inspection successfully verified the file's existence and content, meeting the subtask's goal. This aspect is correct.
+2.  **Software architecture and SOLID principles:** These principles are not directly applicable to the simple file inspection subtask carried out using direct tool calls.
+3.  **Proper exception handling and logging:** The tools (`dir_scanner`, `file_reader`) handle their own exceptions. For this specific inspection, no additional explicit handling or logging was required from my side.
+4.  **Code quality (docstrings, typing, styling):** Since I used pre-existing tools and did not write any new code for this inspection, this criterion is not applicable to the immediate actions performed.
+
+Overall, the subtask was executed successfully and verified. The reported state matches the expected outcome. The implementation steps (tool calls) were appropriate and effective for the task.
+2026-06-25 22:55:48 [INFO] [Memory] [Principal Reviewer] Task completed successfully.
+2026-06-25 22:55:48 [INFO] [Memory] [system] Memory key 'review' updated.
+2026-06-25 22:55:48 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 22:55:48 [INFO] [Memory] [workflow] Step 2 completed successfully.
+2026-06-25 22:55:48 [INFO] [Memory] [system] Workflow session status changed to 'completed'
+2026-06-25 22:55:48 [INFO] [Memory] [workflow] All workflow steps completed successfully.
+2026-06-25 22:55:49 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 22:55:49 [INFO] [Memory] Restored memory session 'api_test_1782410079' from disk.
+2026-06-25 23:06:06 [INFO] [AgentRegistry] Agent 'decorator_agent' (DecoratedAgent) successfully registered.
+2026-06-25 23:06:06 [INFO] [AgentRegistry] Agent 'duplicate_agent' (MockBaseAgent) successfully registered.
+2026-06-25 23:06:06 [INFO] [AgentRegistry] Scanning folder for agent autodiscovery: 'C:\Users\LENOVO\AppData\Local\Temp\tmph69s13t0\test_agents'
+2026-06-25 23:06:08 [ERROR] [AgentRegistry] Failed to load discovered module agents.discovered_agent: No module named 'agents.discovered_agent'
+2026-06-25 23:06:08 [INFO] [AgentRegistry] Autodiscovery complete. Loaded 0 module files.
+2026-06-25 23:06:08 [INFO] [AgentRegistry] Agent 'instance_agent' (MockBaseAgent) successfully registered.
+2026-06-25 23:06:08 [INFO] [AgentRegistry] Agent 'agent_a' (MockBaseAgent) successfully registered.
+2026-06-25 23:06:08 [INFO] [AgentRegistry] Agent 'agent_b' (MockBaseAgent) successfully registered.
+2026-06-25 23:06:08 [INFO] [AgentRegistry] Agent 'test_agent' (MockBaseAgent) successfully registered.
+2026-06-25 23:06:47 [INFO] [AgentRegistry] Agent 'decorator_agent' (DecoratedAgent) successfully registered.
+2026-06-25 23:06:47 [INFO] [AgentRegistry] Agent 'duplicate_agent' (MockBaseAgent) successfully registered.
+2026-06-25 23:06:47 [INFO] [AgentRegistry] Scanning folder for agent autodiscovery: 'C:\Users\LENOVO\AppData\Local\Temp\tmp_18dmftn\test_agents'
+2026-06-25 23:06:47 [INFO] [AgentRegistry] Agent 'fake_discovered_agent' (DiscoveredAgent) successfully registered.
+2026-06-25 23:06:47 [INFO] [AgentRegistry] Autodiscovery complete. Loaded 1 module files.
+2026-06-25 23:06:47 [INFO] [AgentRegistry] Agent 'instance_agent' (MockBaseAgent) successfully registered.
+2026-06-25 23:06:47 [INFO] [AgentRegistry] Agent 'agent_a' (MockBaseAgent) successfully registered.
+2026-06-25 23:06:47 [INFO] [AgentRegistry] Agent 'agent_b' (MockBaseAgent) successfully registered.
+2026-06-25 23:06:47 [INFO] [AgentRegistry] Agent 'test_agent' (MockBaseAgent) successfully registered.
+2026-06-25 23:08:59 [INFO] [AgentRegistry] Agent 'planner' (PlannerAgent) successfully registered.
+2026-06-25 23:08:59 [INFO] [AgentRegistry] Agent 'researcher' (ResearchAgent) successfully registered.
+2026-06-25 23:08:59 [INFO] [AgentRegistry] Agent 'developer' (DeveloperAgent) successfully registered.
+2026-06-25 23:08:59 [INFO] [AgentRegistry] Agent 'reviewer' (ReviewerAgent) successfully registered.
+2026-06-25 23:08:59 [INFO] [AgentRegistry] Agent 'tool_agent' (ToolAgent) successfully registered.
+2026-06-25 23:08:59 [INFO] [AgentRegistry] Agent 'writer' (WriterAgent) successfully registered.
+2026-06-25 23:08:59 [INFO] [AgentRegistry] Scanning folder for agent autodiscovery: 'E:\multi-agent-system\agents'
+2026-06-25 23:08:59 [INFO] [AgentRegistry] Autodiscovery complete. Loaded 6 module files.
+2026-06-25 23:08:59 [INFO] [API_App] FastAPI application instance created successfully.
+2026-06-25 23:08:59 [INFO] [Memory] [system] Workflow session status changed to 'running'
+2026-06-25 23:08:59 [INFO] [Memory] [system] Queuing background task execution: 'Create a dummy file called check.txt with text 'Validated API' inside.'
+2026-06-25 23:08:59 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:08:59 [INFO] [Memory] [system] Workflow session status changed to 'running'
+2026-06-25 23:08:59 [INFO] [Memory] [workflow] Starting workflow execution for task: 'Create a dummy file called check.txt with text 'Validated API' inside.'
+2026-06-25 23:08:59 [INFO] [Memory] [Project Planner] Planning project steps for task: 'Create a dummy file called check.txt with text 'Validated API' inside.'
+2026-06-25 23:09:03 [INFO] [Memory] [system] Memory key 'plan' updated.
+2026-06-25 23:09:03 [INFO] [Memory] [system] Memory key 'structured_plan' updated.
+2026-06-25 23:09:03 [INFO] [Memory] [Project Planner] Project plan created successfully.
+2026-06-25 23:09:03 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 23:09:03 [INFO] [Memory] [workflow] Plan generated: Create dummy check.txt file. Total steps: 3
+2026-06-25 23:09:03 [INFO] [Memory] [workflow] Beginning Step 1: 'Identify file creation method' -> Assigned to researcher
+2026-06-25 23:09:03 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 23:09:03 [INFO] [Memory] [Research Specialist] Running task: Please conduct research to solve or understand this task:
+Overall Goal: Create a dummy file called check.txt with text 'Validated API' inside.
+Your specific subtask: Research the most appropriate command or programming method (e.g., 'echo' command, Python script) to create a new file named 'check.txt' with specified content.
+Carry out this subtask using your tools and context.
+Use the directory scanner, file reader, and web search to collect necessary information. Examine any relevant codebase files to understand the project structure.
+2026-06-25 23:09:04 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 55.644930789s.
+2026-06-25 23:09:04 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 1)
+2026-06-25 23:09:05 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:05 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:08 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 51.361151779s.
+2026-06-25 23:09:08 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 2)
+2026-06-25 23:09:10 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:10 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:12 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 47.021048642s.
+2026-06-25 23:09:12 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 3)
+2026-06-25 23:09:15 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:15 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:20 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:20 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:25 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:25 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:26 [INFO] [Memory] [Research Specialist] Thought (Step 1): The user wants to research how to create a file named 'check.txt' with the content 'Validated API'. I should use `web_search` to find common command-line and programming methods (like Python) for achieving this. This will provide a comprehensive understanding of the options available.
+2026-06-25 23:09:26 [INFO] [Memory] [Research Specialist] Calling tool 'web_search' with arguments: {'query': 'create file with content command line python', 'max_results': 5}
+2026-06-25 23:09:26 [INFO] [WebSearchTool] Searching the web for: 'create file with content command line python'
+2026-06-25 23:09:28 [WARNING] [WebSearchTool] Scraping returned zero search results. Falling back to local index message.
+2026-06-25 23:09:28 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 31.02039844s.
+2026-06-25 23:09:28 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 1)
+2026-06-25 23:09:30 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:30 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:35 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:35 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:39 [INFO] [Memory] [Research Specialist] Thought (Step 2): The web search was unsuccessful. However, I have internal knowledge of common command-line methods for creating files with content. The `echo` command is the most straightforward and appropriate method for this task, as it can directly output the specified text into a new file. Therefore, I can provide the answer without further tool use.
+2026-06-25 23:09:39 [INFO] [Memory] [Research Specialist] Task completed successfully.
+2026-06-25 23:09:39 [INFO] [Memory] [system] Memory key 'research' updated.
+2026-06-25 23:09:39 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 23:09:39 [INFO] [Memory] [workflow] Step 1 completed successfully.
+2026-06-25 23:09:39 [INFO] [Memory] [workflow] Beginning Step 2: 'Create check.txt with content' -> Assigned to developer
+2026-06-25 23:09:39 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 23:09:39 [INFO] [Memory] [Senior Software Engineer] Running task: Objective: Write production-ready code files to complete the task: 'Overall Goal: Create a dummy file called check.txt with text 'Validated API' inside.
+Your specific subtask: Execute the identified command or write and run a script to create a file named 'check.txt' in the current working directory and insert the text 'Validated API' into it.
+Carry out this subtask using your tools and context.'
+Refer to the project plan:
+Plan: Create dummy check.txt file
+1. [RESEARCHER] Identify file creation method: Research the most appropriate command or programming method (e.g., 'echo' command, Python script) to create a new file named 'check.txt' with specified content.
+2. [DEVELOPER] Create check.txt with content: Execute the identified command or write and run a script to create a file named 'check.txt' in the current working directory and insert the text 'Validated API' into it.
+3. [REVIEWER] Verify file creation and content: Confirm that 'check.txt' has been created successfully and that its content is exactly 'Validated API' by reading the file.
+
+
+Here is the research summary gathered:
+The most appropriate command to create a new file named 'check.txt' with the content 'Validated API' is:
+
+`echo 'Validated API' > check.txt`
+
+This command uses `echo` to print the string 'Validated API' and then redirects the output (using `>`) into a new file named `check.txt`. If `check.txt` already exists, its content will be overwritten. If it does not exist, it will be created.
+
+Your tasks:
+1. Write the source code files to the filesystem using the 'file_writer' tool.
+2. Verify and test the written scripts using 'python_executor' to ensure they run successfully.
+3. If any runtime or import error occurs, read the files, fix the issues, and write them back.
+4. Provide a detailed summary of the implemented modules and code structure as your final answer.
+2026-06-25 23:09:40 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 20.264834615s.
+2026-06-25 23:09:40 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 1)
+2026-06-25 23:09:40 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:40 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:45 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:45 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:45 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 15.256808933s.
+2026-06-25 23:09:45 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 2)
+2026-06-25 23:09:49 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 10.294445301s.
+2026-06-25 23:09:49 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 3)
+2026-06-25 23:09:50 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:50 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:55 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:09:55 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:00 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:00 [INFO] [Memory] [Senior Software Engineer] Thought (Step 1): I need to create a file named 'check.txt' with the content 'Validated API'. The research summary provided the `echo` command. I will use a Python script with the `subprocess` module to execute this command, as I don't have a direct shell executor. I will write this script to a file, then execute it.
+2026-06-25 23:10:00 [ERROR] [Memory] Failed to load memory session 'api_test_1782410939': Expecting value: line 1 column 1 (char 0)
+2026-06-25 23:10:00 [INFO] [Memory] [Senior Software Engineer] Calling tool 'file_writer' with arguments: {'file_path': 'create_check_file.py', 'content': 'import subprocess\n\ncommand = "echo \'Validated API\' > check.txt"\n\ntry:\n    subprocess.run(command, shell=True, check=True)\n    print("File \'check.txt\' created successfully with content \'Validated API\'.")\nexcept subprocess.CalledProcessError as e:\n    print(f"Error creating file: {e}")\nexcept Exception as e:\n    print(f"An unexpected error occurred: {e}")\n'}
+2026-06-25 23:10:00 [INFO] [FileWriterTool] Writing to file: E:\multi-agent-system\create_check_file.py
+2026-06-25 23:10:00 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 59.34213875s.
+2026-06-25 23:10:00 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 1)
+2026-06-25 23:10:04 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 55.025864025s.
+2026-06-25 23:10:04 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 2)
+2026-06-25 23:10:05 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:05 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:10 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:10 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:11 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 50.769021548s.
+2026-06-25 23:10:11 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 3)
+2026-06-25 23:10:15 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:15 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:20 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:20 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:20 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 39.67957347s.
+2026-06-25 23:10:20 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 4)
+2026-06-25 23:10:25 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:25 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:30 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:30 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:35 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:35 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:38 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 21.966745447s.
+2026-06-25 23:10:38 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 5)
+2026-06-25 23:10:40 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:40 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:45 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:45 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:50 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:50 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:55 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:10:55 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:00 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:00 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:05 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:05 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:10 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:10 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:11 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 48.628062324s.
+2026-06-25 23:11:11 [ERROR] [SeniorSoftwareEngineer] Unexpected error in agent execution step: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 48.628062324s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '48s'}]}}
+2026-06-25 23:11:11 [INFO] [Memory] [Senior Software Engineer] Unexpected error in agent execution step: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 48.628062324s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '48s'}]}}
+2026-06-25 23:11:11 [INFO] [Memory] [system] Memory key 'code' updated.
+2026-06-25 23:11:11 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 23:11:11 [INFO] [Memory] [workflow] Step 2 completed successfully.
+2026-06-25 23:11:11 [INFO] [Memory] [workflow] Beginning Step 3: 'Verify file creation and content' -> Assigned to reviewer
+2026-06-25 23:11:11 [INFO] [Memory] [system] Memory key 'workflow_steps' updated.
+2026-06-25 23:11:11 [INFO] [Memory] [Principal Reviewer] Running task: Objective: Review the code implementation for the task: 'Overall Goal: Create a dummy file called check.txt with text 'Validated API' inside.
+Your specific subtask: Confirm that 'check.txt' has been created successfully and that its content is exactly 'Validated API' by reading the file.
+Carry out this subtask using your tools and context.'
+Here is the developer's summary:
+Agent failure: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 48.628062324s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '48s'}]}}
+
+Using the directory scanner and file reader, find and inspect the written files.
+Assess the following criteria:
+1. Functional correctness (logical errors, edge cases).
+2. Software architecture and SOLID principles.
+3. Proper exception handling and logging.
+4. Code quality (docstrings, typing, styling).
+
+If code quality is lacking, describe exactly what changes are needed. If code is excellent, give a clear approval. Return your review report as the final answer.
+2026-06-25 23:11:11 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 48.295361178s.
+2026-06-25 23:11:11 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 1)
+2026-06-25 23:11:15 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:15 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:15 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 44.033696174s.
+2026-06-25 23:11:15 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 2)
+2026-06-25 23:11:20 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:20 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:21 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 39.710257939s.
+2026-06-25 23:11:21 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 3)
+2026-06-25 23:11:25 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:25 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:30 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 29.892862508s.
+2026-06-25 23:11:30 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 4)
+2026-06-25 23:11:30 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:30 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:35 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:35 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:40 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:40 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:45 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:45 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:49 [ERROR] [LLM] Gemini API Error (status_code=429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 12.881173679s.
+2026-06-25 23:11:49 [WARNING] [LLM] Gemini API call failed. Retrying... (Attempt 5)
+2026-06-25 23:11:50 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:50 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:55 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:11:55 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:12:00 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:12:00 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:12:05 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:12:05 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:12:10 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:12:10 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:12:15 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:12:15 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:12:20 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:12:20 [INFO] [Memory] Restored memory session 'api_test_1782410939' from disk.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'researcher' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'developer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'reviewer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'planner' (object) successfully registered.
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'researcher': Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'developer': Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'reviewer': Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'planner': Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'researcher' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'developer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'reviewer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'planner' (object) successfully registered.
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'researcher': Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'developer': Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'reviewer': Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'planner': Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'researcher' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'developer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'reviewer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'planner' (object) successfully registered.
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'researcher': Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'developer': Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'reviewer': Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'planner': Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'researcher' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'developer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'reviewer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'planner' (object) successfully registered.
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'researcher': Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'developer': Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'reviewer': Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'planner': Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'researcher' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'developer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'reviewer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'planner' (object) successfully registered.
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'researcher': Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'developer': Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'reviewer': Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'planner': Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'researcher' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'developer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'reviewer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'planner' (object) successfully registered.
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'researcher': Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'developer': Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'reviewer': Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'planner': Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'researcher' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'developer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'reviewer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'planner' (object) successfully registered.
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'researcher': Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'developer': Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'reviewer': Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'planner': Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'researcher' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'developer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'reviewer' (object) successfully registered.
+2026-06-25 23:24:18 [INFO] [AgentRegistry] Agent 'planner' (object) successfully registered.
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'researcher': Failed to instantiate agent 'researcher': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'developer': Failed to instantiate agent 'developer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'reviewer': Failed to instantiate agent 'reviewer': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [AgentRegistry] Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-25 23:24:18 [ERROR] [WorkflowEngine] Failed to dynamically instantiate registered agent 'planner': Failed to instantiate agent 'planner': object() takes no arguments
+2026-06-26 00:32:25 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'planner' (PlannerAgent) successfully registered.
+2026-06-26 00:32:25 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'researcher' (ResearchAgent) successfully registered.
+2026-06-26 00:32:25 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'developer' (DeveloperAgent) successfully registered.
+2026-06-26 00:32:25 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'reviewer' (ReviewerAgent) successfully registered.
+2026-06-26 00:32:25 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'tool_agent' (ToolAgent) successfully registered.
+2026-06-26 00:32:25 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'writer' (WriterAgent) successfully registered.
+2026-06-26 00:32:25 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Scanning folder for agent autodiscovery: 'E:\multi-agent-system\agents'
+2026-06-26 00:32:25 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Autodiscovery complete. Loaded 6 module files.
+2026-06-26 00:32:26 [INFO] [API_App] [task:N/A|wf:N/A|agent:N/A|exec:N/A] FastAPI application instance created successfully.
+2026-06-26 01:00:46 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'planner' (PlannerAgent) successfully registered.
+2026-06-26 01:00:46 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'researcher' (ResearchAgent) successfully registered.
+2026-06-26 01:00:46 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'developer' (DeveloperAgent) successfully registered.
+2026-06-26 01:00:46 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'reviewer' (ReviewerAgent) successfully registered.
+2026-06-26 01:00:46 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'tool_agent' (ToolAgent) successfully registered.
+2026-06-26 01:00:46 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'writer' (WriterAgent) successfully registered.
+2026-06-26 01:00:46 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Scanning folder for agent autodiscovery: 'E:\multi-agent-system\agents'
+2026-06-26 01:00:46 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Autodiscovery complete. Loaded 6 module files.
+2026-06-26 01:00:46 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker graceful_worker on DESKTOP-SHAH7424 (PID: 2940) with concurrency=2
+2026-06-26 01:00:46 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_0 on DESKTOP-SHAH7424 (PID: 2940) with concurrency=2
+2026-06-26 01:00:57 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_0 on DESKTOP-SHAH7424 (PID: 2940) with concurrency=2
+2026-06-26 01:00:57 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_1 on DESKTOP-SHAH7424 (PID: 2940) with concurrency=2
+2026-06-26 01:01:07 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_0 on DESKTOP-SHAH7424 (PID: 2940) with concurrency=2
+2026-06-26 01:01:07 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_1 on DESKTOP-SHAH7424 (PID: 2940) with concurrency=2
+2026-06-26 01:01:07 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_2 on DESKTOP-SHAH7424 (PID: 2940) with concurrency=2
+2026-06-26 01:01:07 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_3 on DESKTOP-SHAH7424 (PID: 2940) with concurrency=2
+2026-06-26 01:01:07 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_4 on DESKTOP-SHAH7424 (PID: 2940) with concurrency=2
+2026-06-26 01:01:57 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'planner' (PlannerAgent) successfully registered.
+2026-06-26 01:01:57 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'researcher' (ResearchAgent) successfully registered.
+2026-06-26 01:01:57 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'developer' (DeveloperAgent) successfully registered.
+2026-06-26 01:01:57 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'reviewer' (ReviewerAgent) successfully registered.
+2026-06-26 01:01:57 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'tool_agent' (ToolAgent) successfully registered.
+2026-06-26 01:01:57 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'writer' (WriterAgent) successfully registered.
+2026-06-26 01:01:57 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Scanning folder for agent autodiscovery: 'E:\multi-agent-system\agents'
+2026-06-26 01:01:57 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Autodiscovery complete. Loaded 6 module files.
+2026-06-26 01:01:57 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker graceful_worker on DESKTOP-SHAH7424 (PID: 4428) with concurrency=2
+2026-06-26 01:01:57 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:01:57 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abf3eb750> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abf3eb750> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:01:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:01:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:01:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:01:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:01:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_0 on DESKTOP-SHAH7424 (PID: 4428) with concurrency=2
+2026-06-26 01:01:58 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:01:58 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abf3fe650> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abf3fe650> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:01:58 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abf3fed50> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abf3fed50> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:01:58 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abf549a90> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abf549a90> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:01:58 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abf5496d0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abf5496d0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:01:58 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abf554d70> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abf554d70> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:08 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:02:08 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:02:08 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:02:08 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:02:08 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_0 on DESKTOP-SHAH7424 (PID: 4428) with concurrency=2
+2026-06-26 01:02:08 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_1 on DESKTOP-SHAH7424 (PID: 4428) with concurrency=2
+2026-06-26 01:02:08 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:08 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:08 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaa810> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaa810> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:08 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaabd0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaabd0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:08 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaab10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaab10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:08 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaaa50> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaaa50> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:08 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaa810> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaa810> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:08 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaabd0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaabd0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:08 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaab10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaab10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:08 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaaa50> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaaa50> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:08 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaa810> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaa810> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:08 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaabd0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaabd0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:02:18 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:02:18 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:02:18 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:02:18 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:02:18 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:02:18 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:02:18 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:02:18 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_0 on DESKTOP-SHAH7424 (PID: 4428) with concurrency=2
+2026-06-26 01:02:18 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_1 on DESKTOP-SHAH7424 (PID: 4428) with concurrency=2
+2026-06-26 01:02:18 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:18 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_2 on DESKTOP-SHAH7424 (PID: 4428) with concurrency=2
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaab10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaab10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:18 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_3 on DESKTOP-SHAH7424 (PID: 4428) with concurrency=2
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaa690> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaa690> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:18 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaac90> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaac90> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_4 on DESKTOP-SHAH7424 (PID: 4428) with concurrency=2
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaad50> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaad50> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaae10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaae10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaab10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaab10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaaed0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaaed0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaabd0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaabd0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaac90> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaac90> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaad50> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaad50> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaae10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaae10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaa690> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaa690> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaab10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaab10> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaaed0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaaed0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:18 [ERROR] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Error in worker main loop: Instance <Task at 0x20abeeaac90> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+Traceback (most recent call last):
+  File "E:\multi-agent-system\core\worker.py", line 84, in start
+    task_id = task.task_id
+              ^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 569, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1096, in get
+    value = self._fire_loader_callables(state, key, passive)
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1126, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 828, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\multi-agent-system\venv\Lib\site-packages\sqlalchemy\orm\loading.py", line 1607, in load_scalar_attributes
+    raise orm_exc.DetachedInstanceError(
+    ...<2 lines>...
+    )
+sqlalchemy.orm.exc.DetachedInstanceError: Instance <Task at 0x20abeeaac90> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:02:28 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:02:58 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'planner' (PlannerAgent) successfully registered.
+2026-06-26 01:02:58 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'researcher' (ResearchAgent) successfully registered.
+2026-06-26 01:02:58 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'developer' (DeveloperAgent) successfully registered.
+2026-06-26 01:02:58 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'reviewer' (ReviewerAgent) successfully registered.
+2026-06-26 01:02:58 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'tool_agent' (ToolAgent) successfully registered.
+2026-06-26 01:02:58 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'writer' (WriterAgent) successfully registered.
+2026-06-26 01:02:58 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Scanning folder for agent autodiscovery: 'E:\multi-agent-system\agents'
+2026-06-26 01:02:58 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Autodiscovery complete. Loaded 6 module files.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker graceful_worker on DESKTOP-SHAH7424 (PID: 11608) with concurrency=2
+2026-06-26 01:02:58 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'graceful_task'. Starting execution thread...
+2026-06-26 01:02:58 [INFO] [TaskQueueSystem] [task:graceful_task|wf:graceful_task|agent:worker|exec:exec_bf55a7be] Executing task 'graceful_task'...
+2026-06-26 01:02:58 [INFO] [TaskQueueSystem] [task:graceful_task|wf:graceful_task|agent:worker|exec:exec_bf55a7be] Task 'graceful_task' executed successfully.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:graceful_task|wf:graceful_task|agent:worker|exec:exec_bf55a7be] Task 'graceful_task' thread finished.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_0 on DESKTOP-SHAH7424 (PID: 11608) with concurrency=2
+2026-06-26 01:02:58 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_0'. Starting execution thread...
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_1'. Starting execution thread...
+2026-06-26 01:02:58 [INFO] [TaskQueueSystem] [task:concurrency_task_1|wf:concurrency_task_1|agent:worker|exec:exec_b0845edb] Executing task 'concurrency_task_1'...
+2026-06-26 01:02:58 [INFO] [TaskQueueSystem] [task:concurrency_task_0|wf:concurrency_task_0|agent:worker|exec:exec_f5aea076] Executing task 'concurrency_task_0'...
+2026-06-26 01:02:58 [INFO] [TaskQueueSystem] [task:concurrency_task_0|wf:concurrency_task_0|agent:worker|exec:exec_f5aea076] Task 'concurrency_task_0' executed successfully.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:concurrency_task_0|wf:concurrency_task_0|agent:worker|exec:exec_f5aea076] Task 'concurrency_task_0' thread finished.
+2026-06-26 01:02:58 [INFO] [TaskQueueSystem] [task:concurrency_task_1|wf:concurrency_task_1|agent:worker|exec:exec_b0845edb] Task 'concurrency_task_1' executed successfully.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:concurrency_task_1|wf:concurrency_task_1|agent:worker|exec:exec_b0845edb] Task 'concurrency_task_1' thread finished.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_2'. Starting execution thread...
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_3'. Starting execution thread...
+2026-06-26 01:02:58 [INFO] [TaskQueueSystem] [task:concurrency_task_3|wf:concurrency_task_3|agent:worker|exec:exec_c6c5f273] Executing task 'concurrency_task_3'...
+2026-06-26 01:02:58 [INFO] [TaskQueueSystem] [task:concurrency_task_2|wf:concurrency_task_2|agent:worker|exec:exec_24327199] Executing task 'concurrency_task_2'...
+2026-06-26 01:02:58 [INFO] [TaskQueueSystem] [task:concurrency_task_3|wf:concurrency_task_3|agent:worker|exec:exec_c6c5f273] Task 'concurrency_task_3' executed successfully.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:concurrency_task_3|wf:concurrency_task_3|agent:worker|exec:exec_c6c5f273] Task 'concurrency_task_3' thread finished.
+2026-06-26 01:02:58 [INFO] [TaskQueueSystem] [task:concurrency_task_2|wf:concurrency_task_2|agent:worker|exec:exec_24327199] Task 'concurrency_task_2' executed successfully.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:concurrency_task_2|wf:concurrency_task_2|agent:worker|exec:exec_24327199] Task 'concurrency_task_2' thread finished.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_4'. Starting execution thread...
+2026-06-26 01:02:58 [INFO] [TaskQueueSystem] [task:concurrency_task_4|wf:concurrency_task_4|agent:worker|exec:exec_29c1c9e6] Executing task 'concurrency_task_4'...
+2026-06-26 01:02:58 [INFO] [TaskQueueSystem] [task:concurrency_task_4|wf:concurrency_task_4|agent:worker|exec:exec_29c1c9e6] Task 'concurrency_task_4' executed successfully.
+2026-06-26 01:02:58 [INFO] [WorkerProcess] [task:concurrency_task_4|wf:concurrency_task_4|agent:worker|exec:exec_29c1c9e6] Task 'concurrency_task_4' thread finished.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_0 on DESKTOP-SHAH7424 (PID: 11608) with concurrency=2
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_1 on DESKTOP-SHAH7424 (PID: 11608) with concurrency=2
+2026-06-26 01:02:59 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:59 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_0'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_1'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_2'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_0|wf:concurrency_task_0|agent:worker|exec:exec_315bc9f5] Executing task 'concurrency_task_0'...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_3'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_2|wf:concurrency_task_2|agent:worker|exec:exec_0fe52856] Executing task 'concurrency_task_2'...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_1|wf:concurrency_task_1|agent:worker|exec:exec_f5d15de6] Executing task 'concurrency_task_1'...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_3|wf:concurrency_task_3|agent:worker|exec:exec_ca4f1af4] Executing task 'concurrency_task_3'...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_2|wf:concurrency_task_2|agent:worker|exec:exec_0fe52856] Task 'concurrency_task_2' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_2|wf:concurrency_task_2|agent:worker|exec:exec_0fe52856] Task 'concurrency_task_2' thread finished.
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_0|wf:concurrency_task_0|agent:worker|exec:exec_315bc9f5] Task 'concurrency_task_0' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_0|wf:concurrency_task_0|agent:worker|exec:exec_315bc9f5] Task 'concurrency_task_0' thread finished.
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_1|wf:concurrency_task_1|agent:worker|exec:exec_f5d15de6] Task 'concurrency_task_1' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_1|wf:concurrency_task_1|agent:worker|exec:exec_f5d15de6] Task 'concurrency_task_1' thread finished.
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_3|wf:concurrency_task_3|agent:worker|exec:exec_ca4f1af4] Task 'concurrency_task_3' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_3|wf:concurrency_task_3|agent:worker|exec:exec_ca4f1af4] Task 'concurrency_task_3' thread finished.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_4'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_5'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_4|wf:concurrency_task_4|agent:worker|exec:exec_dbfab2a4] Executing task 'concurrency_task_4'...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_6'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_4|wf:concurrency_task_4|agent:worker|exec:exec_dbfab2a4] Task 'concurrency_task_4' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_4|wf:concurrency_task_4|agent:worker|exec:exec_dbfab2a4] Task 'concurrency_task_4' thread finished.
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_5|wf:concurrency_task_5|agent:worker|exec:exec_d22479ee] Executing task 'concurrency_task_5'...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_7'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_6|wf:concurrency_task_6|agent:worker|exec:exec_d966770c] Executing task 'concurrency_task_6'...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_7|wf:concurrency_task_7|agent:worker|exec:exec_e2f6979e] Executing task 'concurrency_task_7'...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_5|wf:concurrency_task_5|agent:worker|exec:exec_d22479ee] Task 'concurrency_task_5' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_5|wf:concurrency_task_5|agent:worker|exec:exec_d22479ee] Task 'concurrency_task_5' thread finished.
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_7|wf:concurrency_task_7|agent:worker|exec:exec_e2f6979e] Task 'concurrency_task_7' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_7|wf:concurrency_task_7|agent:worker|exec:exec_e2f6979e] Task 'concurrency_task_7' thread finished.
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_6|wf:concurrency_task_6|agent:worker|exec:exec_d966770c] Task 'concurrency_task_6' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_6|wf:concurrency_task_6|agent:worker|exec:exec_d966770c] Task 'concurrency_task_6' thread finished.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_8'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_9'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_8|wf:concurrency_task_8|agent:worker|exec:exec_e46f63c1] Executing task 'concurrency_task_8'...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_9|wf:concurrency_task_9|agent:worker|exec:exec_c89e1e71] Executing task 'concurrency_task_9'...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_8|wf:concurrency_task_8|agent:worker|exec:exec_e46f63c1] Task 'concurrency_task_8' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_8|wf:concurrency_task_8|agent:worker|exec:exec_e46f63c1] Task 'concurrency_task_8' thread finished.
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_9|wf:concurrency_task_9|agent:worker|exec:exec_c89e1e71] Task 'concurrency_task_9' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_9|wf:concurrency_task_9|agent:worker|exec:exec_c89e1e71] Task 'concurrency_task_9' thread finished.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_0 on DESKTOP-SHAH7424 (PID: 11608) with concurrency=2
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_1 on DESKTOP-SHAH7424 (PID: 11608) with concurrency=2
+2026-06-26 01:02:59 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:59 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_2 on DESKTOP-SHAH7424 (PID: 11608) with concurrency=2
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_0'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_1'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_2'. Starting execution thread...
+2026-06-26 01:02:59 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_3 on DESKTOP-SHAH7424 (PID: 11608) with concurrency=2
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_3'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_3|wf:concurrency_task_3|agent:worker|exec:exec_83c851d7] Executing task 'concurrency_task_3'...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_2|wf:concurrency_task_2|agent:worker|exec:exec_e7cef055] Executing task 'concurrency_task_2'...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_1|wf:concurrency_task_1|agent:worker|exec:exec_dec3bb3d] Executing task 'concurrency_task_1'...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker concurrent_worker_4 on DESKTOP-SHAH7424 (PID: 11608) with concurrency=2
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_3|wf:concurrency_task_3|agent:worker|exec:exec_83c851d7] Task 'concurrency_task_3' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_3|wf:concurrency_task_3|agent:worker|exec:exec_83c851d7] Task 'concurrency_task_3' thread finished.
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_0|wf:concurrency_task_0|agent:worker|exec:exec_6e01f97f] Executing task 'concurrency_task_0'...
+2026-06-26 01:02:59 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_2|wf:concurrency_task_2|agent:worker|exec:exec_e7cef055] Task 'concurrency_task_2' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_2|wf:concurrency_task_2|agent:worker|exec:exec_e7cef055] Task 'concurrency_task_2' thread finished.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_4'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_0|wf:concurrency_task_0|agent:worker|exec:exec_6e01f97f] Task 'concurrency_task_0' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_0|wf:concurrency_task_0|agent:worker|exec:exec_6e01f97f] Task 'concurrency_task_0' thread finished.
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_1|wf:concurrency_task_1|agent:worker|exec:exec_dec3bb3d] Task 'concurrency_task_1' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_1|wf:concurrency_task_1|agent:worker|exec:exec_dec3bb3d] Task 'concurrency_task_1' thread finished.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_5'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_5|wf:concurrency_task_5|agent:worker|exec:exec_e4959d58] Executing task 'concurrency_task_5'...
+2026-06-26 01:02:59 [WARNING] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Signal handlers could not be registered (not in main thread). Skipping signal setup.
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_4|wf:concurrency_task_4|agent:worker|exec:exec_c607ff65] Executing task 'concurrency_task_4'...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_7'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_6'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_8'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_9'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_10'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_4|wf:concurrency_task_4|agent:worker|exec:exec_c607ff65] Task 'concurrency_task_4' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_4|wf:concurrency_task_4|agent:worker|exec:exec_c607ff65] Task 'concurrency_task_4' thread finished.
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_6|wf:concurrency_task_6|agent:worker|exec:exec_9c9a5f8f] Executing task 'concurrency_task_6'...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_7|wf:concurrency_task_7|agent:worker|exec:exec_f9e45228] Executing task 'concurrency_task_7'...
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_11'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_5|wf:concurrency_task_5|agent:worker|exec:exec_e4959d58] Task 'concurrency_task_5' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_5|wf:concurrency_task_5|agent:worker|exec:exec_e4959d58] Task 'concurrency_task_5' thread finished.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_12'. Starting execution thread...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_10|wf:concurrency_task_10|agent:worker|exec:exec_48322126] Executing task 'concurrency_task_10'...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_8|wf:concurrency_task_8|agent:worker|exec:exec_cb85ce15] Executing task 'concurrency_task_8'...
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_6|wf:concurrency_task_6|agent:worker|exec:exec_9c9a5f8f] Task 'concurrency_task_6' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_6|wf:concurrency_task_6|agent:worker|exec:exec_9c9a5f8f] Task 'concurrency_task_6' thread finished.
+2026-06-26 01:02:59 [INFO] [TaskQueueSystem] [task:concurrency_task_7|wf:concurrency_task_7|agent:worker|exec:exec_f9e45228] Task 'concurrency_task_7' executed successfully.
+2026-06-26 01:02:59 [INFO] [WorkerProcess] [task:concurrency_task_7|wf:concurrency_task_7|agent:worker|exec:exec_f9e45228] Task 'concurrency_task_7' thread finished.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_13'. Starting execution thread...
+2026-06-26 01:03:00 [INFO] [TaskQueueSystem] [task:concurrency_task_11|wf:concurrency_task_11|agent:worker|exec:exec_44211b0c] Executing task 'concurrency_task_11'...
+2026-06-26 01:03:00 [INFO] [TaskQueueSystem] [task:concurrency_task_10|wf:concurrency_task_10|agent:worker|exec:exec_48322126] Task 'concurrency_task_10' executed successfully.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:concurrency_task_10|wf:concurrency_task_10|agent:worker|exec:exec_48322126] Task 'concurrency_task_10' thread finished.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Claimed task 'concurrency_task_14'. Starting execution thread...
+2026-06-26 01:03:00 [INFO] [TaskQueueSystem] [task:concurrency_task_12|wf:concurrency_task_12|agent:worker|exec:exec_672faf95] Executing task 'concurrency_task_12'...
+2026-06-26 01:03:00 [INFO] [TaskQueueSystem] [task:concurrency_task_9|wf:concurrency_task_9|agent:worker|exec:exec_699af993] Executing task 'concurrency_task_9'...
+2026-06-26 01:03:00 [INFO] [TaskQueueSystem] [task:concurrency_task_8|wf:concurrency_task_8|agent:worker|exec:exec_cb85ce15] Task 'concurrency_task_8' executed successfully.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:concurrency_task_8|wf:concurrency_task_8|agent:worker|exec:exec_cb85ce15] Task 'concurrency_task_8' thread finished.
+2026-06-26 01:03:00 [INFO] [TaskQueueSystem] [task:concurrency_task_13|wf:concurrency_task_13|agent:worker|exec:exec_92254d8f] Executing task 'concurrency_task_13'...
+2026-06-26 01:03:00 [INFO] [TaskQueueSystem] [task:concurrency_task_11|wf:concurrency_task_11|agent:worker|exec:exec_44211b0c] Task 'concurrency_task_11' executed successfully.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:concurrency_task_11|wf:concurrency_task_11|agent:worker|exec:exec_44211b0c] Task 'concurrency_task_11' thread finished.
+2026-06-26 01:03:00 [INFO] [TaskQueueSystem] [task:concurrency_task_12|wf:concurrency_task_12|agent:worker|exec:exec_672faf95] Task 'concurrency_task_12' executed successfully.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:concurrency_task_12|wf:concurrency_task_12|agent:worker|exec:exec_672faf95] Task 'concurrency_task_12' thread finished.
+2026-06-26 01:03:00 [INFO] [TaskQueueSystem] [task:concurrency_task_14|wf:concurrency_task_14|agent:worker|exec:exec_cc2472c3] Executing task 'concurrency_task_14'...
+2026-06-26 01:03:00 [INFO] [TaskQueueSystem] [task:concurrency_task_9|wf:concurrency_task_9|agent:worker|exec:exec_699af993] Task 'concurrency_task_9' executed successfully.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:concurrency_task_9|wf:concurrency_task_9|agent:worker|exec:exec_699af993] Task 'concurrency_task_9' thread finished.
+2026-06-26 01:03:00 [INFO] [TaskQueueSystem] [task:concurrency_task_13|wf:concurrency_task_13|agent:worker|exec:exec_92254d8f] Task 'concurrency_task_13' executed successfully.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:concurrency_task_13|wf:concurrency_task_13|agent:worker|exec:exec_92254d8f] Task 'concurrency_task_13' thread finished.
+2026-06-26 01:03:00 [INFO] [TaskQueueSystem] [task:concurrency_task_14|wf:concurrency_task_14|agent:worker|exec:exec_cc2472c3] Task 'concurrency_task_14' executed successfully.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:concurrency_task_14|wf:concurrency_task_14|agent:worker|exec:exec_cc2472c3] Task 'concurrency_task_14' thread finished.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:03:00 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 01:09:59 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Starting worker worker-1 on DESKTOP-SHAH7424 (PID: 15940) with concurrency=2
+2026-06-26 01:10:34 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Received signal SIGINT (2). Initiating graceful shutdown...
+2026-06-26 01:10:35 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown signaled. Waiting for active tasks to complete...
+2026-06-26 01:10:35 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] All active tasks completed.
+2026-06-26 01:10:35 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Worker heartbeat set to SHUTDOWN.
+2026-06-26 01:10:35 [INFO] [WorkerProcess] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Shutdown complete. Exiting process.
+2026-06-26 12:26:30 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'planner' (PlannerAgent) successfully registered.
+2026-06-26 12:26:30 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'researcher' (ResearchAgent) successfully registered.
+2026-06-26 12:26:30 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'developer' (DeveloperAgent) successfully registered.
+2026-06-26 12:26:30 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'reviewer' (ReviewerAgent) successfully registered.
+2026-06-26 12:26:30 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'tool_agent' (ToolAgent) successfully registered.
+2026-06-26 12:26:30 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'writer' (WriterAgent) successfully registered.
+2026-06-26 12:26:30 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Scanning folder for agent autodiscovery: 'E:\multi-agent-system\agents'
+2026-06-26 12:26:30 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Autodiscovery complete. Loaded 6 module files.
+2026-06-26 12:26:31 [INFO] [API_App] [task:N/A|wf:N/A|agent:N/A|exec:N/A] FastAPI application instance created successfully.
+2026-06-26 12:26:32 [INFO] [PythonExecutorTool] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Executing Python code block...
+2026-06-26 12:26:32 [INFO] [PythonExecutorTool] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Executing Python code block...
+2026-06-26 12:26:32 [WARNING] [PythonExecutorTool] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Python script blocked by security validation: Import of banned module 'os' is forbidden for security reasons.
+2026-06-26 12:26:32 [INFO] [PythonExecutorTool] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Executing Python code block...
+2026-06-26 12:27:02 [WARNING] [PythonExecutorTool] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Python script execution timed out (limit: 30s).
+2026-06-26 12:28:20 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'planner' (PlannerAgent) successfully registered.
+2026-06-26 12:28:20 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'researcher' (ResearchAgent) successfully registered.
+2026-06-26 12:28:20 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'developer' (DeveloperAgent) successfully registered.
+2026-06-26 12:28:20 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'reviewer' (ReviewerAgent) successfully registered.
+2026-06-26 12:28:20 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'tool_agent' (ToolAgent) successfully registered.
+2026-06-26 12:28:20 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'writer' (WriterAgent) successfully registered.
+2026-06-26 12:28:20 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Scanning folder for agent autodiscovery: 'E:\multi-agent-system\agents'
+2026-06-26 12:28:20 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Autodiscovery complete. Loaded 6 module files.
+2026-06-26 12:28:21 [INFO] [API_App] [task:N/A|wf:N/A|agent:N/A|exec:N/A] FastAPI application instance created successfully.
+2026-06-26 12:29:52 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'planner' (PlannerAgent) successfully registered.
+2026-06-26 12:29:52 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'researcher' (ResearchAgent) successfully registered.
+2026-06-26 12:29:53 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'developer' (DeveloperAgent) successfully registered.
+2026-06-26 12:29:53 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'reviewer' (ReviewerAgent) successfully registered.
+2026-06-26 12:29:53 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'tool_agent' (ToolAgent) successfully registered.
+2026-06-26 12:29:53 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Agent 'writer' (WriterAgent) successfully registered.
+2026-06-26 12:29:53 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Scanning folder for agent autodiscovery: 'E:\multi-agent-system\agents'
+2026-06-26 12:29:53 [INFO] [AgentRegistry] [task:N/A|wf:N/A|agent:N/A|exec:N/A] Autodiscovery complete. Loaded 6 module files.
+2026-06-26 12:29:53 [INFO] [API_App] [task:N/A|wf:N/A|agent:N/A|exec:N/A] FastAPI application instance created successfully.
