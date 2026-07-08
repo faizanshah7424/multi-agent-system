@@ -50,12 +50,13 @@ class TestTaskQueueAndWorkerSystem(unittest.TestCase):
         self.mock_instance.memory.state.status = "completed"
         
         # Clear database tables instead of files
-        from core.database import get_db_session, Task, TaskLog, AgentMessage, WorkflowExecution
+        from core.database import get_db_session, Task, TaskLog, AgentMessage, WorkflowExecution, WorkerHeartbeat
         with get_db_session() as session:
             session.query(WorkflowExecution).delete()
             session.query(AgentMessage).delete()
             session.query(TaskLog).delete()
             session.query(Task).delete()
+            session.query(WorkerHeartbeat).delete()
             
         # Clear queue
         task_queue.clear()
