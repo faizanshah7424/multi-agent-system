@@ -430,3 +430,112 @@ def get_metrics_cache():
         "llm_cache": llm_cache.get_metrics(),
         "tool_cache": tool_cache.get_metrics()
     }
+
+@router.get("/autonomous/executions")
+def list_autonomous_executions():
+    """
+    Retrieve all historical autonomous executions from learning memory.
+    """
+    from core.autonomous_execution.execution_engine import AutonomousExecutionEngine
+    engine = AutonomousExecutionEngine()
+    return [e.model_dump() for e in engine.memory.list_executions()]
+
+@router.post("/autonomous/execute")
+def trigger_autonomous_execution(
+    goal: str = Query(..., description="The autonomous execution goal."),
+    target_files: str = Query(..., description="Comma-separated files impacted by the goal.")
+):
+    """
+    Run the Autonomous Code Execution Engine to fulfill a safety-checked goal.
+    """
+    from core.autonomous_execution.execution_engine import AutonomousExecutionEngine
+    engine = AutonomousExecutionEngine()
+    files_list = [f.strip() for f in target_files.split(",") if f.strip()]
+    res = engine.execute_goal(goal, files_list)
+    return res
+
+@router.get("/autonomous/engineering/records")
+def list_engineering_records():
+    """
+    Retrieve all historical engineering fixes from memory.
+    """
+    from core.autonomous_engineering.engineering_engine import AutonomousEngineeringEngine
+    engine = AutonomousEngineeringEngine()
+    return [r.model_dump() for r in engine.memory.list_records()]
+
+@router.post("/autonomous/engineering/fix")
+def trigger_autonomous_fix(
+    stack_trace: str = Query(..., description="The crash stack trace to analyze and resolve."),
+    failing_tests: Optional[str] = Query(None, description="Comma-separated list of failing tests.")
+):
+    """
+    Triggers the autonomous bug fixing pipeline.
+    """
+    from core.autonomous_engineering.engineering_engine import AutonomousEngineeringEngine
+    engine = AutonomousEngineeringEngine()
+    tests_list = [t.strip() for t in failing_tests.split(",") if t.strip()] if failing_tests else None
+    res = engine.run_bug_fixing_pipeline(stack_trace, tests_list)
+    return res
+
+@router.get("/autonomous/features/records")
+def list_feature_records():
+    """
+    Retrieve all historical feature engineering records from learning memory.
+    """
+    from core.feature_engine.feature_engine import AutonomousFeatureEngine
+    engine = AutonomousFeatureEngine()
+    return [r.model_dump() for r in engine.memory.list_records()]
+
+@router.post("/autonomous/features/develop")
+def trigger_feature_development(
+    requirement: str = Query(..., description="The natural language feature requirement.")
+):
+    """
+    Triggers the autonomous feature development pipeline.
+    """
+    from core.feature_engine.feature_engine import AutonomousFeatureEngine
+    engine = AutonomousFeatureEngine()
+    res = engine.develop_feature(requirement)
+    return res
+
+@router.get("/autonomous/repository/records")
+def list_repository_records():
+    """
+    Retrieve all historical repository engineering records.
+    """
+    from core.autonomous_repository.repository_engine import AutonomousRepositoryEngine
+    engine = AutonomousRepositoryEngine()
+    return [r.model_dump() for r in engine.memory.list_records()]
+
+@router.post("/autonomous/repository/run")
+def run_repository_engineering(
+    goal: str = Query(..., description="The natural language engineering goal.")
+):
+    """
+    Triggers the autonomous repository engineering pipeline.
+    """
+    from core.autonomous_repository.repository_engine import AutonomousRepositoryEngine
+    engine = AutonomousRepositoryEngine()
+    res = engine.run_repository_engineering(goal)
+    return res
+
+@router.get("/autonomous/products/records")
+def list_product_records():
+    """
+    Retrieve all historical product records.
+    """
+    from core.product_builder.product_engine import AutonomousProductBuilder
+    engine = AutonomousProductBuilder()
+    return [r.model_dump() for r in engine.memory.list_records()]
+
+@router.post("/autonomous/products/build")
+def trigger_product_build(
+    idea: str = Query(..., description="The natural language business idea.")
+):
+    """
+    Triggers the autonomous product builder pipeline.
+    """
+    from core.product_builder.product_engine import AutonomousProductBuilder
+    engine = AutonomousProductBuilder()
+    res = engine.build_product(idea)
+    return res

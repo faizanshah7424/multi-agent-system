@@ -131,15 +131,95 @@ export interface MemorySearchItem {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
 
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+function subscribeTokenRefresh(cb: (token: string) => void) {
+  refreshSubscribers.push(cb);
+}
+
+function onRefreshed(token: string) {
+  refreshSubscribers.map(cb => cb(token));
+  refreshSubscribers = [];
+}
+
 async function fetchJson<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${path}`;
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('auth_access_token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+  }
+
   const response = await fetch(url, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      ...headers,
       ...(options?.headers || {}),
     },
   });
+
+  if (response.status === 401 && typeof window !== 'undefined') {
+    const refreshToken = localStorage.getItem('auth_refresh_token');
+    if (refreshToken && path !== '/auth/refresh' && path !== '/auth/login') {
+      if (!isRefreshing) {
+        isRefreshing = true;
+        try {
+          const refreshUrl = `${API_BASE_URL}/auth/refresh`;
+          const refreshRes = await fetch(refreshUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: refreshToken }),
+          });
+
+          if (refreshRes.ok) {
+            const data = await refreshRes.json() as { access_token: string };
+            localStorage.setItem('auth_access_token', data.access_token);
+            isRefreshing = false;
+            onRefreshed(data.access_token);
+          } else {
+            localStorage.removeItem('auth_access_token');
+            localStorage.removeItem('auth_refresh_token');
+            isRefreshing = false;
+            window.dispatchEvent(new Event('auth_logout'));
+            throw new Error('Session expired');
+          }
+        } catch (err) {
+          isRefreshing = false;
+          localStorage.removeItem('auth_access_token');
+          localStorage.removeItem('auth_refresh_token');
+          window.dispatchEvent(new Event('auth_logout'));
+          throw err;
+        }
+      }
+
+      const retryPromise = new Promise<T>((resolve, reject) => {
+        subscribeTokenRefresh((newToken) => {
+          const newHeaders = {
+            ...headers,
+            ...(options?.headers || {}),
+            'Authorization': `Bearer ${newToken}`,
+          };
+          fetch(url, { ...options, headers: newHeaders })
+            .then(res => {
+              if (!res.ok) {
+                res.text().then(txt => reject(new Error(`API Error: ${res.status} - ${txt || res.statusText}`)));
+              } else {
+                resolve(res.json() as Promise<T>);
+              }
+            })
+            .catch(reject);
+        });
+      });
+
+      return retryPromise;
+    }
+  }
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -150,6 +230,29 @@ async function fetchJson<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  // Auth endpoints
+  login: (payload: Record<string, string>) => fetchJson<{ access_token: string; refresh_token: string }>('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
+  signup: (payload: Record<string, string>) => fetchJson<{ message: string; user_id: string; verification_token: string }>('/auth/signup', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
+  logout: (payload: { refresh_token: string }) => fetchJson<{ message: string }>('/auth/logout', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
+  forgotPassword: (payload: { email: string }) => fetchJson<{ message: string; reset_token?: string }>('/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
+  resetPassword: (payload: Record<string, string>) => fetchJson<{ message: string }>('/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
+  verifyEmail: (token: string) => fetchJson<{ message: string }>(`/auth/verify-email?token=${token}`),
+
   // Agent Registry
   getAgents: () => fetchJson<AgentMetadata[]>('/agents'),
 

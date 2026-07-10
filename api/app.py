@@ -140,6 +140,8 @@ def create_app() -> FastAPI:
             raise e
 
     # Register endpoints router
+    from api.auth_routes import router as auth_router
+    app.include_router(auth_router)
     app.include_router(api_router)
 
     @app.get("/")

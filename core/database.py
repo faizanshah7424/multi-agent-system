@@ -850,6 +850,22 @@ class User(Base):
     email = Column(String(150), nullable=False, unique=True)
     hashed_password = Column(String(255), nullable=False)
     is_active = Column(Boolean, default=True)
+    role = Column(String(50), default="member")
+    is_verified = Column(Boolean, default=False)
+    verification_token = Column(String(100), nullable=True)
+    reset_token = Column(String(100), nullable=True)
+    reset_token_expires = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+class RefreshTokenRecord(Base):
+    __tablename__ = 'refresh_tokens'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    user_id = Column(String(50), ForeignKey('users.id'), nullable=False)
+    token = Column(String(255), nullable=False, unique=True, index=True)
+    expires_at = Column(DateTime, nullable=False)
+    is_revoked = Column(Boolean, default=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
 
 
