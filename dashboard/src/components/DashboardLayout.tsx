@@ -10,24 +10,49 @@ import { QueueView } from './QueueView';
 import { CostsView } from './CostsView';
 import { CacheView } from './CacheView';
 import { SettingsView } from './SettingsView';
+import { AutonomousView } from './AutonomousView';
+import { EngineeringView } from './EngineeringView';
+import { FeatureView } from './FeatureView';
+import { RepositoryView } from './RepositoryView';
+import { ProductBuilderView } from './ProductBuilderView';
 import { 
   Activity, Users, CreditCard, Cpu, Database, 
   Layers, Zap, Settings, Sun, Moon, 
-  Menu, X, RefreshCw
+  Menu, X, RefreshCw, Lightbulb, LogOut
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
-type ViewType = 'overview' | 'tasks' | 'agents' | 'memory' | 'queue' | 'costs' | 'cache' | 'settings';
+type ViewType = 
+  | 'overview' 
+  | 'tasks' 
+  | 'agents' 
+  | 'memory' 
+  | 'autonomous' 
+  | 'engineering' 
+  | 'feature' 
+  | 'repository_engineer' 
+  | 'product_builder' 
+  | 'queue' 
+  | 'costs' 
+  | 'cache' 
+  | 'settings';
 
 const DashboardContent: React.FC = () => {
   const [activeView, setActiveView] = useState<ViewType>('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const { darkMode, setDarkMode, useMockData, loading, refreshData } = useDashboard();
+  const { user, logout } = useAuth();
 
   const menuItems = [
     { id: 'overview', name: 'Overview', icon: Cpu },
     { id: 'tasks', name: 'Task Monitor', icon: Activity },
-    { id: 'agents', name: 'Agent Registry', icon: Users },
+    { id: 'agents', name: 'Agents Registry', icon: Users },
     { id: 'memory', name: 'Memory Explorer', icon: Database },
+    { id: 'autonomous', name: 'Autonomous Execution', icon: Cpu },
+    { id: 'engineering', name: 'Engineering Center', icon: Activity },
+    { id: 'feature', name: 'Feature Center', icon: Cpu },
+    { id: 'repository_engineer', name: 'Repository Engineer', icon: Layers },
+    { id: 'product_builder', name: 'Product Builder', icon: Lightbulb },
     { id: 'queue', name: 'Queue Monitor', icon: Layers },
     { id: 'costs', name: 'Cost Analytics', icon: CreditCard },
     { id: 'cache', name: 'Cache Analytics', icon: Zap },
@@ -40,6 +65,11 @@ const DashboardContent: React.FC = () => {
       case 'tasks': return <TasksView />;
       case 'agents': return <AgentsView />;
       case 'memory': return <MemoryView />;
+      case 'autonomous': return <AutonomousView />;
+      case 'engineering': return <EngineeringView />;
+      case 'feature': return <FeatureView />;
+      case 'repository_engineer': return <RepositoryView />;
+      case 'product_builder': return <ProductBuilderView />;
       case 'queue': return <QueueView />;
       case 'costs': return <CostsView />;
       case 'cache': return <CacheView />;
@@ -139,6 +169,17 @@ const DashboardContent: React.FC = () => {
 
           {/* Action buttons (Refresh timer, Dark mode toggles) */}
           <div className="flex items-center space-x-4">
+            {user && (
+              <div className="flex items-center space-x-2 border-r pr-4 border-zinc-800">
+                <div className="flex flex-col text-right hidden sm:flex">
+                  <span className="text-xs font-semibold text-zinc-200">{user.email}</span>
+                  <span className="text-[10px] text-zinc-400 capitalize">{user.role}</span>
+                </div>
+                <div className="h-8 w-8 rounded-full bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center font-bold text-xs text-indigo-400 uppercase">
+                  {user.email ? user.email.substring(0, 2) : 'US'}
+                </div>
+              </div>
+            )}
             
             <button
               onClick={() => refreshData()}
@@ -156,6 +197,16 @@ const DashboardContent: React.FC = () => {
             >
               {darkMode ? <Sun className="h-4 w-4 text-yellow-500" /> : <Moon className="h-4 w-4" />}
             </button>
+
+            {user && (
+              <button
+                onClick={() => logout()}
+                className="p-2 rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition shrink-0"
+                title="Logout"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </header>
 
