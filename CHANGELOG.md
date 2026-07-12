@@ -1,8 +1,21 @@
 # Changelog
 
-All notable changes to the **Multi-Agent AI Platform** will be documented in this file.
+All notable changes to **CodeOrbit AI** will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [1.3.0-beta.1] - 2026-07-12
+
+### Added
+* **Community Standard Documents**: Created `SUPPORT.md` and `VERSION` files. Improved `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, and `SECURITY.md` for professional open-source presentation.
+* **GitHub Templates**: Added structured `.github/PULL_REQUEST_TEMPLATE.md` and issue templates under `.github/ISSUE_TEMPLATE/` (`bug_report.md`, `feature_request.md`, `question.md`).
+* **Dynamic Versioning Subsystem**: Integrated project-wide dynamic versioning reading directly from the root `VERSION` file for both CLI diagnostics and FastAPI endpoints.
+* **Release Preparation Checklist & Audits**: Generated a comprehensive release checklist and documentation audits to prepare for the public beta.
+
+### Changed
+* **CLI & API Metadata Alignment**: Standardized project name, logos, and badges to reflect **CodeOrbit AI** consistently across all onboarding docs.
 
 ---
 

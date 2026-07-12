@@ -1,6 +1,6 @@
 # Architecture Overview
 
-This document describes the design, data flows, components, and security layers of the **Multi-Agent AI Platform**. The platform is built using a clean, decoupling-focused architecture combining a high-performance **FastAPI** web service, an asynchronous **SQLite-backed task queue**, concurrent **Worker threads**, and a **Next.js 15** admin dashboard.
+This document describes the design, data flows, components, and security layers of **CodeOrbit AI**. The platform is built using a clean, decoupling-focused architecture combining a high-performance **FastAPI** web service, an asynchronous **SQLite-backed task queue**, concurrent **Worker threads**, and a **Next.js 15** admin dashboard.
 
 ---
 

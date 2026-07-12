@@ -1,6 +1,6 @@
 # Security Policy
 
-We take the security of the **Multi-Agent AI Platform** seriously. This document outlines our supported versions, reporting procedures, and the robust security mechanisms implemented across the platform to ensure safe LLM agent execution.
+We take the security of **CodeOrbit AI** seriously. This document outlines our supported versions, reporting procedures, and the robust security mechanisms implemented across the platform to ensure safe LLM agent execution.
 
 ## Supported Versions
 
@@ -8,7 +8,8 @@ Only the latest release receives active security updates and patches.
 
 | Version | Supported |
 | --- | :---: |
-| v1.2.x (Current) | ✅ Yes |
+| v1.3.x (Current) | ✅ Yes |
+| v1.2.x | ❌ No |
 | v1.1.x | ❌ No |
 | v1.0.x | ❌ No |
 
@@ -16,7 +17,7 @@ Only the latest release receives active security updates and patches.
 
 If you discover a security vulnerability in this project, please do **not** open a public issue. Instead, report it directly through one of the following channels:
 
-* **Email**: Send a detailed description of the vulnerability to [security@example.com](mailto:security@example.com).
+* **Email**: Send a detailed description of the vulnerability to [security@codeorbit.ai](mailto:security@codeorbit.ai).
 * **Details to Include**:
   * Step-by-step instructions to reproduce the issue.
   * Potential impact (e.g., Remote Code Execution, Privilege Escalation).

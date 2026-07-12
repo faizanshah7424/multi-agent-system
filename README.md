@@ -147,21 +147,17 @@ graph TD
 
 ## 🖼️ Screenshots
 
-<!-- SCREENSHOT PLACEHOLDERS ONLY -->
-> [!NOTE]
-> The screenshots below illustrate the layout of the Mission Control dashboard. High-resolution visuals are located in the `docs/assets/` folder during production release.
+We maintain visual mockups and screenshots of the developer console interfaces under the [docs/screenshots/](docs/screenshots) directory.
 
-* **Task Queue & Live Telemetry Panel**  
-  `![Dashboard Task Monitor Placeholder](docs/assets/dashboard_task_monitor.png)`
-  *Real-time task state monitoring console displaying worker allocation, database writes, and active queues.*
+* **Mission Control Web Dashboard**  
+  ![Mission Control Dashboard](docs/screenshots/dashboard.jpg)
+  *Next-generation Next.js 15 dashboard showing real-time task states queue monitoring, resource metrics, and streaming telemetry.*
 
-* **Mermaid Workflow Execution Visualizer**  
-  `![Mermaid Execution Panel Placeholder](docs/assets/dashboard_mermaid_workflow.png)`
-  *Interactively displays current step execution status overlayed on the planned DAG.*
+* **Developer CLI Interface**  
+  ![Developer CLI Terminal](docs/screenshots/cli.jpg)
+  *Sleek command line diagnostics, installation verification checklist, and system health utilities.*
 
-* **Sandbox Command Monitor & Resource Profile**  
-  `![Sandbox Monitor Placeholder](docs/assets/dashboard_sandbox_profile.png)`
-  *CPU and Memory resource limit metrics updated dynamically per active container runtime.*
+For structural diagram designs and flow sequence visuals, refer to the [Architecture Documentation](docs/architecture).
 
 ---
 
@@ -240,7 +236,7 @@ Ensure the following tools are installed on your host system:
 4. **Trigger a Demo Showcase Run**:
    Run the pre-configured end-to-end showcase workflow via the CLI to check capabilities:
    ```bash
-   python codeorbit.py run examples/python_cli
+   python codeorbit.py run examples/python-cli
    ```
 
 ---

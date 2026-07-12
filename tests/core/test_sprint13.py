@@ -99,7 +99,7 @@ class TestSprint13DiagnosticsAndCLI(unittest.TestCase):
 
     def test_version_manager(self) -> None:
         info = self.version_mgr.get_version_info()
-        self.assertEqual(info["version"], "1.0.0")
+        self.assertEqual(info["version"], "1.3.0-beta.1")
         self.assertEqual(info["architecture_version"], "2.2")
         self.assertEqual(info["sprint_version"], "13")
 

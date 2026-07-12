@@ -160,6 +160,7 @@ def cmd_install(args):
 
     import sys
     import subprocess
+    import sqlite3
 
     # 1. Python version check
     py_ok = sys.version_info >= (3, 10)
@@ -192,7 +193,32 @@ def cmd_install(args):
         pass
     print(f"Node {'[OK]' if node_ok else '[FAIL]'}")
 
-    # 5. API Keys check
+    # 5. npm check
+    npm_ok = False
+    try:
+        # Run npm --version in shell mode on Windows
+        res = subprocess.run(
+            ["npm", "--version"],
+            shell=True,
+            capture_output=True,
+            timeout=2.0,
+        )
+        npm_ok = res.returncode == 0
+        npm_version = res.stdout.decode().strip()
+    except Exception:
+        npm_version = "not found"
+    print(f"npm {'[OK]' if npm_ok else '[FAIL]'} ({npm_version})")
+
+    # 6. SQLite check
+    sqlite_ok = False
+    try:
+        sqlite_ver = sqlite3.sqlite_version
+        sqlite_ok = sqlite3.sqlite_version_info >= (3, 8)
+    except Exception:
+        sqlite_ver = "not found"
+    print(f"SQLite {'[OK]' if sqlite_ok else '[FAIL]'} ({sqlite_ver})")
+
+    # 7. API Keys check
     from core.security.secret_manager import SecretManager
 
     secret_mgr = DIContainer.get(SecretManager)
@@ -200,7 +226,7 @@ def cmd_install(args):
     keys_ok = env_val.get("GEMINI_API_KEY", False)
     print(f"API Keys {'[OK]' if keys_ok else '[FAIL]'}")
 
-    # 6. Database check
+    # 8. Database check
     db_ok = False
     try:
         from core.database import get_db_session
@@ -213,7 +239,7 @@ def cmd_install(args):
         pass
     print(f"Database {'[OK]' if db_ok else '[FAIL]'}")
 
-    # 7. Workspace check
+    # 9. Workspace check
     workspace_ok = False
     try:
         ws_dir = Path("worktrees")
@@ -227,8 +253,11 @@ def cmd_install(args):
     print(f"Workspace {'[OK]' if workspace_ok else '[FAIL]'}")
 
     print("========================================")
-    if py_ok and git_ok and keys_ok and db_ok and workspace_ok:
-        print("Installation Setup completed successfully.")
+    if py_ok and git_ok and db_ok and workspace_ok and npm_ok and sqlite_ok:
+        if not keys_ok or not docker_ok:
+            print("Ready to build with CodeOrbit AI (with warnings)")
+        else:
+            print("Ready to build with CodeOrbit AI")
     else:
         print("Installation complete with warning flags.")
 
@@ -325,6 +354,85 @@ def cmd_logs(args):
             print(line, end="")
 
 
+def cmd_demo(args):
+    """Runs a simulated end-to-end multi-agent software engineering workflow walkthrough."""
+    import time
+    print("========================================")
+    print("CODEORBIT AI: END-TO-END DEMO SIMULATION")
+    print("========================================")
+    
+    # 1. Scan Phase
+    print("[1/8] SCANNING repository codebase...")
+    time.sleep(0.6)
+    print("  -> Parsing AST tree: 48 modules parsed.")
+    print("  -> Extracting class/method dependency graph...")
+    print("  -> Exported 28 core nodes to local index.")
+    print("  [OK] Scan phase complete.\n")
+    
+    # 2. Plan Phase
+    print("[2/8] PLANNING execution graph...")
+    time.sleep(0.6)
+    print("  -> Task: 'Fix import error and add vitals validation in examples/hospital'")
+    print("  -> Decomposing goal into Directed Acyclic Graph (DAG):")
+    print("     - Step 1: Scan and map dependencies. (Successor: Step 2)")
+    print("     - Step 2: Inject vitals range checks in patients.py. (Successor: Step 3)")
+    print("     - Step 3: Run pytest validation checks. (Successor: Step 4)")
+    print("     - Step 4: Submit file diffs for Reviewer approval. (Successor: None)")
+    print("  -> DAG verified for cycles: No cycles detected.")
+    print("  [OK] Plan phase complete.\n")
+    
+    # 3. Consensus Phase
+    print("[3/8] CONSENSUS audit starting...")
+    time.sleep(0.6)
+    print("  -> Reviewing planned DAG with Swarm Agents:")
+    print("     - Tech Lead: APPROVED")
+    print("     - Architect: APPROVED")
+    print("  [OK] Consensus phase complete.\n")
+    
+    # 4. Execute Phase
+    print("[4/8] EXECUTING scheduled task steps...")
+    time.sleep(0.6)
+    print("  -> Initializing isolated Git worktree: session_demo_branch")
+    print("  -> Developer Agent writing code changes to examples/hospital/patients.py...")
+    print("  [OK] Execution phase complete.\n")
+    
+    # 5. Self-Heal Phase
+    print("[5/8] SELF-HEALING validation loop...")
+    time.sleep(0.6)
+    print("  -> Running unit tests in container sandbox...")
+    print("  -> Test failed: NameError 'vitals' is not defined.")
+    time.sleep(0.4)
+    print("  -> Capturing stack trace and returning context to Developer Agent...")
+    print("  -> Applying automated repair patch: fixed NameError namespace check.")
+    time.sleep(0.4)
+    print("  -> Re-executing tests: All tests passed.")
+    print("  [OK] Self-Heal phase complete.\n")
+    
+    # 6. Review Phase
+    print("[6/8] REVIEWING modifications...")
+    time.sleep(0.6)
+    print("  -> Generating git diff report.")
+    print("  -> Reviewer Agent auditing changes:")
+    print("     - Checked AST for security injections: Safe.")
+    print("     - Checked path confinement boundaries: Confined.")
+    print("     - Code styling: Verified.")
+    print("  -> Reviewer Status: APPROVED (100% confidence score).")
+    print("  [OK] Review phase complete.\n")
+    
+    # 7. Merge Phase
+    print("[7/8] MERGING code changes...")
+    time.sleep(0.6)
+    print("  -> Merging session_demo_branch to protected main branch.")
+    print("  -> Tearing down isolated worktree session...")
+    print("  [OK] Merge phase complete.\n")
+    
+    # 8. Complete Phase
+    print("[8/8] COMPLETE: Task finished successfully.")
+    print("========================================")
+    print("Ready to build with CodeOrbit AI")
+    print("========================================")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="CodeOrbit AI: Developer Command Line Interface."
@@ -368,6 +476,9 @@ def main():
         "--lines", type=int, default=20, help="Number of lines to read."
     )
 
+    # demo
+    subparsers.add_parser("demo", help="Run official CodeOrbit AI end-to-end simulation flow.")
+
     args = parser.parse_args()
 
     if args.command == "doctor":
@@ -390,6 +501,8 @@ def main():
         cmd_run(args)
     elif args.command == "logs":
         cmd_logs(args)
+    elif args.command == "demo":
+        cmd_demo(args)
 
 
 if __name__ == "__main__":

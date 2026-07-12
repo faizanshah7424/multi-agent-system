@@ -1,4 +1,5 @@
 import subprocess
+from pathlib import Path
 from typing import Dict, Any
 
 
@@ -9,7 +10,16 @@ class VersionManager:
     """
 
     def __init__(self) -> None:
-        self.version = "1.0.0"
+        # Load version from VERSION file at project root, falling back to '1.3.0-beta.1'
+        version_file = Path(__file__).parent.parent.parent / "VERSION"
+        if version_file.exists():
+            try:
+                self.version = version_file.read_text(encoding="utf-8").strip()
+            except Exception:
+                self.version = "1.3.0-beta.1"
+        else:
+            self.version = "1.3.0-beta.1"
+
         self.architecture_version = "2.2"
         self.sprint_version = "13"
         self.build_number = "103"

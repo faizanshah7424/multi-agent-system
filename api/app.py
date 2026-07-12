@@ -27,13 +27,16 @@ def create_app() -> FastAPI:
         yield
         logger.info("FastAPI shut down complete.")
 
+    from core.diagnostics.version import VersionManager
+    v_mgr = VersionManager()
+
     app = FastAPI(
-        title="Multi-Agent AI System API",
+        title="CodeOrbit AI API",
         description=(
             "FastAPI backend facilitating task plans, agent executions, logs "
-            "tracking, and state memory persistence via Gemini API."
+            "tracking, and state memory persistence for CodeOrbit AI via Gemini API."
         ),
-        version="1.0.0",
+        version=v_mgr.version,
         lifespan=lifespan,
     )
 
@@ -172,9 +175,12 @@ def create_app() -> FastAPI:
     @app.get("/")
     def read_root() -> dict:
         """Root API health check and environment status endpoint."""
+        from core.diagnostics.version import VersionManager
+        v_mgr = VersionManager()
         return {
-            "name": "Multi-Agent AI System API",
+            "name": "CodeOrbit AI API",
             "status": "online",
+            "version": v_mgr.version,
             "default_model": settings.default_model,
             "persist_directory": str(settings.persist_path.resolve()),
         }
