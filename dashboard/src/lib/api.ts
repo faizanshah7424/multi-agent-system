@@ -129,6 +129,185 @@ export interface MemorySearchItem {
   timestamp: string;
 }
 
+export interface AdminUser {
+  id: string;
+  email: string;
+  role: string;
+  is_active: boolean;
+  is_verified: boolean;
+  created_at: string;
+}
+
+export interface AdminRole {
+  id: string;
+  name: string;
+  description: string;
+  created_at: string;
+  permissions: string[];
+}
+
+export interface AdminPermission {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export interface AuditLog {
+  id: number;
+  event_type: string;
+  user_id: string;
+  details: string;
+  timestamp: string;
+}
+
+export interface NotificationItem {
+  id: string;
+  title: string;
+  message: string;
+  type: string;
+  category: string;
+  is_read: boolean;
+  created_at: string;
+  read_at: string | null;
+}
+
+export interface NotificationPreferences {
+  email_enabled: boolean;
+  sms_enabled: boolean;
+  in_app_enabled: boolean;
+  marketing_emails: boolean;
+  security_alerts: boolean;
+  task_updates: boolean;
+}
+
+export interface NotificationQueueItem {
+  id: string;
+  channel: string;
+  recipient: string;
+  title: string | null;
+  content: string;
+  status: string;
+  attempts: number;
+  error_message: string | null;
+  created_at: string;
+}
+
+export interface NotificationStats {
+  in_app: {
+    total: number;
+    unread: number;
+  };
+  queue: {
+    total: number;
+    pending: number;
+    sent: number;
+    failed: number;
+    retrying: number;
+  };
+  channels: {
+    email: number;
+    sms: number;
+  };
+  recent_queue: NotificationQueueItem[];
+}
+
+export interface HospitalPatient {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  date_of_birth: string;
+  gender: string;
+  medical_history: string | null;
+}
+
+export interface HospitalDoctor {
+  id: string;
+  name: string;
+  specialty: string;
+  email: string | null;
+  phone: string | null;
+  is_available: boolean;
+}
+
+export interface HospitalAppointment {
+  id: string;
+  patient_id: string;
+  patient_name: string;
+  doctor_id: string;
+  doctor_name: string;
+  appointment_date: string;
+  reason: string;
+  status: string;
+  notes: string | null;
+}
+
+export interface HospitalBilling {
+  id: string;
+  patient_id: string;
+  patient_name: string;
+  appointment_id: string | null;
+  amount: number;
+  status: string;
+  payment_method: string | null;
+  billing_date: string;
+}
+
+export interface HospitalPharmacyItem {
+  id: string;
+  name: string;
+  dosage: string;
+  stock_quantity: number;
+  unit_price: number;
+}
+
+export interface HospitalPrescription {
+  id: string;
+  patient_id: string;
+  patient_name: string;
+  doctor_id: string;
+  doctor_name: string;
+  medication_name: string;
+  dosage_instruction: string;
+  status: string;
+  created_at: string;
+}
+
+export interface HospitalLabTest {
+  id: string;
+  patient_id: string;
+  patient_name: string;
+  test_name: string;
+  result: string | null;
+  status: string;
+  technician_notes: string | null;
+  created_at: string;
+  completed_at: string | null;
+}
+
+export interface HospitalStats {
+  patients: number;
+  doctors: number;
+  appointments: {
+    total: number;
+    scheduled: number;
+  };
+  billing: {
+    total_billed: number;
+    unpaid: number;
+    paid: number;
+  };
+  pharmacy: {
+    total_drugs: number;
+    total_prescriptions: number;
+    pending: number;
+  };
+  laboratory: {
+    total_tests: number;
+    pending: number;
+  };
+}
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
 
 let isRefreshing = false;
@@ -296,4 +475,77 @@ export const api = {
     fetchJson<{ status: string; session_id: string; consolidated_summary: string }>(`/memory/consolidate?session_id=${sessionId}`, {
       method: 'POST',
     }),
+
+  // Admin endpoints
+  getAdminUsers: () => fetchJson<AdminUser[]>('/admin/users'),
+  updateAdminUser: (userId: string, payload: { role?: string; is_active?: boolean }) =>
+    fetchJson<{ message: string; user: { id: string; email: string; role: string; is_active: boolean } }>(`/admin/users/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+  getAdminRoles: () => fetchJson<AdminRole[]>('/admin/roles'),
+  getAdminPermissions: () => fetchJson<AdminPermission[]>('/admin/permissions'),
+  updateRolePermissions: (roleId: string, permissionNames: string[]) =>
+    fetchJson<{ message: string }>(`/admin/roles/${roleId}/permissions`, {
+      method: 'POST',
+      body: JSON.stringify({ permission_names: permissionNames }),
+    }),
+  getAdminAuditLogs: (limit = 100, offset = 0) =>
+    fetchJson<AuditLog[]>(`/admin/audit-logs?limit=${limit}&offset=${offset}`),
+
+  // Notification endpoints
+  getNotifications: (unreadOnly = false) => 
+    fetchJson<NotificationItem[]>(`/notifications?unread_only=${unreadOnly}`),
+  readNotification: (notificationId: string) => 
+    fetchJson<{ message: string }>(`/notifications/${notificationId}/read`, { method: 'PUT' }),
+  readAllNotifications: () => 
+    fetchJson<{ message: string }>('/notifications/read-all', { method: 'POST' }),
+  getNotificationPreferences: () => 
+    fetchJson<NotificationPreferences>('/notifications/preferences'),
+  updateNotificationPreferences: (payload: Partial<NotificationPreferences>) => 
+    fetchJson<{ message: string; preferences: NotificationPreferences }>('/notifications/preferences', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+  getNotificationStats: () => 
+    fetchJson<NotificationStats>('/notifications/stats'),
+  triggerTestNotification: (payload: { title: string; message: string; category?: string; channel?: string; force_failure?: boolean }) => 
+    fetchJson<{ message: string; result: Record<string, string> }>('/notifications/test', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  triggerProcessQueue: () => 
+    fetchJson<{ message: string }>('/notifications/process-queue', { method: 'POST' }),
+
+  // Hospital Management System endpoints
+  getHospitalPatients: () => fetchJson<HospitalPatient[]>('/hospital/patients'),
+  createHospitalPatient: (payload: Omit<HospitalPatient, 'id'>) => 
+    fetchJson<{ message: string; id: string }>('/hospital/patients', { method: 'POST', body: JSON.stringify(payload) }),
+  getHospitalDoctors: () => fetchJson<HospitalDoctor[]>('/hospital/doctors'),
+  createHospitalDoctor: (payload: Omit<HospitalDoctor, 'id' | 'created_at'>) => 
+    fetchJson<{ message: string; id: string }>('/hospital/doctors', { method: 'POST', body: JSON.stringify(payload) }),
+  getHospitalAppointments: () => fetchJson<HospitalAppointment[]>('/hospital/appointments'),
+  createHospitalAppointment: (payload: { patient_id: string; doctor_id: string; appointment_date: string; reason: string; notes?: string }) => 
+    fetchJson<{ message: string; id: string }>('/hospital/appointments', { method: 'POST', body: JSON.stringify(payload) }),
+  updateHospitalAppointmentStatus: (id: string, status: string) => 
+    fetchJson<{ message: string }>(`/hospital/appointments/${id}/status?status=${status}`, { method: 'PUT' }),
+  getHospitalBilling: () => fetchJson<HospitalBilling[]>('/hospital/billing'),
+  createHospitalBilling: (payload: { patient_id: string; appointment_id?: string; amount: number }) => 
+    fetchJson<{ message: string; id: string }>('/hospital/billing', { method: 'POST', body: JSON.stringify(payload) }),
+  payHospitalBill: (id: string, payload: { payment_method: string }) => 
+    fetchJson<{ message: string }>(`/hospital/billing/${id}/pay`, { method: 'PUT', body: JSON.stringify(payload) }),
+  getHospitalPharmacyItems: () => fetchJson<HospitalPharmacyItem[]>('/hospital/pharmacy/items'),
+  createHospitalPharmacyItem: (payload: Omit<HospitalPharmacyItem, 'id'>) => 
+    fetchJson<{ message: string; id: string }>('/hospital/pharmacy/items', { method: 'POST', body: JSON.stringify(payload) }),
+  getHospitalPrescriptions: () => fetchJson<HospitalPrescription[]>('/hospital/pharmacy/prescriptions'),
+  createHospitalPrescription: (payload: { patient_id: string; doctor_id: string; medication_name: string; dosage_instruction: string }) => 
+    fetchJson<{ message: string; id: string }>('/hospital/pharmacy/prescriptions', { method: 'POST', body: JSON.stringify(payload) }),
+  dispenseHospitalPrescription: (id: string) => 
+    fetchJson<{ message: string }>(`/hospital/pharmacy/prescriptions/${id}/dispense`, { method: 'PUT' }),
+  getHospitalLabTests: () => fetchJson<HospitalLabTest[]>('/hospital/lab/tests'),
+  createHospitalLabTest: (payload: { patient_id: string; test_name: string }) => 
+    fetchJson<{ message: string; id: string }>('/hospital/lab/tests', { method: 'POST', body: JSON.stringify(payload) }),
+  completeHospitalLabTest: (id: string, payload: { result: string; technician_notes?: string }) => 
+    fetchJson<{ message: string }>(`/hospital/lab/tests/${id}/complete`, { method: 'PUT', body: JSON.stringify(payload) }),
+  getHospitalStats: () => fetchJson<HospitalStats>('/hospital/stats'),
 };

@@ -1172,6 +1172,179 @@ class AnalyticsEvent(Base):
     timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
 
 # =====================================================================
+# Sprint 15: RBAC Roles and Permissions Management
+# =====================================================================
+
+class PermissionRecord(Base):
+    __tablename__ = 'permissions'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    name = Column(String(100), nullable=False, unique=True, index=True)
+    description = Column(String(255))
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+class RoleRecord(Base):
+    __tablename__ = 'roles'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    name = Column(String(50), nullable=False, unique=True, index=True)
+    description = Column(String(255))
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+class RolePermissionRecord(Base):
+    __tablename__ = 'role_permissions'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    role_id = Column(String(50), ForeignKey('roles.id', ondelete='CASCADE'), nullable=False)
+    permission_id = Column(String(50), ForeignKey('permissions.id', ondelete='CASCADE'), nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+# =====================================================================
+# Sprint 16: Notification System
+# =====================================================================
+
+class NotificationPreferenceRecord(Base):
+    __tablename__ = 'notification_preferences'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    user_id = Column(String(50), ForeignKey('users.id', ondelete='CASCADE'), nullable=False, unique=True, index=True)
+    email_enabled = Column(Boolean, default=True)
+    sms_enabled = Column(Boolean, default=True)
+    in_app_enabled = Column(Boolean, default=True)
+    marketing_emails = Column(Boolean, default=True)
+    security_alerts = Column(Boolean, default=True)
+    task_updates = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None), onupdate=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+class NotificationRecord(Base):
+    __tablename__ = 'notifications'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    user_id = Column(String(50), ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    title = Column(String(150), nullable=False)
+    message = Column(Text, nullable=False)
+    type = Column(String(50), default='info') # info, success, warning, error
+    category = Column(String(50), default='general') # security, task, marketing, general
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    read_at = Column(DateTime, nullable=True)
+
+
+class NotificationQueueRecord(Base):
+    __tablename__ = 'notification_queue'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    user_id = Column(String(50), ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    channel = Column(String(50), nullable=False) # email, sms, in_app
+    recipient = Column(String(255), nullable=False) # email address or phone number
+    title = Column(String(150), nullable=True)
+    content = Column(Text, nullable=False)
+    status = Column(String(50), default='pending') # pending, sent, failed, retrying
+    attempts = Column(Integer, default=0)
+    max_attempts = Column(Integer, default=3)
+    last_attempt_at = Column(DateTime, nullable=True)
+    next_attempt_at = Column(DateTime, nullable=True)
+    error_message = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+# =====================================================================
+# Sprint 17: Hospital Management System
+# =====================================================================
+
+class PatientRecord(Base):
+    __tablename__ = 'hospital_patients'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    name = Column(String(100), nullable=False)
+    email = Column(String(100), nullable=True)
+    phone = Column(String(50), nullable=True)
+    date_of_birth = Column(String(50), nullable=False)
+    gender = Column(String(20), nullable=False)
+    medical_history = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+class DoctorRecord(Base):
+    __tablename__ = 'hospital_doctors'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    name = Column(String(100), nullable=False)
+    specialty = Column(String(100), nullable=False)
+    email = Column(String(100), nullable=True)
+    phone = Column(String(50), nullable=True)
+    is_available = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+class AppointmentRecord(Base):
+    __tablename__ = 'hospital_appointments'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    patient_id = Column(String(50), ForeignKey('hospital_patients.id', ondelete='CASCADE'), nullable=False)
+    doctor_id = Column(String(50), ForeignKey('hospital_doctors.id', ondelete='CASCADE'), nullable=False)
+    appointment_date = Column(DateTime, nullable=False)
+    reason = Column(String(255), nullable=False)
+    status = Column(String(50), default='scheduled') # scheduled, completed, cancelled
+    notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+class BillingRecord(Base):
+    __tablename__ = 'hospital_billing'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    patient_id = Column(String(50), ForeignKey('hospital_patients.id', ondelete='CASCADE'), nullable=False)
+    appointment_id = Column(String(50), ForeignKey('hospital_appointments.id', ondelete='SET NULL'), nullable=True)
+    amount = Column(Float, nullable=False)
+    status = Column(String(50), default='unpaid') # paid, unpaid, refunded
+    payment_method = Column(String(50), nullable=True)
+    billing_date = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+class PharmacyItemRecord(Base):
+    __tablename__ = 'hospital_pharmacy_items'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    name = Column(String(100), nullable=False, unique=True)
+    dosage = Column(String(50), nullable=False)
+    stock_quantity = Column(Integer, default=0)
+    unit_price = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+class PrescriptionRecord(Base):
+    __tablename__ = 'hospital_prescriptions'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    patient_id = Column(String(50), ForeignKey('hospital_patients.id', ondelete='CASCADE'), nullable=False)
+    doctor_id = Column(String(50), ForeignKey('hospital_doctors.id', ondelete='CASCADE'), nullable=False)
+    medication_name = Column(String(100), nullable=False)
+    dosage_instruction = Column(String(255), nullable=False)
+    status = Column(String(50), default='prescribed') # prescribed, dispensed, cancelled
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+class LabTestRecord(Base):
+    __tablename__ = 'hospital_lab_tests'
+
+    id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
+    patient_id = Column(String(50), ForeignKey('hospital_patients.id', ondelete='CASCADE'), nullable=False)
+    test_name = Column(String(100), nullable=False)
+    result = Column(Text, nullable=True)
+    status = Column(String(50), default='pending') # pending, completed, cancelled
+    technician_notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    completed_at = Column(DateTime, nullable=True)
+
+
+# =====================================================================
 # Database Initialization
 # =====================================================================
 
@@ -1179,6 +1352,51 @@ def init_db():
     log_debug("init_db() - STARTING")
     Base.metadata.create_all(bind=engine)
     
+    # Seed default roles and permissions
+    try:
+        from sqlalchemy.orm import Session
+        with Session(engine) as db_session:
+            roles_count = db_session.query(RoleRecord).count()
+            if roles_count == 0:
+                perms = {
+                    "users:read": "Read users list and profiles",
+                    "users:write": "Create, edit, deactivate users",
+                    "roles:read": "Read roles and permissions assignment",
+                    "roles:write": "Manage role permissions",
+                    "audit:read": "View authentication and system audit logs",
+                    "tasks:create": "Trigger background executions",
+                    "tasks:delete": "Cancel running agent tasks"
+                }
+                db_perms = {}
+                for name, desc in perms.items():
+                    p = PermissionRecord(name=name, description=desc)
+                    db_session.add(p)
+                    db_perms[name] = p
+                
+                db_session.flush()
+                
+                admin_role = RoleRecord(name="admin", description="Full administrator access")
+                dev_role = RoleRecord(name="developer", description="Developer trigger rights")
+                member_role = RoleRecord(name="member", description="Standard read-only member")
+                
+                db_session.add_all([admin_role, dev_role, member_role])
+                db_session.flush()
+                
+                # Associate permissions
+                for p in db_perms.values():
+                    db_session.add(RolePermissionRecord(role_id=admin_role.id, permission_id=p.id))
+                
+                db_session.add(RolePermissionRecord(role_id=dev_role.id, permission_id=db_perms["users:read"].id))
+                db_session.add(RolePermissionRecord(role_id=dev_role.id, permission_id=db_perms["audit:read"].id))
+                db_session.add(RolePermissionRecord(role_id=dev_role.id, permission_id=db_perms["tasks:create"].id))
+                
+                db_session.add(RolePermissionRecord(role_id=member_role.id, permission_id=db_perms["users:read"].id))
+                
+                db_session.commit()
+                log_debug("init_db() - Seeded default roles and permissions successfully")
+    except Exception as e:
+        log_debug(f"init_db() - Seeding error (non-fatal): {e}")
+
     # Dynamic column addition for tasks table migration
     try:
         from sqlalchemy import inspect, text

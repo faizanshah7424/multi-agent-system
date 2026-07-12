@@ -79,6 +79,15 @@ class SecretRedactingFormatter(logging.Formatter):
         original = re.sub(r'(?i)("api_key"\s*:\s*["\']?)[a-zA-Z0-9_\-]{16,}', r'\1[REDACTED]', original)
         original = re.sub(r'(?i)("password"\s*:\s*["\']?)[a-zA-Z0-9_\-]{4,}', r'\1[REDACTED]', original)
 
+        # Dynamic SecretManager masking
+        try:
+            from core.di import DIContainer
+            from core.security.secret_manager import SecretManager
+            secret_mgr = DIContainer.get(SecretManager)
+            original = secret_mgr.mask_secrets(original)
+        except Exception:
+            pass
+
         return original
 
 def get_logger(name: str) -> logging.Logger:

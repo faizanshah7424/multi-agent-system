@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.3.0-RC1] - 2026-07-11
+
+### Added
+* **Onboarding & Installation CLI**: Added `codeorbit install` to run automatic env checkers.
+* **Official Demo Projects**: Configured 6 production-grade sample project structures under the `examples/` directory.
+* **E2E Validation Pipeline**: Integrated command-line showrunner `codeorbit run examples/ecommerce` demonstrating the entire multi-agent cycle.
+* **Diagnostics Dashboard Telemetries**: Visualized CPU core sandbox limitations, active protected files, and EME conventions.
+
+### Changed
+* **ASCII Tag Formatting**: Upgraded doctor check markers to cross-platform CP1252-safe ASCII tags.
+
+---
+
 ## [1.2.0] - 2026-06-26
 
 ### Added

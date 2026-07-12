@@ -1,0 +1,8 @@
+{
+  "name": "nextjs-blog",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build"
+  }
+}

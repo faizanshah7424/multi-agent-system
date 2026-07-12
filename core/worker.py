@@ -7,7 +7,7 @@ import signal
 import threading
 import uuid
 from datetime import datetime, timezone
-from typing import Set, Dict, Optional
+from typing import Dict, Optional
 
 from core.database import get_db_session, init_db
 from core.repositories import TaskRepository, WorkerRepository
@@ -32,6 +32,8 @@ class WorkerRuntime:
         self.heartbeat_thread: Optional[threading.Thread] = None
         
         init_db()
+        from core.di_setup import bootstrap_di
+        bootstrap_di()
 
     def start(self):
         logger.info(f"Starting worker {self.worker_id} on {self.hostname} (PID: {self.pid}) with concurrency={self.concurrency}")
@@ -53,6 +55,7 @@ class WorkerRuntime:
             logger.warning("Signal handlers could not be registered (not in main thread). Skipping signal setup.")
         
         last_recovery_check = 0.0
+        last_notification_check = 0.0
         
         while not self.shutdown_event.is_set():
             try:
@@ -65,6 +68,17 @@ class WorkerRuntime:
                         if recovered:
                             logger.info(f"Recovered stale tasks from crashed workers: {recovered}")
                     last_recovery_check = now
+                
+                # 1b. Process notification queue every 5 seconds
+                if now - last_notification_check > 5.0:
+                    try:
+                        from core.notifications import process_queued_notifications
+                        processed = process_queued_notifications()
+                        if processed > 0:
+                            logger.info(f"Notification queue processor: sent/updated {processed} items.")
+                    except Exception as ne:
+                        logger.error(f"Error processing notifications: {ne}")
+                    last_notification_check = now
                 
                 # 2. Check if we have capacity for more tasks
                 with self.running_tasks_lock:

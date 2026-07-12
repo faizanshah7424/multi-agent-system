@@ -12,6 +12,9 @@ def create_app() -> FastAPI:
     FastAPI Application Factory.
     Configures server settings, registers routers, and sets up middleware.
     """
+    from core.di_setup import bootstrap_di
+    bootstrap_di()
+
     from contextlib import asynccontextmanager
 
     @asynccontextmanager
@@ -141,7 +144,13 @@ def create_app() -> FastAPI:
 
     # Register endpoints router
     from api.auth_routes import router as auth_router
+    from api.admin_routes import router as admin_router
+    from api.notification_routes import router as notification_router
+    from api.hospital_routes import router as hospital_router
     app.include_router(auth_router)
+    app.include_router(admin_router)
+    app.include_router(notification_router)
+    app.include_router(hospital_router)
     app.include_router(api_router)
 
     @app.get("/")

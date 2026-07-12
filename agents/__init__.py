@@ -9,6 +9,10 @@ from agents.developer import DeveloperAgent
 from agents.reviewer import ReviewerAgent
 from agents.tool_agent import ToolAgent
 from agents.writer import WriterAgent
+from agents.product_builder import ProductBuilderAgent
+from agents.repository_engineer import RepositoryEngineerAgent
+from agents.tech_lead import TechLeadAgent
+from agents.architect import ArchitectAgent
 
 __all__ = [
     "BaseAgent",
@@ -19,7 +23,12 @@ __all__ = [
     "ReviewerAgent",
     "ToolAgent",
     "WriterAgent",
+    "ProductBuilderAgent",
+    "RepositoryEngineerAgent",
+    "TechLeadAgent",
+    "ArchitectAgent",
 ]
 
 # Run dynamic discovery to auto-register any external/custom plugin agents placed in this folder
 discover_agents()
+
