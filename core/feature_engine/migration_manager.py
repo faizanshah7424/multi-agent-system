@@ -17,14 +17,16 @@ class MigrationManager:
     def initialize_migration_table(self) -> None:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS schema_migrations (
                 version TEXT PRIMARY KEY,
                 sql_script TEXT,
                 rollback_script TEXT,
                 applied_at TEXT
             )
-        """)
+        """
+        )
         conn.commit()
         conn.close()
 

@@ -34,7 +34,8 @@ class ProductMemory:
     def initialize_tables(self) -> None:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS autonomous_product_records (
                 id TEXT PRIMARY KEY,
                 idea TEXT,
@@ -47,7 +48,8 @@ class ProductMemory:
                 execution_duration_seconds REAL,
                 timestamp TEXT
             )
-        """)
+        """
+        )
         conn.commit()
         conn.close()
 

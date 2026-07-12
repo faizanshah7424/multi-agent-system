@@ -33,7 +33,8 @@ class RepositoryMemory:
     def initialize_tables(self) -> None:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS autonomous_repository_records (
                 id TEXT PRIMARY KEY,
                 goal TEXT,
@@ -45,7 +46,8 @@ class RepositoryMemory:
                 execution_duration_seconds REAL,
                 timestamp TEXT
             )
-        """)
+        """
+        )
         conn.commit()
         conn.close()
 
