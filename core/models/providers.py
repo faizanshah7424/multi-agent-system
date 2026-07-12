@@ -11,31 +11,49 @@ from config import settings
 
 T = TypeVar("T", bound=BaseModel)
 
+
 class ModelCapabilities(BaseModel):
     """
     Defines capabilities and context limits of a model.
     """
+
     model_name: str
-    max_context_window: int = Field(1000000, description="Tokens limit of context window.")
-    supports_structured_json: bool = Field(True, description="True if schema validation is native.")
-    supports_streaming: bool = Field(True, description="True if stream chunks are supported.")
-    input_cost_per_million: float = Field(0.0, description="Cost in USD per 1M input tokens.")
-    output_cost_per_million: float = Field(0.0, description="Cost in USD per 1M output tokens.")
+    max_context_window: int = Field(
+        1000000, description="Tokens limit of context window."
+    )
+    supports_structured_json: bool = Field(
+        True, description="True if schema validation is native."
+    )
+    supports_streaming: bool = Field(
+        True, description="True if stream chunks are supported."
+    )
+    input_cost_per_million: float = Field(
+        0.0, description="Cost in USD per 1M input tokens."
+    )
+    output_cost_per_million: float = Field(
+        0.0, description="Cost in USD per 1M output tokens."
+    )
+
 
 # Global list of callback hooks triggered on token usage tracking
 on_usage_tracked: List[Callable[[str, int, int, float], None]] = []
 
-def calculate_usd_cost(model_name: str, prompt_tokens: int, completion_tokens: int) -> float:
+
+def calculate_usd_cost(
+    model_name: str, prompt_tokens: int, completion_tokens: int
+) -> float:
     """Calculates USD cost based on token counts and settings model pricing."""
     pricing = settings.model_pricing.get(model_name, {"input": 0.0, "output": 0.0})
     input_cost = prompt_tokens * pricing.get("input", 0.0)
     output_cost = completion_tokens * pricing.get("output", 0.0)
     return input_cost + output_cost
 
+
 class GeminiProvider(IModelProvider):
     """
     Concrete implementation of IModelProvider for Google Gemini models.
     """
+
     def __init__(self, model_name: str = "gemini-2.5-flash") -> None:
         self.model_name = model_name
 
@@ -55,30 +73,38 @@ class GeminiProvider(IModelProvider):
                 time.sleep(delay)
                 delay *= 2.0
 
-    def generate(self, prompt: str, system_instruction: str, params: ModelParameters) -> str:
+    def generate(
+        self, prompt: str, system_instruction: str, params: ModelParameters
+    ) -> str:
         # Build GenAI Config
         http_opts = {"timeout": params.timeout} if params.timeout else None
         config = types.GenerateContentConfig(
             system_instruction=system_instruction,
             temperature=params.temperature,
             max_output_tokens=params.max_tokens,
-            http_options=http_opts
+            http_options=http_opts,
         )
-        
+
         def call_api():
             return client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-                config=config
+                model=self.model_name, contents=prompt, config=config
             )
 
         response = self._execute_with_retry(call_api, params.retries)
-        
+
         # Track Tokens and Costs
-        p_toks = response.usage_metadata.prompt_token_count or 0 if response.usage_metadata else 0
-        c_toks = response.usage_metadata.candidates_token_count or 0 if response.usage_metadata else 0
+        p_toks = (
+            response.usage_metadata.prompt_token_count or 0
+            if response.usage_metadata
+            else 0
+        )
+        c_toks = (
+            response.usage_metadata.candidates_token_count or 0
+            if response.usage_metadata
+            else 0
+        )
         cost = calculate_usd_cost(self.model_name, p_toks, c_toks)
-        
+
         # Trigger hooks
         for hook in on_usage_tracked:
             try:
@@ -88,7 +114,13 @@ class GeminiProvider(IModelProvider):
 
         return response.text or ""
 
-    def generate_structured(self, prompt: str, schema: Type[T], system_instruction: str, params: ModelParameters) -> T:
+    def generate_structured(
+        self,
+        prompt: str,
+        schema: Type[T],
+        system_instruction: str,
+        params: ModelParameters,
+    ) -> T:
         http_opts = {"timeout": params.timeout} if params.timeout else None
         config = types.GenerateContentConfig(
             system_instruction=system_instruction,
@@ -96,23 +128,29 @@ class GeminiProvider(IModelProvider):
             max_output_tokens=params.max_tokens,
             response_mime_type="application/json",
             response_schema=schema,
-            http_options=http_opts
+            http_options=http_opts,
         )
-        
+
         def call_api():
             return client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-                config=config
+                model=self.model_name, contents=prompt, config=config
             )
 
         response = self._execute_with_retry(call_api, params.retries)
-        
+
         # Track Tokens and Costs
-        p_toks = response.usage_metadata.prompt_token_count or 0 if response.usage_metadata else 0
-        c_toks = response.usage_metadata.candidates_token_count or 0 if response.usage_metadata else 0
+        p_toks = (
+            response.usage_metadata.prompt_token_count or 0
+            if response.usage_metadata
+            else 0
+        )
+        c_toks = (
+            response.usage_metadata.candidates_token_count or 0
+            if response.usage_metadata
+            else 0
+        )
         cost = calculate_usd_cost(self.model_name, p_toks, c_toks)
-        
+
         for hook in on_usage_tracked:
             try:
                 hook(self.model_name, p_toks, c_toks, cost)
@@ -124,25 +162,27 @@ class GeminiProvider(IModelProvider):
             return schema.model_validate_json(text)
         else:
             import json
+
             return schema(**json.loads(text))
 
-    def generate_stream(self, prompt: str, system_instruction: str, params: ModelParameters) -> Iterator[str]:
+    def generate_stream(
+        self, prompt: str, system_instruction: str, params: ModelParameters
+    ) -> Iterator[str]:
         http_opts = {"timeout": params.timeout} if params.timeout else None
         config = types.GenerateContentConfig(
             system_instruction=system_instruction,
             temperature=params.temperature,
             max_output_tokens=params.max_tokens,
-            http_options=http_opts
+            http_options=http_opts,
         )
-        
+
         response_stream = client.models.generate_content_stream(
-            model=self.model_name,
-            contents=prompt,
-            config=config
+            model=self.model_name, contents=prompt, config=config
         )
-        
+
         for chunk in response_stream:
             yield chunk.text or ""
+
 
 import urllib.request
 import urllib.error
@@ -152,12 +192,12 @@ import os
 from core.di import DIContainer
 from core.security.secret_manager import SecretManager
 
-def _post_http_request(url: str, headers: dict, data: dict, timeout: float = 30.0) -> dict:
+
+def _post_http_request(
+    url: str, headers: dict, data: dict, timeout: float = 30.0
+) -> dict:
     req = urllib.request.Request(
-        url=url,
-        data=json.dumps(data).encode("utf-8"),
-        headers=headers,
-        method="POST"
+        url=url, data=json.dumps(data).encode("utf-8"), headers=headers, method="POST"
     )
     try:
         with urllib.request.urlopen(req, timeout=timeout) as response:
@@ -168,10 +208,12 @@ def _post_http_request(url: str, headers: dict, data: dict, timeout: float = 30.
     except Exception as e:
         raise RuntimeError(f"Connection failed: {e}")
 
+
 class OpenAIProvider(IModelProvider):
     """
     Concrete implementation of IModelProvider for OpenAI GPT models.
     """
+
     def __init__(self, model_name: str = "gpt-4o") -> None:
         self.model_name = model_name
 
@@ -181,23 +223,30 @@ class OpenAIProvider(IModelProvider):
         except Exception:
             return os.getenv("OPENAI_API_KEY", "")
 
-    def generate(self, prompt: str, system_instruction: str, params: ModelParameters) -> str:
+    def generate(
+        self, prompt: str, system_instruction: str, params: ModelParameters
+    ) -> str:
         api_key = self._get_api_key()
         headers = {
             "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
         data = {
             "model": self.model_name,
             "messages": [
                 {"role": "system", "content": system_instruction},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": prompt},
             ],
             "temperature": params.temperature,
-            "max_tokens": params.max_tokens
+            "max_tokens": params.max_tokens,
         }
-        res = _post_http_request("https://api.openai.com/v1/chat/completions", headers, data, params.timeout or 30.0)
-        
+        res = _post_http_request(
+            "https://api.openai.com/v1/chat/completions",
+            headers,
+            data,
+            params.timeout or 30.0,
+        )
+
         # Token and cost tracking
         usage = res.get("usage", {})
         p_toks = usage.get("prompt_tokens", 0)
@@ -211,24 +260,35 @@ class OpenAIProvider(IModelProvider):
 
         return res["choices"][0]["message"]["content"] or ""
 
-    def generate_structured(self, prompt: str, schema: Type[T], system_instruction: str, params: ModelParameters) -> T:
+    def generate_structured(
+        self,
+        prompt: str,
+        schema: Type[T],
+        system_instruction: str,
+        params: ModelParameters,
+    ) -> T:
         api_key = self._get_api_key()
         headers = {
             "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
         data = {
             "model": self.model_name,
             "messages": [
                 {"role": "system", "content": system_instruction},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": prompt},
             ],
             "temperature": params.temperature,
             "max_tokens": params.max_tokens,
-            "response_format": {"type": "json_object"}
+            "response_format": {"type": "json_object"},
         }
-        res = _post_http_request("https://api.openai.com/v1/chat/completions", headers, data, params.timeout or 30.0)
-        
+        res = _post_http_request(
+            "https://api.openai.com/v1/chat/completions",
+            headers,
+            data,
+            params.timeout or 30.0,
+        )
+
         usage = res.get("usage", {})
         p_toks = usage.get("prompt_tokens", 0)
         c_toks = usage.get("completion_tokens", 0)
@@ -245,14 +305,18 @@ class OpenAIProvider(IModelProvider):
         else:
             return schema(**json.loads(text))
 
-    def generate_stream(self, prompt: str, system_instruction: str, params: ModelParameters) -> Iterator[str]:
+    def generate_stream(
+        self, prompt: str, system_instruction: str, params: ModelParameters
+    ) -> Iterator[str]:
         res = self.generate(prompt, system_instruction, params)
         yield res
+
 
 class AnthropicProvider(IModelProvider):
     """
     Concrete implementation of IModelProvider for Anthropic Claude models.
     """
+
     def __init__(self, model_name: str = "claude-3-5-sonnet") -> None:
         self.model_name = model_name
 
@@ -262,24 +326,29 @@ class AnthropicProvider(IModelProvider):
         except Exception:
             return os.getenv("ANTHROPIC_API_KEY", "")
 
-    def generate(self, prompt: str, system_instruction: str, params: ModelParameters) -> str:
+    def generate(
+        self, prompt: str, system_instruction: str, params: ModelParameters
+    ) -> str:
         api_key = self._get_api_key()
         headers = {
             "x-api-key": api_key,
             "anthropic-version": "2023-06-01",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
         data = {
             "model": self.model_name,
             "system": system_instruction,
-            "messages": [
-                {"role": "user", "content": prompt}
-            ],
+            "messages": [{"role": "user", "content": prompt}],
             "max_tokens": params.max_tokens,
-            "temperature": params.temperature
+            "temperature": params.temperature,
         }
-        res = _post_http_request("https://api.anthropic.com/v1/messages", headers, data, params.timeout or 30.0)
-        
+        res = _post_http_request(
+            "https://api.anthropic.com/v1/messages",
+            headers,
+            data,
+            params.timeout or 30.0,
+        )
+
         # Token and cost tracking
         usage = res.get("usage", {})
         p_toks = usage.get("input_tokens", 0)
@@ -296,7 +365,13 @@ class AnthropicProvider(IModelProvider):
             return content_list[0].get("text", "")
         return ""
 
-    def generate_structured(self, prompt: str, schema: Type[T], system_instruction: str, params: ModelParameters) -> T:
+    def generate_structured(
+        self,
+        prompt: str,
+        schema: Type[T],
+        system_instruction: str,
+        params: ModelParameters,
+    ) -> T:
         prompt_with_schema = f"{prompt}\n\nYou must return only a valid JSON object matching this schema definition (no markup, no markdown formatting): {schema.model_json_schema()}"
         res_text = self.generate(prompt_with_schema, system_instruction, params)
         clean_text = re.sub(r"```json\s*|```", "", res_text).strip()
@@ -305,19 +380,25 @@ class AnthropicProvider(IModelProvider):
         else:
             return schema(**json.loads(clean_text))
 
-    def generate_stream(self, prompt: str, system_instruction: str, params: ModelParameters) -> Iterator[str]:
+    def generate_stream(
+        self, prompt: str, system_instruction: str, params: ModelParameters
+    ) -> Iterator[str]:
         res = self.generate(prompt, system_instruction, params)
         yield res
+
 
 class FailoverModelProvider(IModelProvider):
     """
     Model Provider wrapper enabling automatic retry policies and cascading failovers
     across multiple underlying model API platforms (Gemini -> OpenAI -> Anthropic).
     """
+
     def __init__(self, providers: List[IModelProvider]) -> None:
         self.providers = providers
 
-    def generate(self, prompt: str, system_instruction: str, params: ModelParameters) -> str:
+    def generate(
+        self, prompt: str, system_instruction: str, params: ModelParameters
+    ) -> str:
         last_error = None
         for provider in self.providers:
             try:
@@ -326,33 +407,51 @@ class FailoverModelProvider(IModelProvider):
                 last_error = e
         raise last_error or RuntimeError("All failover model providers failed.")
 
-    def generate_structured(self, prompt: str, schema: Type[T], system_instruction: str, params: ModelParameters) -> T:
+    def generate_structured(
+        self,
+        prompt: str,
+        schema: Type[T],
+        system_instruction: str,
+        params: ModelParameters,
+    ) -> T:
         last_error = None
         for provider in self.providers:
             try:
-                return provider.generate_structured(prompt, schema, system_instruction, params)
+                return provider.generate_structured(
+                    prompt, schema, system_instruction, params
+                )
             except Exception as e:
                 last_error = e
-        raise last_error or RuntimeError("All failover model providers failed structured generation.")
+        raise last_error or RuntimeError(
+            "All failover model providers failed structured generation."
+        )
 
-    def generate_stream(self, prompt: str, system_instruction: str, params: ModelParameters) -> Iterator[str]:
+    def generate_stream(
+        self, prompt: str, system_instruction: str, params: ModelParameters
+    ) -> Iterator[str]:
         last_error = None
         for provider in self.providers:
             try:
                 return provider.generate_stream(prompt, system_instruction, params)
             except Exception as e:
                 last_error = e
-        raise last_error or RuntimeError("All failover model providers failed streaming generation.")
+        raise last_error or RuntimeError(
+            "All failover model providers failed streaming generation."
+        )
+
 
 class ModelProviderRegistry:
     """
     Registry for model providers and capabilities metadata.
     """
+
     _providers: Dict[str, IModelProvider] = {}
     _capabilities: Dict[str, ModelCapabilities] = {}
 
     @classmethod
-    def register(cls, name: str, provider: IModelProvider, capabilities: ModelCapabilities) -> None:
+    def register(
+        cls, name: str, provider: IModelProvider, capabilities: ModelCapabilities
+    ) -> None:
         cls._providers[name] = provider
         cls._capabilities[name] = capabilities
 

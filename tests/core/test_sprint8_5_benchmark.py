@@ -12,6 +12,7 @@ from core.benchmark.schemas import InjectableBug
 from core.queue.scheduler import PlanDAG
 from core.queue.execution_runtime import IPlanExecutor
 
+
 class MockPlanExecutor(IPlanExecutor):
     def __init__(self, succeed: bool = True) -> None:
         self.succeed = succeed
@@ -19,12 +20,13 @@ class MockPlanExecutor(IPlanExecutor):
     def execute_plan(self, task_id: str, plan: PlanDAG) -> bool:
         return self.succeed
 
+
 class TestBenchmarkFramework(unittest.TestCase):
     def setUp(self) -> None:
         bootstrap_di()
         self.manager = DIContainer.get(IBenchmarkManager)
         self.injector = FailureInjectionEngine()
-        
+
         # Override PlanExecutor with a mock to prevent E2E database lockups
         self.mock_executor = MockPlanExecutor(succeed=True)
         DIContainer.register(IPlanExecutor, self.mock_executor)
@@ -50,13 +52,15 @@ class TestBenchmarkFramework(unittest.TestCase):
             file_path="utils.py",
             target_content="return x + y",
             bug_content="return x +",
-            category="SYNTAX_ERROR"
+            category="SYNTAX_ERROR",
         )
 
         with TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             target_file = temp_path / "utils.py"
-            target_file.write_text("def add(x, y):\n    return x + y\n", encoding="utf-8")
+            target_file.write_text(
+                "def add(x, y):\n    return x + y\n", encoding="utf-8"
+            )
 
             # 1. Inject Bug
             injected = self.injector.inject_bug(str(temp_path), bug)
@@ -71,7 +75,7 @@ class TestBenchmarkFramework(unittest.TestCase):
     def test_e2e_benchmark_execution_and_reports(self) -> None:
         # Run benchmark
         report = self.manager.run_benchmark("python_lib", "syntax_bug")
-        
+
         # Assert report structure
         self.assertEqual(report["status"], "SUCCESS")
         self.assertEqual(report["project_name"], "python_lib")
@@ -81,7 +85,7 @@ class TestBenchmarkFramework(unittest.TestCase):
         # Assert versioned markdown reports generated
         docs_dir = Path(__file__).parent.parent.parent / "docs"
         reports_dir = docs_dir / "reports"
-        
+
         self.assertTrue((docs_dir / "BENCHMARK_SUITE.md").exists())
         self.assertTrue((reports_dir / "benchmark_results.md").exists())
         self.assertTrue((reports_dir / "benchmark_scorecard.md").exists())

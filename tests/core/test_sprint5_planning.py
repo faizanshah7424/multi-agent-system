@@ -10,25 +10,38 @@ from core.queue.planning_engine import PlanningEngine
 
 T = TypeVar("T", bound=BaseModel)
 
+
 class MockModelProvider(IModelProvider):
     """
     Mock model provider returning a pre-defined PlanDAG for test validation.
     """
+
     def __init__(self, plan_to_return: PlanDAG) -> None:
         self.plan_to_return = plan_to_return
         self.last_prompt = None
         self.last_system_instruction = None
 
-    def generate(self, prompt: str, system_instruction: str, params: ModelParameters) -> str:
+    def generate(
+        self, prompt: str, system_instruction: str, params: ModelParameters
+    ) -> str:
         return ""
 
-    def generate_structured(self, prompt: str, schema: Type[T], system_instruction: str, params: ModelParameters) -> T:
+    def generate_structured(
+        self,
+        prompt: str,
+        schema: Type[T],
+        system_instruction: str,
+        params: ModelParameters,
+    ) -> T:
         self.last_prompt = prompt
         self.last_system_instruction = system_instruction
         return self.plan_to_return
 
-    def generate_stream(self, prompt: str, system_instruction: str, params: ModelParameters) -> Iterator[str]:
+    def generate_stream(
+        self, prompt: str, system_instruction: str, params: ModelParameters
+    ) -> Iterator[str]:
         yield ""
+
 
 class TestPlanningAndScheduler(unittest.TestCase):
     def setUp(self) -> None:
@@ -65,7 +78,12 @@ class TestPlanningAndScheduler(unittest.TestCase):
         dag = PlanDAG(steps=[s1])
 
         errors = self.scheduler.validate_dag(dag)
-        self.assertTrue(any("non-existent" in e.lower() or "invalid dependency" in e.lower() for e in errors))
+        self.assertTrue(
+            any(
+                "non-existent" in e.lower() or "invalid dependency" in e.lower()
+                for e in errors
+            )
+        )
 
     def test_dag_validation_invalid_agent(self) -> None:
         # Step 1 assigned to an unknown agent
@@ -82,7 +100,12 @@ class TestPlanningAndScheduler(unittest.TestCase):
         dag = PlanDAG(steps=[s1, s2])
 
         errors = self.scheduler.validate_dag(dag)
-        self.assertTrue(any("circular dependencies" in e.lower() or "cycle" in e.lower() for e in errors))
+        self.assertTrue(
+            any(
+                "circular dependencies" in e.lower() or "cycle" in e.lower()
+                for e in errors
+            )
+        )
 
     def test_topological_sort_execution_order(self) -> None:
         # Branching graph:
@@ -97,7 +120,7 @@ class TestPlanningAndScheduler(unittest.TestCase):
         dag = PlanDAG(steps=[s1, s2, s3, s4])
 
         order = self.scheduler.get_execution_order(dag)
-        
+
         # 1 must run first
         self.assertEqual(order[0], 1)
         # 4 must run last
@@ -120,7 +143,12 @@ class TestPlanningAndScheduler(unittest.TestCase):
 
     def test_planning_engine_structured_generation(self) -> None:
         # 1. Setup target PlanDAG
-        s1 = PlanStep(step_id=10, dependencies=[], assigned_agent="developer", description="Step 10 description")
+        s1 = PlanStep(
+            step_id=10,
+            dependencies=[],
+            assigned_agent="developer",
+            description="Step 10 description",
+        )
         expected_plan = PlanDAG(steps=[s1])
 
         # 2. Register mock provider inside the DI Container to prevent external calls

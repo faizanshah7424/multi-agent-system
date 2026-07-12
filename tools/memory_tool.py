@@ -3,9 +3,16 @@ from pydantic import BaseModel, Field
 from tools.base import BaseTool
 from core.memory import VectorMemoryIndex
 
+
 class MemoryRecallArgs(BaseModel):
-    query: str = Field(..., description="The semantic query search term (e.g. 'How did we fix the FastAPI validation?')")
-    limit: int = Field(default=3, description="Maximum number of historical memory snippets to return.")
+    query: str = Field(
+        ...,
+        description="The semantic query search term (e.g. 'How did we fix the FastAPI validation?')",
+    )
+    limit: int = Field(
+        default=3, description="Maximum number of historical memory snippets to return."
+    )
+
 
 class MemoryRecallTool(BaseTool):
     name: str = "memory_recall"
@@ -21,7 +28,7 @@ class MemoryRecallTool(BaseTool):
             results = index.search(query, limit=limit)
             if not results:
                 return "No matching semantic memories were found in the long-term history index."
-            
+
             output = []
             for idx, (item, similarity) in enumerate(results):
                 output.append(
@@ -34,9 +41,16 @@ class MemoryRecallTool(BaseTool):
         except Exception as e:
             return f"Error executing memory recall: {str(e)}"
 
+
 class MemoryStoreArgs(BaseModel):
-    text: str = Field(..., description="The learning, code snippet, styling rule, or observation text to store.")
-    metadata: Optional[Dict[str, Any]] = Field(default=None, description="Optional metadata key-value tags.")
+    text: str = Field(
+        ...,
+        description="The learning, code snippet, styling rule, or observation text to store.",
+    )
+    metadata: Optional[Dict[str, Any]] = Field(
+        default=None, description="Optional metadata key-value tags."
+    )
+
 
 class MemoryStoreTool(BaseTool):
     name: str = "memory_store"

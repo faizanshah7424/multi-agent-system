@@ -2,12 +2,12 @@ import unittest
 from core.autonomous_repository.repository_context import RepositoryContext
 from core.autonomous_repository.repository_planner import RepositoryPlanner
 
+
 class TestRepositoryPlanner(unittest.TestCase):
     def setUp(self):
         self.planner = RepositoryPlanner()
         self.context = RepositoryContext(
-            frameworks=["FastAPI"],
-            tests=["tests/test_auth_system.py"]
+            frameworks=["FastAPI"], tests=["tests/test_auth_system.py"]
         )
 
     def test_create_plan_auth(self):

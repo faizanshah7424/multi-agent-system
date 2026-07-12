@@ -12,11 +12,13 @@ from core.feature_engine.migration_manager import MigrationManager
 from core.feature_engine.feature_validator import FeatureValidator
 from core.feature_engine.feature_memory import FeatureMemory, FeatureRecord
 
+
 class AutonomousFeatureEngine:
     """
     Core coordinator of the Autonomous Feature Development Engine (AFDE).
     Pipeline: Natural Language Goal -> Parsing -> KG Traversal -> Fit Checks -> Debate -> Plan -> Build -> Verify -> Log.
     """
+
     def __init__(self, graph: Optional[InMemoryGraphEngine] = None):
         self.graph = graph or InMemoryGraphEngine()
         self.parser = FeatureParser()
@@ -29,7 +31,9 @@ class AutonomousFeatureEngine:
         self.debate_engine = DebateEngine()
         self.memory = FeatureMemory()
 
-    def develop_feature(self, requirement: str, apply_feature_fn: Optional[Any] = None) -> Dict[str, Any]:
+    def develop_feature(
+        self, requirement: str, apply_feature_fn: Optional[Any] = None
+    ) -> Dict[str, Any]:
         t_start = time.perf_counter()
         execution_id = str(uuid.uuid4())
 
@@ -40,11 +44,13 @@ class AutonomousFeatureEngine:
         arch_analysis = self.architect.analyze_architecture_fit(spec)
 
         # 3. Multi-Agent Debate
-        debate_res = self.debate_engine.run_debate({
-            "requirement": requirement,
-            "spec": spec.model_dump(),
-            "architect_analysis": arch_analysis
-        })
+        debate_res = self.debate_engine.run_debate(
+            {
+                "requirement": requirement,
+                "spec": spec.model_dump(),
+                "architect_analysis": arch_analysis,
+            }
+        )
 
         # 4. Feature Planning
         plan = self.planner.create_plan(spec)
@@ -61,7 +67,9 @@ class AutonomousFeatureEngine:
             migration_ver = f"migration_{execution_id[:8]}"
             db_script = "\n".join(plan.database_migration_steps)
             rollback_script = f"-- rollback {migration_ver}"
-            mig_ok = self.migration_mgr.apply_migration(migration_ver, db_script, rollback_script)
+            mig_ok = self.migration_mgr.apply_migration(
+                migration_ver, db_script, rollback_script
+            )
 
             if not mig_ok:
                 raise RuntimeError("Database migration execution failed.")
@@ -74,7 +82,9 @@ class AutonomousFeatureEngine:
             # 8. Post-Execution Validation
             val_res = self.validator.validate_feature(plan.affected_files)
             if not val_res["success"]:
-                raise RuntimeError(f"Validation constraints failed: {val_res['results']}")
+                raise RuntimeError(
+                    f"Validation constraints failed: {val_res['results']}"
+                )
         except Exception as e:
             success = False
             failures = str(e)
@@ -93,8 +103,12 @@ class AutonomousFeatureEngine:
             success_rate=1.0 if success else 0.0,
             confidence=plan.confidence,
             lessons_learned=[
-                f"Successfully implemented {requirement}." if success else f"Failed to build {requirement}: {failures}"
-            ]
+                (
+                    f"Successfully implemented {requirement}."
+                    if success
+                    else f"Failed to build {requirement}: {failures}"
+                )
+            ],
         )
         self.memory.add_record(record)
 
@@ -107,5 +121,5 @@ class AutonomousFeatureEngine:
             "plan": plan.model_dump(),
             "architect_analysis": arch_analysis,
             "debate": debate_res,
-            "artifacts": artifacts
+            "artifacts": artifacts,
         }

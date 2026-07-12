@@ -8,13 +8,17 @@ from core.queue.self_healing import SelfHealingEngine, ISelfHealingEngine
 from core.queue.execution_runtime import IAgentExecutor
 from core.sandbox.interface import ISandbox, SandboxExecutionResult
 
+
 class MockAgentExecutor(IAgentExecutor):
     def __init__(self) -> None:
         self.call_count = 0
 
-    def execute_step(self, task_id: str, step: PlanStep, workspace_path: str, sandbox: Any) -> bool:
+    def execute_step(
+        self, task_id: str, step: PlanStep, workspace_path: str, sandbox: Any
+    ) -> bool:
         self.call_count += 1
         return True
+
 
 class MockSandbox(ISandbox):
     def __init__(self, fail_attempts: int) -> None:
@@ -30,22 +34,23 @@ class MockSandbox(ISandbox):
     def execute(self, cmd: List[str]) -> SandboxExecutionResult:
         if cmd[0] == "ruff":
             self.call_count += 1
-            
+
         if self.call_count <= self.fail_attempts:
             return SandboxExecutionResult(
                 exit_code=1,
                 stdout="",
                 stderr="Validation failure simulated.",
                 duration_seconds=0.01,
-                timeout_exceeded=False
+                timeout_exceeded=False,
             )
         return SandboxExecutionResult(
             exit_code=0,
             stdout="",
             stderr="",
             duration_seconds=0.01,
-            timeout_exceeded=False
+            timeout_exceeded=False,
         )
+
 
 class TestSelfHealingEngine(unittest.TestCase):
     def setUp(self) -> None:
@@ -60,7 +65,7 @@ class TestSelfHealingEngine(unittest.TestCase):
     def test_python_traceback_parsing(self) -> None:
         log = (
             'File "core/utils.py", line 45, in format_text\n'
-            '    res = val + 10\n'
+            "    res = val + 10\n"
             'TypeError: can only concatenate str (not "int") to str'
         )
         res = self.engine.classify_failure(log)
@@ -82,10 +87,10 @@ class TestSelfHealingEngine(unittest.TestCase):
 
     def test_pytest_failure_parsing(self) -> None:
         log = (
-            '>       assert math_op(5) == 25\n'
-            'E       AssertionError: assert 10 == 25\n'
-            '\n'
-            'tests/test_math.py:15: AssertionError'
+            ">       assert math_op(5) == 25\n"
+            "E       AssertionError: assert 10 == 25\n"
+            "\n"
+            "tests/test_math.py:15: AssertionError"
         )
         res = self.engine.classify_failure(log)
         self.assertIsNotNone(res)
@@ -114,14 +119,21 @@ class TestSelfHealingEngine(unittest.TestCase):
     def test_safety_gate_blocking_test_edits(self) -> None:
         log = (
             'File "tests/test_helper.py", line 10, in test_run\n'
-            '    res = 1 / 0\n'
-            'ZeroDivisionError: division by zero'
+            "    res = 1 / 0\n"
+            "ZeroDivisionError: division by zero"
         )
-        step = PlanStep(step_id=1, dependencies=[], assigned_agent="developer", description="Fix test division")
+        step = PlanStep(
+            step_id=1,
+            dependencies=[],
+            assigned_agent="developer",
+            description="Fix test division",
+        )
         sandbox = MockSandbox(fail_attempts=0)
-        
+
         # Should block and return False immediately due to safety rules
-        repaired = self.engine.repair_failure("task_123", step, log, "dummy_path", sandbox)
+        repaired = self.engine.repair_failure(
+            "task_123", step, log, "dummy_path", sandbox
+        )
         self.assertFalse(repaired)
         self.assertEqual(self.mock_agent.call_count, 0)
 
@@ -129,9 +141,16 @@ class TestSelfHealingEngine(unittest.TestCase):
         # Fails once, succeeds on second attempt
         sandbox = MockSandbox(fail_attempts=1)
         log = "core/module.py:10:5: F821 Undefined name 'x'"
-        step = PlanStep(step_id=1, dependencies=[], assigned_agent="developer", description="Fix variable")
-        
-        repaired = self.engine.repair_failure("task_123", step, log, "dummy_path", sandbox)
+        step = PlanStep(
+            step_id=1,
+            dependencies=[],
+            assigned_agent="developer",
+            description="Fix variable",
+        )
+
+        repaired = self.engine.repair_failure(
+            "task_123", step, log, "dummy_path", sandbox
+        )
         self.assertTrue(repaired)
         self.assertEqual(self.mock_agent.call_count, 2)  # Two attempts executed
 
@@ -139,8 +158,17 @@ class TestSelfHealingEngine(unittest.TestCase):
         # Fails continually
         sandbox = MockSandbox(fail_attempts=5)
         log = "core/module.py:10:5: F821 Undefined name 'x'"
-        step = PlanStep(step_id=1, dependencies=[], assigned_agent="developer", description="Fix variable")
-        
-        repaired = self.engine.repair_failure("task_123", step, log, "dummy_path", sandbox)
+        step = PlanStep(
+            step_id=1,
+            dependencies=[],
+            assigned_agent="developer",
+            description="Fix variable",
+        )
+
+        repaired = self.engine.repair_failure(
+            "task_123", step, log, "dummy_path", sandbox
+        )
         self.assertFalse(repaired)
-        self.assertEqual(self.mock_agent.call_count, 3)  # Exact max of 3 attempts executed
+        self.assertEqual(
+            self.mock_agent.call_count, 3
+        )  # Exact max of 3 attempts executed

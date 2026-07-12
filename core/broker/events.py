@@ -5,11 +5,13 @@ from core.logging import get_logger
 
 logger = get_logger("EventBroker")
 
+
 class WebSocketEventBroker(IEventBroker):
     """
     Concrete Thread-Safe Event Broker facilitating real-time WebSocket messaging
     and in-memory pub/sub topic channels.
     """
+
     def __init__(self) -> None:
         self._subscribers: Dict[str, List[Any]] = {}
         self._lock = threading.Lock()
@@ -21,7 +23,7 @@ class WebSocketEventBroker(IEventBroker):
         logger.info(f"Publishing to channel '{channel}': {message}")
         with self._lock:
             callbacks = list(self._subscribers.get(channel, []))
-            
+
         for callback in callbacks:
             try:
                 # Trigger callback dynamically
@@ -29,7 +31,7 @@ class WebSocketEventBroker(IEventBroker):
                 t = threading.Thread(
                     target=self._safe_execute_callback,
                     args=(callback, message),
-                    name="BrokerCallbackThread"
+                    name="BrokerCallbackThread",
                 )
                 t.daemon = True
                 t.start()

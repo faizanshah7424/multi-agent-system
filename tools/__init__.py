@@ -19,11 +19,13 @@ ALL_TOOL_CLASSES: List[Type[BaseTool]] = [
     MemoryStoreTool,
 ]
 
+
 def get_tool_instances() -> List[BaseTool]:
     """
     Instantiate and return a list of all tools.
     """
     return [tool_cls() for tool_cls in ALL_TOOL_CLASSES]
+
 
 def get_tool_map() -> Dict[str, BaseTool]:
     """

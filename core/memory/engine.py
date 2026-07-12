@@ -10,36 +10,50 @@ from core.memory.compaction import MemoryCompactionManager
 
 logger = get_logger("EngineeringMemoryEngine")
 
+
 class DBEngineeringMemory(Base):
     """
     SQLAlchemy table persisting episodic software engineering memories.
     """
-    __tablename__ = 'engineering_memories'
+
+    __tablename__ = "engineering_memories"
 
     memory_id = Column(Integer, primary_key=True, autoincrement=True)
     task_id = Column(String(50), nullable=False)
     step_id = Column(Integer, nullable=False)
     file_path = Column(String(255), nullable=False)
-    error_msg = Column(Text, nullable=False) # Compacted traceback representation
+    error_msg = Column(Text, nullable=False)  # Compacted traceback representation
     applied_fix = Column(Text, nullable=False)
-    timestamp = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime,
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
+    )
+
 
 class DBEngineeringConvention(Base):
     """
     SQLAlchemy table persisting software engineering conventions/standards.
     """
-    __tablename__ = 'engineering_conventions'
+
+    __tablename__ = "engineering_conventions"
 
     convention_id = Column(Integer, primary_key=True, autoincrement=True)
     task_id = Column(String(50), nullable=False)
-    file_path = Column(String(255), nullable=True) # Optional target file path/pattern
+    file_path = Column(String(255), nullable=True)  # Optional target file path/pattern
     convention_name = Column(String(100), nullable=False)
     description = Column(Text, nullable=False)
     category = Column(String(50), nullable=False, default="general")
-    timestamp = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime,
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
+    )
+
 
 # Initialize database schema dynamically
 Base.metadata.create_all(bind=engine)
+
 
 class EngineeringMemoryEngine(IEngineeringMemoryEngine):
     """
@@ -47,30 +61,39 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
     Utilizes hybrid search (Jaccard keyword matching + semantic vector embeddings)
     for both episodic bug-fix retrieval and convention enforcement.
     """
+
     def __init__(self) -> None:
         self.compactor = MemoryCompactionManager()
 
-    def record_fix(self, task_id: str, step_id: int, file_path: str, error_msg: str, applied_fix: str) -> None:
+    def record_fix(
+        self,
+        task_id: str,
+        step_id: int,
+        file_path: str,
+        error_msg: str,
+        applied_fix: str,
+    ) -> None:
         """
         Records a successful debug/repair session in the persistent episodic ledger and local vector DB.
         """
         compacted_msg = self.compactor.compact_log(error_msg)
-        
+
         with get_db_session() as session:
             memory = DBEngineeringMemory(
                 task_id=task_id,
                 step_id=step_id,
                 file_path=file_path,
                 error_msg=compacted_msg,
-                applied_fix=applied_fix
+                applied_fix=applied_fix,
             )
             session.add(memory)
-            session.flush() # Populate memory_id before committing
+            session.flush()  # Populate memory_id before committing
             memory_id = memory.memory_id
-        
+
         # Async-safe dynamic import to prevent circular import issues
         try:
             from core.memory import VectorMemoryIndex
+
             vector_index = VectorMemoryIndex("eme_fixes_index")
             vector_index.add_memory(
                 text=compacted_msg,
@@ -79,21 +102,27 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
                     "task_id": task_id,
                     "step_id": step_id,
                     "file_path": file_path,
-                    "applied_fix": applied_fix
-                }
+                    "applied_fix": applied_fix,
+                },
             )
         except Exception as e:
-            logger.warning(f"Could not index fix semantically in VectorMemoryIndex: {e}")
+            logger.warning(
+                f"Could not index fix semantically in VectorMemoryIndex: {e}"
+            )
 
-        logger.info(f"Recorded engineering fix memory in EME database for file {file_path}")
+        logger.info(
+            f"Recorded engineering fix memory in EME database for file {file_path}"
+        )
 
-    def retrieve_similar_fixes(self, error_msg: str, limit: int = 3) -> List[Dict[str, Any]]:
+    def retrieve_similar_fixes(
+        self, error_msg: str, limit: int = 3
+    ) -> List[Dict[str, Any]]:
         """
         Queries EME to retrieve relevant past fixes using hybrid search (vector matching + Jaccard tokens).
         """
         compacted_query = self.compactor.compact_log(error_msg)
         query_tokens = self._tokenize(compacted_query)
-        
+
         if not query_tokens:
             return []
 
@@ -101,6 +130,7 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
         vector_results = []
         try:
             from core.memory import VectorMemoryIndex
+
             vector_index = VectorMemoryIndex("eme_fixes_index")
             vector_results = vector_index.search(compacted_query, limit=limit * 2)
         except Exception as e:
@@ -113,14 +143,14 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
                     "memory_id": r.memory_id,
                     "file_path": r.file_path,
                     "error_msg": r.error_msg,
-                    "applied_fix": r.applied_fix
+                    "applied_fix": r.applied_fix,
                 }
                 for r in records
             ]
 
         vector_scores = {
-            item.metadata["memory_id"]: score 
-            for item, score in vector_results 
+            item.metadata["memory_id"]: score
+            for item, score in vector_results
             if "memory_id" in item.metadata
         }
 
@@ -128,7 +158,7 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
         for mem in memory_list:
             mid = mem["memory_id"]
             stored_tokens = self._tokenize(mem["error_msg"])
-            
+
             # Compute Jaccard overlap coefficient
             intersection = query_tokens.intersection(stored_tokens)
             union = query_tokens.union(stored_tokens)
@@ -143,26 +173,37 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
             else:
                 hybrid_score = jaccard_score  # Fallback to pure Jaccard
 
-            if jaccard_score > 0.0:  # Require some keyword/token overlap for software tracebacks
+            if (
+                jaccard_score > 0.0
+            ):  # Require some keyword/token overlap for software tracebacks
                 scored_records.append((hybrid_score, mem))
 
         # Sort by overlap score descending
         scored_records.sort(key=lambda x: x[0], reverse=True)
-        
+
         results = []
         for score, mem in scored_records[:limit]:
-            results.append({
-                "memory_id": mem["memory_id"],
-                "file_path": mem["file_path"],
-                "error_msg": mem["error_msg"],
-                "applied_fix": mem["applied_fix"],
-                "score": score
-            })
-            
+            results.append(
+                {
+                    "memory_id": mem["memory_id"],
+                    "file_path": mem["file_path"],
+                    "error_msg": mem["error_msg"],
+                    "applied_fix": mem["applied_fix"],
+                    "score": score,
+                }
+            )
+
         logger.info(f"EME query matched {len(results)} past fix profiles.")
         return results
 
-    def record_convention(self, task_id: str, file_path: str, convention_name: str, description: str, category: str = "general") -> None:
+    def record_convention(
+        self,
+        task_id: str,
+        file_path: str,
+        convention_name: str,
+        description: str,
+        category: str = "general",
+    ) -> None:
         """
         Records a software engineering convention or styling policy in both DB and Vector DB.
         """
@@ -172,7 +213,7 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
                 file_path=file_path,
                 convention_name=convention_name,
                 description=description,
-                category=category
+                category=category,
             )
             session.add(convention)
             session.flush()
@@ -181,6 +222,7 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
         # Index in VectorMemoryIndex for semantic search
         try:
             from core.memory import VectorMemoryIndex
+
             vector_index = VectorMemoryIndex("eme_conventions_index")
             text_to_embed = f"Category: {category}\nConvention: {convention_name}\nDescription: {description}"
             vector_index.add_memory(
@@ -190,15 +232,21 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
                     "task_id": task_id,
                     "file_path": file_path,
                     "convention_name": convention_name,
-                    "category": category
-                }
+                    "category": category,
+                },
             )
         except Exception as e:
-            logger.warning(f"Could not index convention semantically in VectorMemoryIndex: {e}")
-        
-        logger.info(f"Recorded engineering convention '{convention_name}' in EME for path {file_path}")
+            logger.warning(
+                f"Could not index convention semantically in VectorMemoryIndex: {e}"
+            )
 
-    def retrieve_similar_conventions(self, query: str, file_path: Optional[str] = None, limit: int = 3) -> List[Dict[str, Any]]:
+        logger.info(
+            f"Recorded engineering convention '{convention_name}' in EME for path {file_path}"
+        )
+
+    def retrieve_similar_conventions(
+        self, query: str, file_path: Optional[str] = None, limit: int = 3
+    ) -> List[Dict[str, Any]]:
         """
         Queries EME to retrieve relevant conventions based on a file path or semantic query.
         """
@@ -206,6 +254,7 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
         vector_results = []
         try:
             from core.memory import VectorMemoryIndex
+
             vector_index = VectorMemoryIndex("eme_conventions_index")
             vector_results = vector_index.search(query, limit=limit * 2)
         except Exception as e:
@@ -221,7 +270,7 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
                     "file_path": r.file_path,
                     "convention_name": r.convention_name,
                     "description": r.description,
-                    "category": r.category
+                    "category": r.category,
                 }
                 for r in records
             ]
@@ -229,8 +278,8 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
         # Score candidates
         scored_candidates = []
         vector_scores = {
-            item.metadata["convention_id"]: score 
-            for item, score in vector_results 
+            item.metadata["convention_id"]: score
+            for item, score in vector_results
             if "convention_id" in item.metadata
         }
 
@@ -238,12 +287,14 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
 
         for conv in convention_list:
             cid = conv["convention_id"]
-            
+
             # 1. Semantic score from vector search
             vector_score = vector_scores.get(cid, 0.0)
 
             # 2. Text keyword match score (Jaccard) on convention content
-            conv_text = f"{conv['convention_name']} {conv['description']} {conv['category']}"
+            conv_text = (
+                f"{conv['convention_name']} {conv['description']} {conv['category']}"
+            )
             conv_tokens = self._tokenize(conv_text)
             text_score = 0.0
             if query_tokens and conv_tokens:
@@ -260,12 +311,14 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
                     path_score = 0.5
                 else:
                     # Token overlap on file paths
-                    fp_tokens = set(re.split(r'[/\\_.]', norm_fp))
-                    conv_fp_tokens = set(re.split(r'[/\\_.]', norm_conv_fp))
+                    fp_tokens = set(re.split(r"[/\\_.]", norm_fp))
+                    conv_fp_tokens = set(re.split(r"[/\\_.]", norm_conv_fp))
                     fp_tokens = {t for t in fp_tokens if len(t) > 2}
                     conv_fp_tokens = {t for t in conv_fp_tokens if len(t) > 2}
                     if fp_tokens and conv_fp_tokens:
-                        path_score = len(fp_tokens.intersection(conv_fp_tokens)) / len(fp_tokens.union(conv_fp_tokens))
+                        path_score = len(fp_tokens.intersection(conv_fp_tokens)) / len(
+                            fp_tokens.union(conv_fp_tokens)
+                        )
 
             # Combine scores with weighting
             if vector_scores:
@@ -281,15 +334,17 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
 
         results = []
         for score, conv in scored_candidates[:limit]:
-            results.append({
-                "convention_id": conv["convention_id"],
-                "task_id": conv["task_id"],
-                "file_path": conv["file_path"],
-                "convention_name": conv["convention_name"],
-                "description": conv["description"],
-                "category": conv["category"],
-                "score": score
-            })
+            results.append(
+                {
+                    "convention_id": conv["convention_id"],
+                    "task_id": conv["task_id"],
+                    "file_path": conv["file_path"],
+                    "convention_name": conv["convention_name"],
+                    "description": conv["description"],
+                    "category": conv["category"],
+                    "score": score,
+                }
+            )
 
         logger.info(f"EME query matched {len(results)} conventions.")
         return results
@@ -310,5 +365,5 @@ class EngineeringMemoryEngine(IEngineeringMemoryEngine):
         Splits string trace into relevant alphanumeric tokens (filtering out paths and line numbers).
         """
         # Strip paths and select standard identifiers and exception names
-        words = re.findall(r'[a-zA-Z_]\w*', text)
+        words = re.findall(r"[a-zA-Z_]\w*", text)
         return {w.lower() for w in words if len(w) > 3}

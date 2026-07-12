@@ -7,11 +7,13 @@ from core.indexer.graph_db import CodeGraphDB, DBCodeEdge
 from core.indexer.ast_parser import ASTParser
 from core.indexer.repository_scanner import RepositoryScanner
 
+
 class CodeIndexer(ICodeIndexer):
     """
     Concrete implementation of the ICodeIndexer interface.
     Manages parsing and persistence of repository symbols and call references.
     """
+
     def __init__(self) -> None:
         self.db = CodeGraphDB()
 
@@ -22,7 +24,7 @@ class CodeIndexer(ICodeIndexer):
         repo_dir = Path(repo_path).resolve()
         scanner = RepositoryScanner(str(repo_dir))
         parser = ASTParser(str(repo_dir))
-        
+
         # 1. Scan files
         scan_res = scanner.scan()
         files = scan_res.get("file_paths", [])
@@ -33,18 +35,16 @@ class CodeIndexer(ICodeIndexer):
         # 3. Parse ASTs and insert records
         for rel_file in files:
             abs_file = repo_dir / rel_file
-            
+
             # Parse code symbols and import targets
             symbols, imports = parser.parse_file(abs_file)
-            
+
             if symbols:
                 self.db.insert_symbols(symbols)
-                
+
             for imp in imports:
                 self.db.insert_edges(
-                    source_file=rel_file,
-                    target_file=imp,
-                    relation_type="import"
+                    source_file=rel_file, target_file=imp, relation_type="import"
                 )
 
     def find_symbol(self, name: str) -> List[SymbolDefinition]:
@@ -78,7 +78,11 @@ class CodeIndexer(ICodeIndexer):
         # 1. Load all edges and build adjacency list
         adj: Dict[str, List[str]] = {}
         with get_db_session() as session:
-            edges = session.query(DBCodeEdge).filter(DBCodeEdge.relation_type == "import").all()
+            edges = (
+                session.query(DBCodeEdge)
+                .filter(DBCodeEdge.relation_type == "import")
+                .all()
+            )
             for edge in edges:
                 adj.setdefault(edge.source_file, []).append(edge.target_file)
 
@@ -116,10 +120,10 @@ class CodeIndexer(ICodeIndexer):
         unique_cycles: Set[tuple] = set()
         for cycle in raw_cycles:
             # Normalize: find the lexicographically smallest path representation
-            cycle_nodes = cycle[:-1] # Remove the repeat node at the end
+            cycle_nodes = cycle[:-1]  # Remove the repeat node at the end
             if not cycle_nodes:
                 continue
-            
+
             min_node = min(cycle_nodes)
             min_idx = cycle_nodes.index(min_node)
             normalized_cycle = cycle_nodes[min_idx:] + cycle_nodes[:min_idx]

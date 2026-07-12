@@ -1,10 +1,12 @@
 from typing import Dict, Any, List
 from core.knowledge.engine import InMemoryGraphEngine
 
+
 class RepositoryValidator:
     """
     Validates formatting, lints, type checkers, tests, and database/graph schemas.
     """
+
     def __init__(self, graph: InMemoryGraphEngine):
         self.graph = graph
 
@@ -17,7 +19,7 @@ class RepositoryValidator:
             "integration_tests": True,
             "kg_validation": True,
             "dependency_validation": True,
-            "architecture_validation": True
+            "architecture_validation": True,
         }
 
         # Validate graph node boundaries
@@ -27,7 +29,4 @@ class RepositoryValidator:
                 pass
 
         success = all(results.values())
-        return {
-            "success": success,
-            "results": results
-        }
+        return {"success": success, "results": results}

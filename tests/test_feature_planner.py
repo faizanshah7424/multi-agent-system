@@ -2,6 +2,7 @@ import unittest
 from core.feature_engine.feature_parser import FeatureParser
 from core.feature_engine.feature_planner import FeaturePlanner
 
+
 class TestFeaturePlanner(unittest.TestCase):
     def setUp(self):
         self.parser = FeatureParser()

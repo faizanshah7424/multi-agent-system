@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from typing import Dict, Any, List
 from pydantic import BaseModel, Field
 
+
 class LatencyBreakdown(BaseModel):
     planning: float = Field(default=0.0)
     execution: float = Field(default=0.0)
@@ -11,19 +12,24 @@ class LatencyBreakdown(BaseModel):
     consensus: float = Field(default=0.0)
     memory_lookup: float = Field(default=0.0)
 
+
 class RunMetrics(BaseModel):
-    timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp: str = Field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     task_id: str
     success: bool
     latencies: LatencyBreakdown
     tokens_used: int = Field(default=0)
     cost_usd: float = Field(default=0.0)
 
+
 class MetricsCollector:
     """
     Subsystem gathering run latencies, token counters, costs, and success profiles.
     Persists data in a local JSON database database catalog history.
     """
+
     def __init__(self, persist_path: str = "data/metrics_history.json") -> None:
         self.persist_path = Path(persist_path)
         self.persist_path.parent.mkdir(parents=True, exist_ok=True)
@@ -60,22 +66,22 @@ class MetricsCollector:
                 "avg_cost_usd": 0.0,
                 "avg_planning_s": 0.0,
                 "avg_execution_s": 0.0,
-                "avg_consensus_s": 0.0
+                "avg_consensus_s": 0.0,
             }
-            
+
         total = len(self.runs)
         successes = sum(1 for r in self.runs if r.success)
         avg_cost = sum(r.cost_usd for r in self.runs) / total
-        
+
         avg_plan = sum(r.latencies.planning for r in self.runs) / total
         avg_exec = sum(r.latencies.execution for r in self.runs) / total
         avg_con = sum(r.latencies.consensus for r in self.runs) / total
-        
+
         return {
             "total_runs": total,
             "success_rate": (successes / total) * 100.0,
             "avg_cost_usd": avg_cost,
             "avg_planning_s": avg_plan,
             "avg_execution_s": avg_exec,
-            "avg_consensus_s": avg_con
+            "avg_consensus_s": avg_con,
         }

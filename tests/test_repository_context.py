@@ -1,6 +1,7 @@
 import unittest
 from core.autonomous_repository.repository_context import RepositoryContextDetector
 
+
 class TestRepositoryContext(unittest.TestCase):
     def setUp(self):
         self.detector = RepositoryContextDetector()

@@ -3,12 +3,14 @@ from pathlib import Path
 from typing import Dict, List, Set
 from core.registry.interface import IPromptLibrary
 
+
 class PromptLibrary(IPromptLibrary):
     """
     Concrete implementation of IPromptLibrary.
     Loads markdown prompt templates from disk, performs variable substitution,
     and validates parameter inputs.
     """
+
     def __init__(self, prompts_dir: str) -> None:
         self.prompts_dir = Path(prompts_dir).resolve()
 
@@ -22,12 +24,14 @@ class PromptLibrary(IPromptLibrary):
             # Try alternate flat filename style, e.g. planner_v1.md
             flat_name = name.replace("/", "_")
             prompt_path = (self.prompts_dir / f"{flat_name}.md").resolve()
-            
+
         if not prompt_path.exists():
-            raise FileNotFoundError(f"Prompt template '{name}' not found under: {self.prompts_dir}")
+            raise FileNotFoundError(
+                f"Prompt template '{name}' not found under: {self.prompts_dir}"
+            )
 
         template = prompt_path.read_text(encoding="utf-8", errors="replace")
-        
+
         # Validate that all required variables are supplied
         required_vars = self.extract_placeholders(template)
         missing_vars = required_vars - set(variables.keys())
@@ -40,7 +44,7 @@ class PromptLibrary(IPromptLibrary):
         formatted = template
         for key, val in variables.items():
             formatted = formatted.replace(f"{{{{{key}}}}}", val)
-            
+
         return formatted
 
     def extract_placeholders(self, template: str) -> Set[str]:

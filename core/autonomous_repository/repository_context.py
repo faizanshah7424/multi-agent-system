@@ -2,6 +2,7 @@ import os
 from typing import List, Dict, Any
 from pydantic import BaseModel, Field
 
+
 class RepositoryContext(BaseModel):
     frameworks: List[str] = Field(default_factory=list)
     architecture: str = "Clean Hexagonal / Decoupled Multi-Agent design"
@@ -13,16 +14,28 @@ class RepositoryContext(BaseModel):
     frontend_pages: List[str] = Field(default_factory=list)
     tests: List[str] = Field(default_factory=list)
 
+
 class RepositoryContextDetector:
     """
     Scans the repository structure, discovers databases, APIs, UIs, styles, and architectures.
     """
+
     def build_context(self, repo_path: str = ".") -> RepositoryContext:
         ctx = RepositoryContext()
         ctx.frameworks = ["FastAPI", "Next.js", "React"]
 
         for root, dirs, files in os.walk(repo_path):
-            if any(p in root for p in ["venv", ".git", "node_modules", ".next", "__pycache__", "brain"]):
+            if any(
+                p in root
+                for p in [
+                    "venv",
+                    ".git",
+                    "node_modules",
+                    ".next",
+                    "__pycache__",
+                    "brain",
+                ]
+            ):
                 continue
             for f in files:
                 rel_path = os.path.join(root, f).replace("\\", "/")
@@ -46,8 +59,10 @@ class RepositoryContextDetector:
         ctx.services = ctx.services[:10]
         ctx.frontend_pages = ctx.frontend_pages[:15]
         ctx.reusable_components = [
-            "core/database.py", "core/logging.py",
-            "core/auth/security.py", "core/auth/dependencies.py"
+            "core/database.py",
+            "core/logging.py",
+            "core/auth/security.py",
+            "core/auth/dependencies.py",
         ]
 
         return ctx

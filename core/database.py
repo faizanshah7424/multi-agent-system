@@ -4,7 +4,21 @@ from datetime import datetime, timezone
 from contextlib import contextmanager
 from typing import Generator
 
-from sqlalchemy import create_engine, Column, String, Integer, DateTime, Text, JSON, ForeignKey, Index, event, Boolean, Float, func
+from sqlalchemy import (
+    create_engine,
+    Column,
+    String,
+    Integer,
+    DateTime,
+    Text,
+    JSON,
+    ForeignKey,
+    Index,
+    event,
+    Boolean,
+    Float,
+    func,
+)
 from sqlalchemy.orm import declarative_base, sessionmaker, scoped_session
 from config import settings
 
@@ -23,25 +37,23 @@ if DATABASE_URL == "sqlite:///data/system.db":
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(
         DATABASE_URL,
-        connect_args={
-            "check_same_thread": False,
-            "timeout": 30
-        },
+        connect_args={"check_same_thread": False, "timeout": 30},
         pool_size=db_settings.pool_size,
         max_overflow=db_settings.max_overflow,
-        pool_recycle=db_settings.pool_recycle
+        pool_recycle=db_settings.pool_recycle,
     )
 else:
     engine = create_engine(
         DATABASE_URL,
         pool_size=db_settings.pool_size,
         max_overflow=db_settings.max_overflow,
-        pool_recycle=db_settings.pool_recycle
+        pool_recycle=db_settings.pool_recycle,
     )
 
 import sys
 import threading
 from sqlalchemy.orm import Session
+
 
 def log_debug(msg):
     pid = os.getpid()
@@ -50,13 +62,16 @@ def log_debug(msg):
     sys.stdout.write(f"[DB_TRACE] [PID:{pid}] [TID:{tid} ({tname})] {msg}\n")
     sys.stdout.flush()
 
+
 @event.listens_for(engine, "checkout")
 def on_checkout(dbapi_connection, connection_record, connection_proxy):
     log_debug(f"Connection CHECKOUT (Conn ID: {id(dbapi_connection)})")
 
+
 @event.listens_for(engine, "checkin")
 def on_checkin(dbapi_connection, connection_record):
     log_debug(f"Connection CHECKIN (Conn ID: {id(dbapi_connection)})")
+
 
 # Enforce SQLite WAL (Write-Ahead Logging) for high concurrency writes without lock congestion
 @event.listens_for(engine, "connect")
@@ -70,21 +85,28 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
         cursor.execute("PRAGMA busy_timeout=5000")
         cursor.close()
 
+
 # Session Management
 session_factory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db_session = scoped_session(session_factory)
 
+
 @event.listens_for(Session, "after_begin")
 def on_after_begin(session, transaction, connection):
-    log_debug(f"Session {id(session)}: BEGIN transaction (Conn ID: {id(connection.connection)})")
+    log_debug(
+        f"Session {id(session)}: BEGIN transaction (Conn ID: {id(connection.connection)})"
+    )
+
 
 @event.listens_for(Session, "after_commit")
 def on_after_commit(session):
     log_debug(f"Session {id(session)}: COMMIT transaction event")
 
+
 @event.listens_for(Session, "after_rollback")
 def on_after_rollback(session):
     log_debug(f"Session {id(session)}: ROLLBACK transaction event")
+
 
 @contextmanager
 def get_db_session() -> Generator[scoped_session, None, None]:
@@ -92,6 +114,7 @@ def get_db_session() -> Generator[scoped_session, None, None]:
     Context manager providing transactional thread-safe database session boundaries.
     """
     from core.telemetry import tracer
+
     with tracer.start_as_current_span("sqlalchemy.session") as span:
         span.set_attribute("db.system", engine.dialect.name)
         session = db_session()
@@ -103,7 +126,9 @@ def get_db_session() -> Generator[scoped_session, None, None]:
             session.commit()
             log_debug(f"get_db_session() - Session {session_id} COMMIT successful")
         except Exception as e:
-            log_debug(f"get_db_session() - Session {session_id} ROLLBACK starting due to error: {e}")
+            log_debug(
+                f"get_db_session() - Session {session_id} ROLLBACK starting due to error: {e}"
+            )
             session.rollback()
             log_debug(f"get_db_session() - Session {session_id} ROLLBACK completed")
             span.record_exception(e)
@@ -113,14 +138,18 @@ def get_db_session() -> Generator[scoped_session, None, None]:
             db_session.remove()
             log_debug(f"get_db_session() - Session {session_id} CLOSE completed")
 
+
 # =====================================================================
 # Database Models (Original, Reconstructed & Sprints)
 # =====================================================================
 
-class Task(Base):
-    __tablename__ = 'tasks'
 
-    task_id = Column(String(50), primary_key=True, default=lambda: f"task_{uuid.uuid4().hex[:8]}")
+class Task(Base):
+    __tablename__ = "tasks"
+
+    task_id = Column(
+        String(50), primary_key=True, default=lambda: f"task_{uuid.uuid4().hex[:8]}"
+    )
     user_id = Column(String(50))
     org_id = Column(String(50))
     workspace_id = Column(String(50))
@@ -130,7 +159,9 @@ class Task(Base):
     variables_json = Column(JSON)
     claimed_by = Column(String(50))
     lease_expires_at = Column(DateTime)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
     started_at = Column(DateTime)
     completed_at = Column(DateTime)
     retry_count = Column(Integer, default=0)
@@ -138,7 +169,7 @@ class Task(Base):
 
 
 class APIKeyRecord(Base):
-    __tablename__ = 'api_keys'
+    __tablename__ = "api_keys"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     key_hash = Column(String(64), nullable=False, unique=True, index=True)
@@ -146,26 +177,32 @@ class APIKeyRecord(Base):
     org_id = Column(String(50))
     workspace_id = Column(String(50))
     name = Column(String(100), nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
     expires_at = Column(DateTime)
     is_active = Column(Boolean, default=True)
 
 
 class AuthAuditLogRecord(Base):
-    __tablename__ = 'auth_audit_logs'
+    __tablename__ = "auth_audit_logs"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    event_type = Column(String(50), nullable=False, index=True)  # LOGIN_SUCCESS, LOGIN_FAILED, TOKEN_DENIED, API_KEY_USED, API_KEY_DENIED, ROLE_DENIED
+    event_type = Column(
+        String(50), nullable=False, index=True
+    )  # LOGIN_SUCCESS, LOGIN_FAILED, TOKEN_DENIED, API_KEY_USED, API_KEY_DENIED, ROLE_DENIED
     user_id = Column(String(50))
     org_id = Column(String(50))
     workspace_id = Column(String(50))
     ip_address_hash = Column(String(64))
     details = Column(Text)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class UserSessionRecord(Base):
-    __tablename__ = 'user_sessions'
+    __tablename__ = "user_sessions"
 
     id = Column(String(100), primary_key=True)  # session token ID or claims ID
     user_id = Column(String(50), nullable=False, index=True)
@@ -173,59 +210,70 @@ class UserSessionRecord(Base):
     workspace_id = Column(String(50))
     expires_at = Column(DateTime, nullable=False)
     is_revoked = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
-
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class MemoryEntry(Base):
-    __tablename__ = 'memory_entries'
+    __tablename__ = "memory_entries"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     session_id = Column(String(50), nullable=False)
     text = Column(Text, nullable=False)
     metadata_json = Column(JSON, nullable=False)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class WorkerHeartbeat(Base):
-    __tablename__ = 'worker_heartbeats'
+    __tablename__ = "worker_heartbeats"
 
     worker_id = Column(String(50), primary_key=True)
     hostname = Column(String(100), nullable=False)
     pid = Column(Integer, nullable=False)
-    startup_time = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
-    last_seen = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    startup_time = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+    last_seen = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
     active_task_id = Column(String(50))
     status = Column(String(20), default="IDLE")
 
 
 class TaskLog(Base):
-    __tablename__ = 'task_logs'
+    __tablename__ = "task_logs"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('tasks.task_id'), nullable=False)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    task_id = Column(String(50), ForeignKey("tasks.task_id"), nullable=False)
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
     source = Column(String(50), nullable=False)
     message = Column(Text, nullable=False)
     level = Column(String(10), default="INFO")
 
 
 class AgentMessage(Base):
-    __tablename__ = 'agent_messages'
+    __tablename__ = "agent_messages"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('tasks.task_id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("tasks.task_id"), nullable=False)
     role = Column(String(20), nullable=False)
     agent_name = Column(String(50), nullable=False)
     content = Column(Text, nullable=False)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class WorkflowExecution(Base):
-    __tablename__ = 'workflow_executions'
+    __tablename__ = "workflow_executions"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('tasks.task_id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("tasks.task_id"), nullable=False)
     step_id = Column(Integer, nullable=False)
     name = Column(String(100), nullable=False)
     description = Column(Text, nullable=False)
@@ -237,80 +285,92 @@ class WorkflowExecution(Base):
 
 
 class CodebaseIndex(Base):
-    __tablename__ = 'codebase_indices'
+    __tablename__ = "codebase_indices"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     session_id = Column(String(50), nullable=False)
     workspace_path = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class AgentChangeHistory(Base):
-    __tablename__ = 'agent_change_history'
+    __tablename__ = "agent_change_history"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('tasks.task_id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("tasks.task_id"), nullable=False)
     agent_name = Column(String(50), nullable=False)
     file_path = Column(Text, nullable=False)
     change_type = Column(String(20), nullable=False)
     diff = Column(Text)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class CodeReviewComment(Base):
-    __tablename__ = 'code_review_comments'
+    __tablename__ = "code_review_comments"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('tasks.task_id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("tasks.task_id"), nullable=False)
     file_path = Column(Text, nullable=False)
     line_number = Column(Integer)
     comment = Column(Text, nullable=False)
     severity = Column(String(20), default="info")
     reviewer_agent = Column(String(50), nullable=False)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class CodebaseFileIndex(Base):
-    __tablename__ = 'codebase_file_indices'
+    __tablename__ = "codebase_file_indices"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    index_id = Column(String(50), ForeignKey('codebase_indices.id'), nullable=False)
+    index_id = Column(String(50), ForeignKey("codebase_indices.id"), nullable=False)
     file_path = Column(Text, nullable=False)
     file_type = Column(String(20))
     size = Column(Integer, nullable=False)
     content_hash = Column(String(64), nullable=False)
     is_important = Column(Boolean, default=False)
     summary = Column(Text)
-    last_indexed = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    last_indexed = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class GitBranchTracking(Base):
-    __tablename__ = 'git_branch_tracking'
+    __tablename__ = "git_branch_tracking"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('tasks.task_id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("tasks.task_id"), nullable=False)
     branch_name = Column(String(100), nullable=False)
     commit_hash = Column(String(40), nullable=False)
     is_merged = Column(Boolean, default=False)
     pull_request_url = Column(Text)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class GitChangeTracking(Base):
-    __tablename__ = 'git_change_tracking'
+    __tablename__ = "git_change_tracking"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('tasks.task_id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("tasks.task_id"), nullable=False)
     file_path = Column(Text, nullable=False)
     original_hash = Column(String(64))
     modified_hash = Column(String(64))
     change_type = Column(String(20), nullable=False)
     diff = Column(Text)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class GitHubRepository(Base):
-    __tablename__ = 'github_repositories'
+    __tablename__ = "github_repositories"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     repo_name = Column(String(100), nullable=False)
@@ -324,10 +384,12 @@ class GitHubRepository(Base):
 
 
 class GitHubPullRequest(Base):
-    __tablename__ = 'github_pull_requests'
+    __tablename__ = "github_pull_requests"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     pr_number = Column(Integer, nullable=False)
     title = Column(String(200), nullable=False)
     state = Column(String(20), nullable=False)
@@ -343,10 +405,12 @@ class GitHubPullRequest(Base):
 
 
 class GitHubIssue(Base):
-    __tablename__ = 'github_issues'
+    __tablename__ = "github_issues"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     issue_number = Column(Integer, nullable=False)
     title = Column(String(200), nullable=False)
     state = Column(String(20), nullable=False)
@@ -361,10 +425,10 @@ class GitHubIssue(Base):
 
 
 class CodebaseNode(Base):
-    __tablename__ = 'codebase_nodes'
+    __tablename__ = "codebase_nodes"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    index_id = Column(String(50), ForeignKey('codebase_indices.id'), nullable=False)
+    index_id = Column(String(50), ForeignKey("codebase_indices.id"), nullable=False)
     name = Column(String(100), nullable=False)
     node_type = Column(String(50), nullable=False)
     file_path = Column(Text)
@@ -372,21 +436,21 @@ class CodebaseNode(Base):
 
 
 class CodebaseEdge(Base):
-    __tablename__ = 'codebase_edges'
+    __tablename__ = "codebase_edges"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    index_id = Column(String(50), ForeignKey('codebase_indices.id'), nullable=False)
-    source_node_id = Column(String(50), ForeignKey('codebase_nodes.id'), nullable=False)
-    target_node_id = Column(String(50), ForeignKey('codebase_nodes.id'), nullable=False)
+    index_id = Column(String(50), ForeignKey("codebase_indices.id"), nullable=False)
+    source_node_id = Column(String(50), ForeignKey("codebase_nodes.id"), nullable=False)
+    target_node_id = Column(String(50), ForeignKey("codebase_nodes.id"), nullable=False)
     relationship_type = Column(String(50), nullable=False)
     metadata_json = Column(JSON)
 
 
 class DecisionRecord(Base):
-    __tablename__ = 'decision_records'
+    __tablename__ = "decision_records"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('tasks.task_id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("tasks.task_id"), nullable=False)
     proposal_title = Column(String(100), nullable=False)
     alternatives_json = Column(JSON)
     selected_plan = Column(Text, nullable=False)
@@ -394,39 +458,47 @@ class DecisionRecord(Base):
     risk_level = Column(String(20))
     approval_status = Column(String(20))
     explainability_log = Column(Text)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class ExecutionPlanRecord(Base):
-    __tablename__ = 'execution_plans'
+    __tablename__ = "execution_plans"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('tasks.task_id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("tasks.task_id"), nullable=False)
     steps_json = Column(JSON)
     selected_strategy = Column(String(100), nullable=False)
     risk_level = Column(String(20))
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class RepairHistoryRecord(Base):
-    __tablename__ = 'repair_history'
+    __tablename__ = "repair_history"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('tasks.task_id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("tasks.task_id"), nullable=False)
     test_command = Column(String(200), nullable=False)
     attempt_number = Column(Integer, nullable=False)
     failure_details_json = Column(JSON)
     repair_plan = Column(Text)
     repair_explanation = Column(Text)
     status = Column(String(20))
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class GitHubBranch(Base):
-    __tablename__ = 'github_branches'
+    __tablename__ = "github_branches"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     branch_name = Column(String(100), nullable=False)
     commit_hash = Column(String(100))
     created_at = Column(DateTime)
@@ -434,20 +506,24 @@ class GitHubBranch(Base):
 
 
 class GitHubLabel(Base):
-    __tablename__ = 'github_labels'
+    __tablename__ = "github_labels"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     name = Column(String(100), nullable=False)
     color = Column(String(10))
     description = Column(Text)
 
 
 class GitHubMilestone(Base):
-    __tablename__ = 'github_milestones'
+    __tablename__ = "github_milestones"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     number = Column(Integer, nullable=False)
     title = Column(String(100), nullable=False)
     description = Column(Text)
@@ -456,10 +532,12 @@ class GitHubMilestone(Base):
 
 
 class GitHubDiscussion(Base):
-    __tablename__ = 'github_discussions'
+    __tablename__ = "github_discussions"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     discussion_number = Column(Integer, nullable=False)
     title = Column(String(200), nullable=False)
     body = Column(Text)
@@ -469,10 +547,12 @@ class GitHubDiscussion(Base):
 
 
 class GitHubReview(Base):
-    __tablename__ = 'github_reviews'
+    __tablename__ = "github_reviews"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    pull_request_id = Column(String(50), ForeignKey('github_pull_requests.id'), nullable=False)
+    pull_request_id = Column(
+        String(50), ForeignKey("github_pull_requests.id"), nullable=False
+    )
     review_id = Column(String(50))
     user = Column(String(100))
     body = Column(Text)
@@ -481,19 +561,23 @@ class GitHubReview(Base):
 
 
 class GitHubTag(Base):
-    __tablename__ = 'github_tags'
+    __tablename__ = "github_tags"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     name = Column(String(100), nullable=False)
     commit_hash = Column(String(100))
 
 
 class GitHubRelease(Base):
-    __tablename__ = 'github_releases'
+    __tablename__ = "github_releases"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     tag_name = Column(String(100), nullable=False)
     name = Column(String(200))
     body = Column(Text)
@@ -502,10 +586,12 @@ class GitHubRelease(Base):
 
 
 class GitHubSyncHistory(Base):
-    __tablename__ = 'github_sync_history'
+    __tablename__ = "github_sync_history"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     sync_started_at = Column(DateTime)
     sync_completed_at = Column(DateTime)
     status = Column(String(20))
@@ -514,15 +600,19 @@ class GitHubSyncHistory(Base):
     statistics = Column(JSON)
     error = Column(Text)
 
+
 # =====================================================================
 # Sprint 7: GitHub Analysis Models
 # =====================================================================
 
+
 class RepositoryHealth(Base):
-    __tablename__ = 'repository_health'
+    __tablename__ = "repository_health"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     health_score = Column(Float)
     open_issues_count = Column(Integer)
     closed_issues_count = Column(Integer)
@@ -535,32 +625,40 @@ class RepositoryHealth(Base):
     stale_branches_count = Column(Integer)
     stale_issues_count = Column(Integer)
     detailed_metrics = Column(JSON)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class IssueAnalysis(Base):
-    __tablename__ = 'issue_analyses'
+    __tablename__ = "issue_analyses"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    issue_id = Column(String(50), ForeignKey('github_issues.id'), nullable=False)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    issue_id = Column(String(50), ForeignKey("github_issues.id"), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     priority = Column(String(50))
     is_duplicate = Column(Boolean)
-    duplicate_of_id = Column(String(50), ForeignKey('github_issues.id'))
+    duplicate_of_id = Column(String(50), ForeignKey("github_issues.id"))
     requirement_category = Column(String(100))
     classification = Column(String(50))
     complexity_estimation = Column(String(50))
     risk_estimation = Column(String(50))
     reasoning_details = Column(Text)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class PullRequestAnalysis(Base):
-    __tablename__ = 'pull_request_analyses'
+    __tablename__ = "pull_request_analyses"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    pr_id = Column(String(50), ForeignKey('github_pull_requests.id'), nullable=False)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    pr_id = Column(String(50), ForeignKey("github_pull_requests.id"), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     risk_score = Column(Float)
     breaking_change_probability = Column(Float)
     estimated_review_time_minutes = Column(Integer)
@@ -569,14 +667,18 @@ class PullRequestAnalysis(Base):
     hotspots = Column(JSON)
     test_coverage_recommendation = Column(Text)
     structured_summary = Column(JSON)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class DeveloperAnalytics(Base):
-    __tablename__ = 'developer_analytics'
+    __tablename__ = "developer_analytics"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     developer_username = Column(String(100), nullable=False)
     commits_count = Column(Integer)
     pr_approvals_count = Column(Integer)
@@ -584,141 +686,175 @@ class DeveloperAnalytics(Base):
     most_modified_files = Column(JSON)
     active_branches = Column(JSON)
     code_ownership_share = Column(Float)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class HistoricalMetrics(Base):
-    __tablename__ = 'historical_metrics'
+    __tablename__ = "historical_metrics"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    repository_id = Column(String(50), ForeignKey('github_repositories.id'), nullable=False)
+    repository_id = Column(
+        String(50), ForeignKey("github_repositories.id"), nullable=False
+    )
     metric_type = Column(String(50), nullable=False)
     metric_value = Column(Float)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+
 
 # =====================================================================
 # Sprints 8 & 9: Autonomous Loop, Timeline & Pair Programming Models
 # =====================================================================
 
-class AutonomousTask(Base):
-    __tablename__ = 'autonomous_tasks'
 
-    id = Column(String(50), primary_key=True, default=lambda: f"task_{uuid.uuid4().hex[:8]}")
+class AutonomousTask(Base):
+    __tablename__ = "autonomous_tasks"
+
+    id = Column(
+        String(50), primary_key=True, default=lambda: f"task_{uuid.uuid4().hex[:8]}"
+    )
     request_text = Column(Text, nullable=False)
     status = Column(String(20), default="running")
     current_phase = Column(String(50))
     report_content = Column(Text)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class DecisionLog(Base):
-    __tablename__ = 'decision_logs'
+    __tablename__ = "decision_logs"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('autonomous_tasks.id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("autonomous_tasks.id"), nullable=False)
     phase_name = Column(String(50), nullable=False)
     decision_reason = Column(Text, nullable=False)
     alternatives_considered = Column(JSON)
     selected_option = Column(String(100), nullable=False)
     risk_level = Column(String(20))
     confidence_score = Column(Float)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class TaskTimeline(Base):
-    __tablename__ = 'task_timelines'
+    __tablename__ = "task_timelines"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('autonomous_tasks.id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("autonomous_tasks.id"), nullable=False)
     event_name = Column(String(100), nullable=False)
     event_description = Column(Text)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class ExecutionPhase(Base):
-    __tablename__ = 'execution_phases'
+    __tablename__ = "execution_phases"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('autonomous_tasks.id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("autonomous_tasks.id"), nullable=False)
     phase_name = Column(String(50), nullable=False)
     status = Column(String(20), default="pending")
-    started_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    started_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
     completed_at = Column(DateTime)
     phase_data = Column(JSON)
 
 
 class ApprovalRequest(Base):
-    __tablename__ = 'approval_requests'
+    __tablename__ = "approval_requests"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('autonomous_tasks.id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("autonomous_tasks.id"), nullable=False)
     requester_agent = Column(String(50), nullable=False)
     action_description = Column(Text, nullable=False)
     status = Column(String(20), default="pending")
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class ApprovalDecision(Base):
-    __tablename__ = 'approval_decisions'
+    __tablename__ = "approval_decisions"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    request_id = Column(String(50), ForeignKey('approval_requests.id'), nullable=False)
+    request_id = Column(String(50), ForeignKey("approval_requests.id"), nullable=False)
     approver_user = Column(String(100), nullable=False)
     decision = Column(String(20), nullable=False)
     comments = Column(Text)
-    decided_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    decided_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class EngineeringConversation(Base):
-    __tablename__ = 'engineering_conversations'
+    __tablename__ = "engineering_conversations"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('autonomous_tasks.id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("autonomous_tasks.id"), nullable=False)
     sender = Column(String(50), nullable=False)
     recipient = Column(String(50), nullable=False)
     message_content = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class ExecutionTimeline(Base):
-    __tablename__ = 'execution_timelines'
+    __tablename__ = "execution_timelines"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('autonomous_tasks.id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("autonomous_tasks.id"), nullable=False)
     event_name = Column(String(100), nullable=False)
     event_description = Column(Text)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class RollbackRecord(Base):
-    __tablename__ = 'rollback_records'
+    __tablename__ = "rollback_records"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('autonomous_tasks.id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("autonomous_tasks.id"), nullable=False)
     file_path = Column(String(255), nullable=False)
     backup_content_hash = Column(String(100), nullable=False)
     status = Column(String(20), default="success")
-    restored_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    restored_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class PairProgrammingSession(Base):
-    __tablename__ = 'pair_programming_sessions'
+    __tablename__ = "pair_programming_sessions"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('autonomous_tasks.id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("autonomous_tasks.id"), nullable=False)
     developer_role = Column(String(50), nullable=False)
     navigator_role = Column(String(50), nullable=False)
     active_file = Column(String(255))
     conversation_history = Column(JSON)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+
 
 # =====================================================================
 # Sprint 10: Context & Prompt Caching Models
 # =====================================================================
 
+
 class ContextCache(Base):
-    __tablename__ = 'context_caches'
+    __tablename__ = "context_caches"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     index_id = Column(String(50), nullable=False)
@@ -726,11 +862,13 @@ class ContextCache(Base):
     repo_hash = Column(String(100), nullable=False)
     depth = Column(Integer, default=0)
     context_data = Column(JSON, nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class PromptCacheRecord(Base):
-    __tablename__ = 'prompt_cache_records'
+    __tablename__ = "prompt_cache_records"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     prompt_key = Column(String(255), nullable=False, unique=True)
@@ -738,14 +876,18 @@ class PromptCacheRecord(Base):
     rendered_prompt = Column(Text, nullable=False)
     hit_count = Column(Integer, default=0)
     miss_count = Column(Integer, default=0)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+
 
 # =====================================================================
 # Sprint 11: Multi-LLM Orchestration Models
 # =====================================================================
 
+
 class LLMModelConfig(Base):
-    __tablename__ = 'llm_model_configs'
+    __tablename__ = "llm_model_configs"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     provider = Column(String(50), nullable=False)
@@ -753,22 +895,26 @@ class LLMModelConfig(Base):
     api_key = Column(String(255))
     api_base = Column(String(255))
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class LLMProviderHealth(Base):
-    __tablename__ = 'llm_provider_health'
+    __tablename__ = "llm_provider_health"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     provider = Column(String(50), nullable=False, unique=True)
     is_healthy = Column(Boolean, default=True)
     error_count = Column(Integer, default=0)
     latency_avg_ms = Column(Float, default=0.0)
-    last_checked = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    last_checked = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class LLMBenchmark(Base):
-    __tablename__ = 'llm_benchmarks'
+    __tablename__ = "llm_benchmarks"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     benchmark_name = Column(String(100), nullable=False)
@@ -777,11 +923,13 @@ class LLMBenchmark(Base):
     latency_ms = Column(Float)
     success_rate = Column(Float)
     quality_score = Column(Float)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class LLMRequestLog(Base):
-    __tablename__ = 'llm_request_logs'
+    __tablename__ = "llm_request_logs"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     provider = Column(String(50), nullable=False)
@@ -792,32 +940,40 @@ class LLMRequestLog(Base):
     latency_ms = Column(Float, default=0.0)
     outcome = Column(String(20), nullable=False)
     error_message = Column(Text)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+
 
 # =====================================================================
 # Sprint 12: IDE Integration & Local Agent Models
 # =====================================================================
 
+
 class TerminalSession(Base):
-    __tablename__ = 'terminal_sessions'
+    __tablename__ = "terminal_sessions"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     session_name = Column(String(100), nullable=False)
     cwd = Column(Text)
     env_vars = Column(JSON)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class WorkspaceScan(Base):
-    __tablename__ = 'workspace_scans'
+    __tablename__ = "workspace_scans"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     workspace_path = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class ExecutionAuditLog(Base):
-    __tablename__ = 'execution_audit_logs'
+    __tablename__ = "execution_audit_logs"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     action_name = Column(String(100), nullable=False)
@@ -826,25 +982,31 @@ class ExecutionAuditLog(Base):
     stdout = Column(Text)
     stderr = Column(Text)
     execution_time_ms = Column(Integer)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class ProcessLog(Base):
-    __tablename__ = 'process_logs'
+    __tablename__ = "process_logs"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     pid = Column(Integer, nullable=False)
     process_name = Column(String(100))
     port = Column(Integer)
     status = Column(String(20), default="running")
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+
 
 # =====================================================================
 # Sprint 14: SaaS Foundation & Multi-Tenant Models
 # =====================================================================
 
+
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     email = Column(String(150), nullable=False, unique=True)
@@ -855,103 +1017,123 @@ class User(Base):
     verification_token = Column(String(100), nullable=True)
     reset_token = Column(String(100), nullable=True)
     reset_token_expires = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class RefreshTokenRecord(Base):
-    __tablename__ = 'refresh_tokens'
+    __tablename__ = "refresh_tokens"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    user_id = Column(String(50), ForeignKey('users.id'), nullable=False)
+    user_id = Column(String(50), ForeignKey("users.id"), nullable=False)
     token = Column(String(255), nullable=False, unique=True, index=True)
     expires_at = Column(DateTime, nullable=False)
     is_revoked = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class Organization(Base):
-    __tablename__ = 'organizations'
+    __tablename__ = "organizations"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     name = Column(String(100), nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class OrganizationMembership(Base):
-    __tablename__ = 'organization_memberships'
+    __tablename__ = "organization_memberships"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    user_id = Column(String(50), ForeignKey('users.id'), nullable=False)
-    org_id = Column(String(50), ForeignKey('organizations.id'), nullable=False)
+    user_id = Column(String(50), ForeignKey("users.id"), nullable=False)
+    org_id = Column(String(50), ForeignKey("organizations.id"), nullable=False)
     role = Column(String(50), nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class Project(Base):
-    __tablename__ = 'projects'
+    __tablename__ = "projects"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    org_id = Column(String(50), ForeignKey('organizations.id'), nullable=False)
+    org_id = Column(String(50), ForeignKey("organizations.id"), nullable=False)
     name = Column(String(100), nullable=False)
     repository_url = Column(String(255))
     agent_config = Column(JSON)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class UserApiKey(Base):
-    __tablename__ = 'user_api_keys'
+    __tablename__ = "user_api_keys"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    user_id = Column(String(50), ForeignKey('users.id'), nullable=False)
+    user_id = Column(String(50), ForeignKey("users.id"), nullable=False)
     key_hash = Column(String(255), nullable=False)
     scopes = Column(JSON)
     environment = Column(String(50), default="development")
     is_revoked = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class UsageQuota(Base):
-    __tablename__ = 'usage_quotas'
+    __tablename__ = "usage_quotas"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    org_id = Column(String(50), ForeignKey('organizations.id'), nullable=False)
+    org_id = Column(String(50), ForeignKey("organizations.id"), nullable=False)
     requests_count = Column(Integer, default=0)
     token_count = Column(Integer, default=0)
     storage_bytes = Column(Integer, default=0)
     execution_seconds = Column(Float, default=0.0)
     limit_usd = Column(Float, default=100.0)
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class SaaSAuditLog(Base):
-    __tablename__ = 'saas_audit_logs'
+    __tablename__ = "saas_audit_logs"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     actor_id = Column(String(50))
     action = Column(String(100), nullable=False)
     details = Column(JSON)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+
 
 # =====================================================================
 # Sprint 15: DevOps, Deployment & Secret Manager Models
 # =====================================================================
 
+
 class DeploymentTarget(Base):
-    __tablename__ = 'deployment_targets'
+    __tablename__ = "deployment_targets"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    project_id = Column(String(50), ForeignKey('projects.id'), nullable=False)
+    project_id = Column(String(50), ForeignKey("projects.id"), nullable=False)
     provider = Column(String(50), nullable=False)
     target_config = Column(JSON)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class Deployment(Base):
-    __tablename__ = 'deployments'
+    __tablename__ = "deployments"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    project_id = Column(String(50), ForeignKey('projects.id'), nullable=False)
-    target_id = Column(String(50), ForeignKey('deployment_targets.id'), nullable=False)
+    project_id = Column(String(50), ForeignKey("projects.id"), nullable=False)
+    target_id = Column(String(50), ForeignKey("deployment_targets.id"), nullable=False)
     provider = Column(String(50), nullable=False)
     branch = Column(String(100), default="main")
     commit_hash = Column(String(100))
@@ -959,59 +1141,71 @@ class Deployment(Base):
     rollback_status = Column(String(20))
     duration_seconds = Column(Integer)
     error_message = Column(Text)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class DeploymentLog(Base):
-    __tablename__ = 'deployment_logs'
+    __tablename__ = "deployment_logs"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    deployment_id = Column(String(50), ForeignKey('deployments.id'), nullable=False)
+    deployment_id = Column(String(50), ForeignKey("deployments.id"), nullable=False)
     log_level = Column(String(10), default="INFO")
     message = Column(Text, nullable=False)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class DeploymentMetric(Base):
-    __tablename__ = 'deployment_metrics'
+    __tablename__ = "deployment_metrics"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    deployment_id = Column(String(50), ForeignKey('deployments.id'), nullable=False)
+    deployment_id = Column(String(50), ForeignKey("deployments.id"), nullable=False)
     cpu_usage_pct = Column(Float)
     memory_usage_mb = Column(Float)
     response_time_ms = Column(Float)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class DeploymentSecret(Base):
-    __tablename__ = 'deployment_secrets'
+    __tablename__ = "deployment_secrets"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    project_id = Column(String(50), ForeignKey('projects.id'), nullable=False)
+    project_id = Column(String(50), ForeignKey("projects.id"), nullable=False)
     secret_name = Column(String(100), nullable=False)
     secret_value_encrypted = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+
 
 # =====================================================================
 # Sprint 16: Code Review & Quality Score Models
 # =====================================================================
 
+
 class CodeReview(Base):
-    __tablename__ = 'code_reviews'
+    __tablename__ = "code_reviews"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    project_id = Column(String(50), ForeignKey('projects.id'), nullable=False)
+    project_id = Column(String(50), ForeignKey("projects.id"), nullable=False)
     target_commit = Column(String(100))
     target_branch = Column(String(100))
     summary = Column(Text)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class SecurityFinding(Base):
-    __tablename__ = 'security_findings'
+    __tablename__ = "security_findings"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    review_id = Column(String(50), ForeignKey('code_reviews.id'), nullable=False)
+    review_id = Column(String(50), ForeignKey("code_reviews.id"), nullable=False)
     file_path = Column(String(255), nullable=False)
     line_number = Column(Integer)
     rule_id = Column(String(100))
@@ -1019,14 +1213,16 @@ class SecurityFinding(Base):
     description = Column(Text, nullable=False)
     recommendation = Column(Text)
     evidence = Column(Text)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class PerformanceFinding(Base):
-    __tablename__ = 'performance_findings'
+    __tablename__ = "performance_findings"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    review_id = Column(String(50), ForeignKey('code_reviews.id'), nullable=False)
+    review_id = Column(String(50), ForeignKey("code_reviews.id"), nullable=False)
     file_path = Column(String(255), nullable=False)
     line_number = Column(Integer)
     rule_id = Column(String(100))
@@ -1034,14 +1230,16 @@ class PerformanceFinding(Base):
     description = Column(Text, nullable=False)
     recommendation = Column(Text)
     evidence = Column(Text)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class ArchitectureFinding(Base):
-    __tablename__ = 'architecture_findings'
+    __tablename__ = "architecture_findings"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    review_id = Column(String(50), ForeignKey('code_reviews.id'), nullable=False)
+    review_id = Column(String(50), ForeignKey("code_reviews.id"), nullable=False)
     file_path = Column(String(255), nullable=False)
     line_number = Column(Integer)
     rule_id = Column(String(100))
@@ -1049,14 +1247,16 @@ class ArchitectureFinding(Base):
     description = Column(Text, nullable=False)
     recommendation = Column(Text)
     evidence = Column(Text)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class QualityScore(Base):
-    __tablename__ = 'quality_scores'
+    __tablename__ = "quality_scores"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    review_id = Column(String(50), ForeignKey('code_reviews.id'), nullable=False)
+    review_id = Column(String(50), ForeignKey("code_reviews.id"), nullable=False)
     overall_score = Column(Float)
     maintainability = Column(Float)
     readability = Column(Float)
@@ -1066,61 +1266,73 @@ class QualityScore(Base):
     documentation = Column(Float)
     architecture = Column(Float)
     technical_debt_hours = Column(Float)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+
 
 # =====================================================================
 # Sprint 17: Self-Healing & Learning Engine Models
 # =====================================================================
 
+
 class RepairSession(Base):
-    __tablename__ = 'repair_sessions'
+    __tablename__ = "repair_sessions"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('tasks.task_id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("tasks.task_id"), nullable=False)
     status = Column(String(20), default="running")
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
     completed_at = Column(DateTime)
 
 
 class RepairAttempt(Base):
-    __tablename__ = 'repair_attempts'
+    __tablename__ = "repair_attempts"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    task_id = Column(String(50), ForeignKey('tasks.task_id'), nullable=False)
+    task_id = Column(String(50), ForeignKey("tasks.task_id"), nullable=False)
     attempt_number = Column(Integer, nullable=False)
     test_results = Column(JSON)
     error_classification = Column(String(100))
     repair_plan = Column(Text)
     code_diff = Column(Text)
     status = Column(String(20))
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class ConfidenceScoreModel(Base):
-    __tablename__ = 'confidence_scores'
+    __tablename__ = "confidence_scores"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    session_id = Column(String(50), ForeignKey('repair_sessions.id'), nullable=False)
+    session_id = Column(String(50), ForeignKey("repair_sessions.id"), nullable=False)
     repair_confidence = Column(Float)
     risk_score = Column(Float)
     regression_probability = Column(Float)
     architecture_impact = Column(Float)
     deployment_risk = Column(Float)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class RegressionReportModel(Base):
-    __tablename__ = 'regression_reports'
+    __tablename__ = "regression_reports"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    session_id = Column(String(50), ForeignKey('repair_sessions.id'), nullable=False)
+    session_id = Column(String(50), ForeignKey("repair_sessions.id"), nullable=False)
     has_regression = Column(Boolean)
     details = Column(Text)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class LearningRecord(Base):
-    __tablename__ = 'learning_records'
+    __tablename__ = "learning_records"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     failure_pattern = Column(Text, nullable=False)
@@ -1129,11 +1341,13 @@ class LearningRecord(Base):
     failure_rate = Column(Float)
     affected_technologies = Column(JSON)
     repair_history = Column(JSON)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class RepairStrategy(Base):
-    __tablename__ = 'repair_strategies'
+    __tablename__ = "repair_strategies"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     pattern = Column(Text, nullable=False)
@@ -1141,14 +1355,18 @@ class RepairStrategy(Base):
     success_count = Column(Integer, default=0)
     failure_count = Column(Integer, default=0)
     technologies = Column(JSON)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+
 
 # =====================================================================
 # Sprint 10: Commercial Readiness & Billing
 # =====================================================================
 
+
 class Subscription(Base):
-    __tablename__ = 'subscriptions'
+    __tablename__ = "subscriptions"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     org_id = Column(String(50), nullable=False, unique=True)
@@ -1159,106 +1377,153 @@ class Subscription(Base):
     trial_start = Column(DateTime, nullable=True)
     trial_end = Column(DateTime, nullable=True)
     current_period_end = Column(DateTime, nullable=True)
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+
 
 class AnalyticsEvent(Base):
-    __tablename__ = 'analytics_events'
+    __tablename__ = "analytics_events"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     user_id = Column(String(50), nullable=True)
     org_id = Column(String(50), nullable=True)
     event_name = Column(String(100), nullable=False)
     properties = Column(JSON)
-    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    timestamp = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+
 
 # =====================================================================
 # Sprint 15: RBAC Roles and Permissions Management
 # =====================================================================
 
+
 class PermissionRecord(Base):
-    __tablename__ = 'permissions'
+    __tablename__ = "permissions"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     name = Column(String(100), nullable=False, unique=True, index=True)
     description = Column(String(255))
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class RoleRecord(Base):
-    __tablename__ = 'roles'
+    __tablename__ = "roles"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     name = Column(String(50), nullable=False, unique=True, index=True)
     description = Column(String(255))
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class RolePermissionRecord(Base):
-    __tablename__ = 'role_permissions'
+    __tablename__ = "role_permissions"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    role_id = Column(String(50), ForeignKey('roles.id', ondelete='CASCADE'), nullable=False)
-    permission_id = Column(String(50), ForeignKey('permissions.id', ondelete='CASCADE'), nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    role_id = Column(
+        String(50), ForeignKey("roles.id", ondelete="CASCADE"), nullable=False
+    )
+    permission_id = Column(
+        String(50), ForeignKey("permissions.id", ondelete="CASCADE"), nullable=False
+    )
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 # =====================================================================
 # Sprint 16: Notification System
 # =====================================================================
 
+
 class NotificationPreferenceRecord(Base):
-    __tablename__ = 'notification_preferences'
+    __tablename__ = "notification_preferences"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    user_id = Column(String(50), ForeignKey('users.id', ondelete='CASCADE'), nullable=False, unique=True, index=True)
+    user_id = Column(
+        String(50),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+        index=True,
+    )
     email_enabled = Column(Boolean, default=True)
     sms_enabled = Column(Boolean, default=True)
     in_app_enabled = Column(Boolean, default=True)
     marketing_emails = Column(Boolean, default=True)
     security_alerts = Column(Boolean, default=True)
     task_updates = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None), onupdate=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+    updated_at = Column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
+        onupdate=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
+    )
 
 
 class NotificationRecord(Base):
-    __tablename__ = 'notifications'
+    __tablename__ = "notifications"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    user_id = Column(String(50), ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    user_id = Column(
+        String(50),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     title = Column(String(150), nullable=False)
     message = Column(Text, nullable=False)
-    type = Column(String(50), default='info') # info, success, warning, error
-    category = Column(String(50), default='general') # security, task, marketing, general
+    type = Column(String(50), default="info")  # info, success, warning, error
+    category = Column(
+        String(50), default="general"
+    )  # security, task, marketing, general
     is_read = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
     read_at = Column(DateTime, nullable=True)
 
 
 class NotificationQueueRecord(Base):
-    __tablename__ = 'notification_queue'
+    __tablename__ = "notification_queue"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    user_id = Column(String(50), ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
-    channel = Column(String(50), nullable=False) # email, sms, in_app
-    recipient = Column(String(255), nullable=False) # email address or phone number
+    user_id = Column(
+        String(50),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    channel = Column(String(50), nullable=False)  # email, sms, in_app
+    recipient = Column(String(255), nullable=False)  # email address or phone number
     title = Column(String(150), nullable=True)
     content = Column(Text, nullable=False)
-    status = Column(String(50), default='pending') # pending, sent, failed, retrying
+    status = Column(String(50), default="pending")  # pending, sent, failed, retrying
     attempts = Column(Integer, default=0)
     max_attempts = Column(Integer, default=3)
     last_attempt_at = Column(DateTime, nullable=True)
     next_attempt_at = Column(DateTime, nullable=True)
     error_message = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 # =====================================================================
 # Sprint 17: Hospital Management System
 # =====================================================================
 
+
 class PatientRecord(Base):
-    __tablename__ = 'hospital_patients'
+    __tablename__ = "hospital_patients"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     name = Column(String(100), nullable=False)
@@ -1267,11 +1532,13 @@ class PatientRecord(Base):
     date_of_birth = Column(String(50), nullable=False)
     gender = Column(String(20), nullable=False)
     medical_history = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class DoctorRecord(Base):
-    __tablename__ = 'hospital_doctors'
+    __tablename__ = "hospital_doctors"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     name = Column(String(100), nullable=False)
@@ -1279,68 +1546,112 @@ class DoctorRecord(Base):
     email = Column(String(100), nullable=True)
     phone = Column(String(50), nullable=True)
     is_available = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class AppointmentRecord(Base):
-    __tablename__ = 'hospital_appointments'
+    __tablename__ = "hospital_appointments"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    patient_id = Column(String(50), ForeignKey('hospital_patients.id', ondelete='CASCADE'), nullable=False)
-    doctor_id = Column(String(50), ForeignKey('hospital_doctors.id', ondelete='CASCADE'), nullable=False)
+    patient_id = Column(
+        String(50),
+        ForeignKey("hospital_patients.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    doctor_id = Column(
+        String(50),
+        ForeignKey("hospital_doctors.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     appointment_date = Column(DateTime, nullable=False)
     reason = Column(String(255), nullable=False)
-    status = Column(String(50), default='scheduled') # scheduled, completed, cancelled
+    status = Column(String(50), default="scheduled")  # scheduled, completed, cancelled
     notes = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class BillingRecord(Base):
-    __tablename__ = 'hospital_billing'
+    __tablename__ = "hospital_billing"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    patient_id = Column(String(50), ForeignKey('hospital_patients.id', ondelete='CASCADE'), nullable=False)
-    appointment_id = Column(String(50), ForeignKey('hospital_appointments.id', ondelete='SET NULL'), nullable=True)
+    patient_id = Column(
+        String(50),
+        ForeignKey("hospital_patients.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    appointment_id = Column(
+        String(50),
+        ForeignKey("hospital_appointments.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     amount = Column(Float, nullable=False)
-    status = Column(String(50), default='unpaid') # paid, unpaid, refunded
+    status = Column(String(50), default="unpaid")  # paid, unpaid, refunded
     payment_method = Column(String(50), nullable=True)
-    billing_date = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    billing_date = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class PharmacyItemRecord(Base):
-    __tablename__ = 'hospital_pharmacy_items'
+    __tablename__ = "hospital_pharmacy_items"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
     name = Column(String(100), nullable=False, unique=True)
     dosage = Column(String(50), nullable=False)
     stock_quantity = Column(Integer, default=0)
     unit_price = Column(Float, nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class PrescriptionRecord(Base):
-    __tablename__ = 'hospital_prescriptions'
+    __tablename__ = "hospital_prescriptions"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    patient_id = Column(String(50), ForeignKey('hospital_patients.id', ondelete='CASCADE'), nullable=False)
-    doctor_id = Column(String(50), ForeignKey('hospital_doctors.id', ondelete='CASCADE'), nullable=False)
+    patient_id = Column(
+        String(50),
+        ForeignKey("hospital_patients.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    doctor_id = Column(
+        String(50),
+        ForeignKey("hospital_doctors.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     medication_name = Column(String(100), nullable=False)
     dosage_instruction = Column(String(255), nullable=False)
-    status = Column(String(50), default='prescribed') # prescribed, dispensed, cancelled
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    status = Column(
+        String(50), default="prescribed"
+    )  # prescribed, dispensed, cancelled
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
 
 
 class LabTestRecord(Base):
-    __tablename__ = 'hospital_lab_tests'
+    __tablename__ = "hospital_lab_tests"
 
     id = Column(String(50), primary_key=True, default=lambda: uuid.uuid4().hex)
-    patient_id = Column(String(50), ForeignKey('hospital_patients.id', ondelete='CASCADE'), nullable=False)
+    patient_id = Column(
+        String(50),
+        ForeignKey("hospital_patients.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     test_name = Column(String(100), nullable=False)
     result = Column(Text, nullable=True)
-    status = Column(String(50), default='pending') # pending, completed, cancelled
+    status = Column(String(50), default="pending")  # pending, completed, cancelled
     technician_notes = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
     completed_at = Column(DateTime, nullable=True)
 
 
@@ -1348,13 +1659,15 @@ class LabTestRecord(Base):
 # Database Initialization
 # =====================================================================
 
+
 def init_db():
     log_debug("init_db() - STARTING")
     Base.metadata.create_all(bind=engine)
-    
+
     # Seed default roles and permissions
     try:
         from sqlalchemy.orm import Session
+
         with Session(engine) as db_session:
             roles_count = db_session.query(RoleRecord).count()
             if roles_count == 0:
@@ -1365,41 +1678,68 @@ def init_db():
                     "roles:write": "Manage role permissions",
                     "audit:read": "View authentication and system audit logs",
                     "tasks:create": "Trigger background executions",
-                    "tasks:delete": "Cancel running agent tasks"
+                    "tasks:delete": "Cancel running agent tasks",
                 }
                 db_perms = {}
                 for name, desc in perms.items():
                     p = PermissionRecord(name=name, description=desc)
                     db_session.add(p)
                     db_perms[name] = p
-                
+
                 db_session.flush()
-                
-                admin_role = RoleRecord(name="admin", description="Full administrator access")
-                dev_role = RoleRecord(name="developer", description="Developer trigger rights")
-                member_role = RoleRecord(name="member", description="Standard read-only member")
-                
+
+                admin_role = RoleRecord(
+                    name="admin", description="Full administrator access"
+                )
+                dev_role = RoleRecord(
+                    name="developer", description="Developer trigger rights"
+                )
+                member_role = RoleRecord(
+                    name="member", description="Standard read-only member"
+                )
+
                 db_session.add_all([admin_role, dev_role, member_role])
                 db_session.flush()
-                
+
                 # Associate permissions
                 for p in db_perms.values():
-                    db_session.add(RolePermissionRecord(role_id=admin_role.id, permission_id=p.id))
-                
-                db_session.add(RolePermissionRecord(role_id=dev_role.id, permission_id=db_perms["users:read"].id))
-                db_session.add(RolePermissionRecord(role_id=dev_role.id, permission_id=db_perms["audit:read"].id))
-                db_session.add(RolePermissionRecord(role_id=dev_role.id, permission_id=db_perms["tasks:create"].id))
-                
-                db_session.add(RolePermissionRecord(role_id=member_role.id, permission_id=db_perms["users:read"].id))
-                
+                    db_session.add(
+                        RolePermissionRecord(role_id=admin_role.id, permission_id=p.id)
+                    )
+
+                db_session.add(
+                    RolePermissionRecord(
+                        role_id=dev_role.id, permission_id=db_perms["users:read"].id
+                    )
+                )
+                db_session.add(
+                    RolePermissionRecord(
+                        role_id=dev_role.id, permission_id=db_perms["audit:read"].id
+                    )
+                )
+                db_session.add(
+                    RolePermissionRecord(
+                        role_id=dev_role.id, permission_id=db_perms["tasks:create"].id
+                    )
+                )
+
+                db_session.add(
+                    RolePermissionRecord(
+                        role_id=member_role.id, permission_id=db_perms["users:read"].id
+                    )
+                )
+
                 db_session.commit()
-                log_debug("init_db() - Seeded default roles and permissions successfully")
+                log_debug(
+                    "init_db() - Seeded default roles and permissions successfully"
+                )
     except Exception as e:
         log_debug(f"init_db() - Seeding error (non-fatal): {e}")
 
     # Dynamic column addition for tasks table migration
     try:
         from sqlalchemy import inspect, text
+
         inspector = inspect(engine)
         columns = [col["name"] for col in inspector.get_columns("tasks")]
         with engine.begin() as conn:
@@ -1407,13 +1747,19 @@ def init_db():
                 conn.execute(text("ALTER TABLE tasks ADD COLUMN org_id VARCHAR(50)"))
                 log_debug("init_db() - Migration: Added org_id to tasks")
             if "workspace_id" not in columns:
-                conn.execute(text("ALTER TABLE tasks ADD COLUMN workspace_id VARCHAR(50)"))
+                conn.execute(
+                    text("ALTER TABLE tasks ADD COLUMN workspace_id VARCHAR(50)")
+                )
                 log_debug("init_db() - Migration: Added workspace_id to tasks")
             if "lease_expires_at" not in columns:
-                col_type = "TIMESTAMP" if engine.dialect.name == "postgresql" else "DATETIME"
-                conn.execute(text(f"ALTER TABLE tasks ADD COLUMN lease_expires_at {col_type}"))
+                col_type = (
+                    "TIMESTAMP" if engine.dialect.name == "postgresql" else "DATETIME"
+                )
+                conn.execute(
+                    text(f"ALTER TABLE tasks ADD COLUMN lease_expires_at {col_type}")
+                )
                 log_debug("init_db() - Migration: Added lease_expires_at to tasks")
     except Exception as e:
         log_debug(f"init_db() - Schema migration error (non-fatal): {e}")
-        
+
     log_debug("init_db() - COMPLETED")

@@ -2,6 +2,7 @@ from typing import List
 from pydantic import BaseModel, Field
 from core.feature_engine.feature_parser import FeatureSpec
 
+
 class FeatureExecutionPlan(BaseModel):
     affected_files: List[str] = Field(default_factory=list)
     execution_order: List[str] = Field(default_factory=list)
@@ -13,10 +14,12 @@ class FeatureExecutionPlan(BaseModel):
     estimated_time: str = "4 hours"
     confidence: float = 0.95
 
+
 class FeaturePlanner:
     """
     Creates FeatureExecutionPlan based on Feature Specs.
     """
+
     def create_plan(self, spec: FeatureSpec) -> FeatureExecutionPlan:
         plan = FeatureExecutionPlan()
         plan.affected_files = list(spec.dependencies)
@@ -38,16 +41,16 @@ class FeaturePlanner:
             "2. Implement backend structures and services.",
             "3. Add API endpoints in router files.",
             "4. Mount frontend views on dashboard router.",
-            "5. Execute verification tests."
+            "5. Execute verification tests.",
         ]
         plan.testing_strategy = [
             "Write pytest integration cases for the new feature.",
             "Verify lint/ruff compliance.",
-            "Run full platform regression test suites."
+            "Run full platform regression test suites.",
         ]
         plan.rollback_strategy = [
             "Use git manager to checkout safety checkpoint files.",
-            "Run migration manager rollback schema migrations."
+            "Run migration manager rollback schema migrations.",
         ]
 
         plan.estimated_time = "4 hours"

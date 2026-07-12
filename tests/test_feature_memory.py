@@ -3,6 +3,7 @@ import tempfile
 import os
 from core.feature_engine.feature_memory import FeatureMemory, FeatureRecord
 
+
 class TestFeatureMemory(unittest.TestCase):
     def setUp(self):
         self.db_fd, self.db_path = tempfile.mkstemp(suffix=".db")
@@ -21,7 +22,7 @@ class TestFeatureMemory(unittest.TestCase):
             files_modified=["core/database.py"],
             success_rate=1.0,
             confidence=0.98,
-            lessons_learned=["JWT is clean"]
+            lessons_learned=["JWT is clean"],
         )
         self.memory.add_record(record)
 

@@ -1,4 +1,8 @@
-from core.diagnostics.health import RepositoryHealthInspector, HealthReport, HealthCheckItem
+from core.diagnostics.health import (
+    RepositoryHealthInspector,
+    HealthReport,
+    HealthCheckItem,
+)
 from core.diagnostics.recovery import RecoveryManager, CrashReportGenerator
 from core.diagnostics.metrics import MetricsCollector, RunMetrics, LatencyBreakdown
 from core.diagnostics.doc_audit import DocumentationAudit
@@ -14,5 +18,5 @@ __all__ = [
     "RunMetrics",
     "LatencyBreakdown",
     "DocumentationAudit",
-    "VersionManager"
+    "VersionManager",
 ]

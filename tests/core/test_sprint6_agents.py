@@ -18,19 +18,29 @@ from core.database import get_db_session
 
 T = TypeVar("T", bound=BaseModel)
 
+
 class MockAgentModelProvider(IModelProvider):
     """
     Mock model provider that returns a sequence of AgentDecisions to simulate ReAct.
     """
+
     def __init__(self, decisions: List[AgentDecision]) -> None:
         self.decisions = decisions
         self.current_idx = 0
         self.last_system_instruction = None
 
-    def generate(self, prompt: str, system_instruction: str, params: ModelParameters) -> str:
+    def generate(
+        self, prompt: str, system_instruction: str, params: ModelParameters
+    ) -> str:
         return ""
 
-    def generate_structured(self, prompt: str, schema: Type[T], system_instruction: str, params: ModelParameters) -> T:
+    def generate_structured(
+        self,
+        prompt: str,
+        schema: Type[T],
+        system_instruction: str,
+        params: ModelParameters,
+    ) -> T:
         self.last_system_instruction = system_instruction
         if self.current_idx < len(self.decisions):
             decision = self.decisions[self.current_idx]
@@ -39,11 +49,14 @@ class MockAgentModelProvider(IModelProvider):
         return AgentDecision(
             thought="No more actions, respond success.",
             action="respond",
-            final_answer="Done"
+            final_answer="Done",
         )
 
-    def generate_stream(self, prompt: str, system_instruction: str, params: ModelParameters) -> Iterator[str]:
+    def generate_stream(
+        self, prompt: str, system_instruction: str, params: ModelParameters
+    ) -> Iterator[str]:
         yield ""
+
 
 class TestAgentExecutorFramework(unittest.TestCase):
     def setUp(self) -> None:
@@ -53,12 +66,15 @@ class TestAgentExecutorFramework(unittest.TestCase):
 
         # Clean DB session states to prevent leaks
         with get_db_session() as session:
-            session.query(DBSessionState).filter(DBSessionState.task_id == self.task_id).delete()
+            session.query(DBSessionState).filter(
+                DBSessionState.task_id == self.task_id
+            ).delete()
 
     def tearDown(self) -> None:
         # Clean workspace session
         try:
             from core.workspace.interface import IWorkspaceSessionManager
+
             session_mgr = DIContainer.get(IWorkspaceSessionManager)
             session_mgr.end_session(self.task_id)
         except Exception:
@@ -77,18 +93,18 @@ class TestAgentExecutorFramework(unittest.TestCase):
                 thought="I will write a test file first.",
                 action="write_file",
                 file_path="react_test_file.txt",
-                content="hello react world"
+                content="hello react world",
             ),
             AgentDecision(
                 thought="Now I will read the file to confirm it was written.",
                 action="read_file",
-                file_path="react_test_file.txt"
+                file_path="react_test_file.txt",
             ),
             AgentDecision(
                 thought="Success, I am ready to complete the task.",
                 action="respond",
-                final_answer="File verified successfully."
-            )
+                final_answer="File verified successfully.",
+            ),
         ]
 
         # Register MockAgentModelProvider
@@ -103,21 +119,28 @@ class TestAgentExecutorFramework(unittest.TestCase):
                 step_id=1,
                 dependencies=[],
                 assigned_agent="developer",
-                description="Write and verify react_test_file.txt"
+                description="Write and verify react_test_file.txt",
             )
 
             # Trigger execution
-            success = self.agent_executor.execute_step(self.task_id, step, temp_dir, sandbox)
+            success = self.agent_executor.execute_step(
+                self.task_id, step, temp_dir, sandbox
+            )
             self.assertTrue(success)
 
             # Assert target file was physically created in the workspace path
             target_path = Path(temp_dir) / "react_test_file.txt"
             self.assertTrue(target_path.exists())
-            self.assertEqual(target_path.read_text(encoding="utf-8"), "hello react world")
+            self.assertEqual(
+                target_path.read_text(encoding="utf-8"), "hello react world"
+            )
 
             # Assert system instructions loaded correct profile variables
             self.assertIn("Developer Agent", mock_provider.last_system_instruction)
-            self.assertIn("Write and verify react_test_file.txt", mock_provider.last_system_instruction)
+            self.assertIn(
+                "Write and verify react_test_file.txt",
+                mock_provider.last_system_instruction,
+            )
 
             sandbox.terminate()
 
@@ -131,7 +154,9 @@ class TestAgentExecutorFramework(unittest.TestCase):
             self.assertEqual(res_safe.exit_code, 0)
 
             # Test command chain using semicolon
-            res_semicolon = sandbox.execute(["python", "-c", "print('unsafe')", ";", "echo", "injected"])
+            res_semicolon = sandbox.execute(
+                ["python", "-c", "print('unsafe')", ";", "echo", "injected"]
+            )
             self.assertEqual(res_semicolon.exit_code, -1)
             self.assertIn("Access Denied", res_semicolon.stderr)
 

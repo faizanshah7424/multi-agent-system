@@ -2,10 +2,12 @@ from typing import Dict, Any, List
 from core.knowledge.engine import InMemoryGraphEngine
 from core.autonomous_repository.repository_planner import RepositoryTaskPlan
 
+
 class RepositoryExecutor:
     """
     Executes changes defensively: runs impact analysis, checks Knowledge Graph bounds, and formats generated artifacts.
     """
+
     def __init__(self, graph: InMemoryGraphEngine):
         self.graph = graph
 
@@ -26,7 +28,7 @@ class RepositoryExecutor:
             "affected_tables": affected_tables,
             "affected_uis": affected_uis,
             "affected_workflows": ["task_queue_service"],
-            "affected_tests": ["tests/test_auth_system.py"]
+            "affected_tests": ["tests/test_auth_system.py"],
         }
 
     def generate_code_artifacts(self, plan: RepositoryTaskPlan) -> Dict[str, str]:
@@ -37,6 +39,6 @@ class RepositoryExecutor:
             "tests": "def test_generated_service():\n    assert True\n",
             "documentation": "# Generated Repository Feature Documentation",
             "configs": "{}",
-            "migration_scripts": "-- sql migration script --"
+            "migration_scripts": "-- sql migration script --",
         }
         return artifacts

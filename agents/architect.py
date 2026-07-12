@@ -4,23 +4,25 @@ from config import settings
 from tools.file_reader import FileReaderTool
 from core.registry import register_agent
 
+
 @register_agent(
     name="architect",
     role="Architect",
     description="Validates code and plans against design patterns, architectural style guides, and structural specifications.",
     capabilities=["architectural_review", "standards"],
-    tools=["file_reader"]
+    tools=["file_reader"],
 )
 class ArchitectAgent(BaseAgent):
     """
     Architect Agent responsible for reviewing plans, designs, and code structures for architectural compliance.
     """
+
     def __init__(self, role: str, memory: Any):
         super().__init__(
             role=role,
             memory=memory,
             model=settings.default_model,
-            tools=[FileReaderTool()]
+            tools=[FileReaderTool()],
         )
 
     def run(self, task: str = "") -> str:

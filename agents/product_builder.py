@@ -4,23 +4,25 @@ from config import settings
 from tools.file_reader import FileReaderTool
 from core.registry import register_agent
 
+
 @register_agent(
     name="product_builder",
     role="Product Builder",
     description="Formulates product requirements, vision, and specifications from user ideas.",
     capabilities=["product_design", "requirements"],
-    tools=["file_reader"]
+    tools=["file_reader"],
 )
 class ProductBuilderAgent(BaseAgent):
     """
     Product Builder Agent responsible for translating ideas into formal software requirements and visions.
     """
+
     def __init__(self, role: str, memory: Any):
         super().__init__(
             role=role,
             memory=memory,
             model=settings.default_model,
-            tools=[FileReaderTool()]
+            tools=[FileReaderTool()],
         )
 
     def run(self, task: str = "") -> str:

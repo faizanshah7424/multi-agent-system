@@ -16,6 +16,7 @@ from core.product_builder.documentation_generator import DocumentationGenerator
 from core.product_builder.product_memory import ProductMemory, ProductRecord
 from core.product_builder.product_engine import AutonomousProductBuilder
 
+
 class TestProductBuilder(unittest.TestCase):
     def setUp(self):
         self.graph = InMemoryGraphEngine()
@@ -133,7 +134,7 @@ class TestProductBuilder(unittest.TestCase):
             "frontend_plan": fe_plan.model_dump(),
             "backend_plan": be_plan.model_dump(),
             "testing_plan": t_plan.model_dump(),
-            "deployment_plan": d_plan.model_dump()
+            "deployment_plan": d_plan.model_dump(),
         }
 
         docs_paths = self.doc_gen.generate_documentation(doc_data)
@@ -153,7 +154,7 @@ class TestProductBuilder(unittest.TestCase):
             generated_documents={"summary": "docs/summary.md"},
             confidence=0.98,
             debate_results={"consensus": "HEX"},
-            execution_duration_seconds=1.45
+            execution_duration_seconds=1.45,
         )
         memory.add_record(record)
         records = memory.list_records()
@@ -163,6 +164,8 @@ class TestProductBuilder(unittest.TestCase):
     def test_full_pipeline_orchestration(self):
         res = self.builder.build_product("Hospital Management System")
         self.assertTrue(res["success"])
-        self.assertEqual(res["business_specs"]["domain"], "Healthcare / Medical Operations")
+        self.assertEqual(
+            res["business_specs"]["domain"], "Healthcare / Medical Operations"
+        )
         self.assertEqual(len(res["documents"]), 10)
         self.assertIn("entity_patient", self.graph.nodes)

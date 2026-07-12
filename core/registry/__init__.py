@@ -15,53 +15,67 @@ logger = get_logger("AgentRegistry")
 # Custom Exception Definitions
 # =====================================================================
 
+
 class RegistryError(Exception):
     """Base exception class for all Agent Registry operations."""
+
     pass
+
 
 class AgentNotFoundError(RegistryError):
     """Raised when looking up or creating an agent that is not registered."""
+
     pass
+
 
 class DuplicateAgentError(RegistryError):
     """Raised when registering an agent with a name that already exists."""
+
     pass
+
 
 class AgentRegistrationError(RegistryError):
     """Raised when registration details or inputs validation fail."""
+
     pass
+
 
 # =====================================================================
 # Models
 # =====================================================================
 
+
 class AgentMetadata(BaseModel):
     """
     Structured data describing an agent's identity, role, and capabilities.
     """
+
     name: str = Field(..., description="Unique code name for the agent registry index.")
-    role: str = Field(..., description="Display role name (e.g. Senior Software Engineer).")
-    description: str = Field(..., description="Description of the agent's responsibilities.")
+    role: str = Field(
+        ..., description="Display role name (e.g. Senior Software Engineer)."
+    )
+    description: str = Field(
+        ..., description="Description of the agent's responsibilities."
+    )
     capabilities: List[str] = Field(
-        default_factory=list, 
-        description="Functional capability tags (e.g. ['research', 'scrapers'])."
+        default_factory=list,
+        description="Functional capability tags (e.g. ['research', 'scrapers']).",
     )
     tools: List[str] = Field(
-        default_factory=list, 
-        description="Explicit tools names this agent can access."
+        default_factory=list, description="Explicit tools names this agent can access."
     )
     input_schema: Optional[Dict[str, Any]] = Field(
-        default=None, 
-        description="Optional input schema for structured execution."
+        default=None, description="Optional input schema for structured execution."
     )
     output_schema: Optional[Dict[str, Any]] = Field(
-        default=None, 
-        description="Optional output schema for structured execution."
+        default=None, description="Optional output schema for structured execution."
     )
+
 
 # =====================================================================
 # AgentRegistry Singleton Class
 # =====================================================================
+
 
 class AgentRegistry:
     """
@@ -69,6 +83,7 @@ class AgentRegistry:
     Prevents circular imports and dynamic state leakage by instantiating
     fresh agent instances on demand.
     """
+
     _instance: Optional["AgentRegistry"] = None
     _lock = threading.Lock()
 
@@ -82,7 +97,7 @@ class AgentRegistry:
         # Prevent re-initialization of self._registry dictionary in singleton instances
         if hasattr(self, "_initialized"):
             return
-            
+
         self._registry: Dict[str, Dict[str, Any]] = {}
         self._initialized = True
         self._registry_lock = threading.Lock()
@@ -91,11 +106,11 @@ class AgentRegistry:
     def register(self, metadata: AgentMetadata, class_ref: Type[Any]) -> None:
         """
         Registers an agent class definition with its metadata description.
-        
+
         Args:
             metadata: Pydantic metadata schema.
             class_ref: Python class reference of the agent.
-            
+
         Raises:
             DuplicateAgentError: If an agent with the same name is already registered.
             AgentRegistrationError: If class_ref is missing or metadata is invalid.
@@ -103,7 +118,9 @@ class AgentRegistry:
         if not metadata.name:
             raise AgentRegistrationError("Agent registry name key cannot be empty.")
         if not class_ref:
-            raise AgentRegistrationError(f"Class reference for agent '{metadata.name}' cannot be None.")
+            raise AgentRegistrationError(
+                f"Class reference for agent '{metadata.name}' cannot be None."
+            )
 
         with self._registry_lock:
             if metadata.name in self._registry:
@@ -115,9 +132,11 @@ class AgentRegistry:
             self._registry[metadata.name] = {
                 "metadata": metadata,
                 "class": class_ref,
-                "registered_at": datetime.now(timezone.utc).replace(tzinfo=None)
+                "registered_at": datetime.now(timezone.utc).replace(tzinfo=None),
             }
-            logger.info(f"Agent '{metadata.name}' ({class_ref.__name__}) successfully registered.")
+            logger.info(
+                f"Agent '{metadata.name}' ({class_ref.__name__}) successfully registered."
+            )
 
     def unregister(self, name: str) -> None:
         """
@@ -133,65 +152,71 @@ class AgentRegistry:
     def get_agent_class(self, name: str) -> Type[Any]:
         """
         Retrieves the registered class reference of an agent.
-        
+
         Raises:
             AgentNotFoundError: If name is not registered.
         """
         with self._registry_lock:
             entry = self._registry.get(name)
             if not entry:
-                raise AgentNotFoundError(f"Agent '{name}' is not registered in the system.")
+                raise AgentNotFoundError(
+                    f"Agent '{name}' is not registered in the system."
+                )
             return entry["class"]
 
     def get_agent_metadata(self, name: str) -> AgentMetadata:
         """
         Retrieves the registered metadata definition of an agent.
-        
+
         Raises:
             AgentNotFoundError: If name is not registered.
         """
         with self._registry_lock:
             entry = self._registry.get(name)
             if not entry:
-                raise AgentNotFoundError(f"Agent '{name}' is not registered in the system.")
+                raise AgentNotFoundError(
+                    f"Agent '{name}' is not registered in the system."
+                )
             return entry["metadata"]
 
     def create_agent(self, name: str, memory: Any, **kwargs: Any) -> Any:
         """
         Instantiates a fresh agent instance from the registered class reference.
         Passes the metadata role and memory directly to the constructor.
-        
+
         Args:
             name: Dynamic registration name.
             memory: SharedMemory context reference.
             **kwargs: Additional parameters passed to constructor.
-            
+
         Returns:
             The instantiated agent object.
-            
+
         Raises:
             AgentNotFoundError: If agent name is not found in registry.
         """
         with self._registry_lock:
             entry = self._registry.get(name)
             if not entry:
-                raise AgentNotFoundError(f"Agent '{name}' is not registered in the system.")
-            
+                raise AgentNotFoundError(
+                    f"Agent '{name}' is not registered in the system."
+                )
+
             agent_class = entry["class"]
             metadata = entry["metadata"]
-            
-        logger.debug(f"Instantiating fresh instance of agent '{name}' ({agent_class.__name__}).")
-        
+
+        logger.debug(
+            f"Instantiating fresh instance of agent '{name}' ({agent_class.__name__})."
+        )
+
         # Instantiate agent using registered class constructor
         try:
-            return agent_class(
-                role=metadata.role,
-                memory=memory,
-                **kwargs
-            )
+            return agent_class(role=metadata.role, memory=memory, **kwargs)
         except Exception as e:
             logger.error(f"Failed to instantiate agent '{name}': {str(e)}")
-            raise RegistryError(f"Failed to instantiate agent '{name}': {str(e)}") from e
+            raise RegistryError(
+                f"Failed to instantiate agent '{name}': {str(e)}"
+            ) from e
 
     def list_agents(self) -> List[AgentMetadata]:
         """
@@ -200,7 +225,9 @@ class AgentRegistry:
         with self._registry_lock:
             return [entry["metadata"] for entry in self._registry.values()]
 
-    def find_by_capability(self, capability: str) -> List[Tuple[Type[Any], AgentMetadata]]:
+    def find_by_capability(
+        self, capability: str
+    ) -> List[Tuple[Type[Any], AgentMetadata]]:
         """
         Finds all registered agents supporting a specific capability tag.
         """
@@ -224,9 +251,11 @@ class AgentRegistry:
                     results.append((entry["class"], metadata))
             return results
 
+
 # =====================================================================
 # Decorator Function
 # =====================================================================
+
 
 def register_agent(
     name: str,
@@ -235,11 +264,12 @@ def register_agent(
     capabilities: Optional[List[str]] = None,
     tools: Optional[List[str]] = None,
     input_schema: Optional[Dict[str, Any]] = None,
-    output_schema: Optional[Dict[str, Any]] = None
+    output_schema: Optional[Dict[str, Any]] = None,
 ) -> Any:
     """
     Class decorator to automatically register an agent class with AgentRegistry.
     """
+
     def decorator(cls: Type[Any]) -> Type[Any]:
         metadata = AgentMetadata(
             name=name,
@@ -248,15 +278,18 @@ def register_agent(
             capabilities=capabilities or [],
             tools=tools or [],
             input_schema=input_schema,
-            output_schema=output_schema
+            output_schema=output_schema,
         )
         AgentRegistry().register(metadata, cls)
         return cls
+
     return decorator
+
 
 # =====================================================================
 # Autodiscovery Loader
 # =====================================================================
+
 
 def discover_agents(directory_path: Optional[str] = None) -> None:
     """
@@ -282,13 +315,15 @@ def discover_agents(directory_path: Optional[str] = None) -> None:
     for _, module_name, is_pkg in pkgutil.iter_modules([str(path.resolve())]):
         if module_name.startswith("__") or module_name in ("base_agent", "manager"):
             continue
-            
+
         full_module_path = f"{package_name}.{module_name}"
         try:
             logger.debug(f"Importing discovered agent module: {full_module_path}")
             importlib.import_module(full_module_path)
             modules_imported += 1
         except Exception as e:
-            logger.error(f"Failed to load discovered module {full_module_path}: {str(e)}")
-            
+            logger.error(
+                f"Failed to load discovered module {full_module_path}: {str(e)}"
+            )
+
     logger.info(f"Autodiscovery complete. Loaded {modules_imported} module files.")

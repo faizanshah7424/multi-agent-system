@@ -1,10 +1,12 @@
 import os
 from typing import List, Dict
 
+
 class RollbackManager:
     """
     Creates file checkpoints and restores them if an execution failure occurs.
     """
+
     def __init__(self, graph=None):
         self.graph = graph
         self.backups: Dict[str, bytes] = {}

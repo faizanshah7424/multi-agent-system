@@ -6,9 +6,14 @@ from core.di_setup import bootstrap_di
 from core.security.secret_manager import SecretManager
 from core.security.policy_manager import RuntimePolicyManager
 from core.security.audit import SecurityAuditEngine, SecurityFinding
-from core.models.providers import FailoverModelProvider, OpenAIProvider, AnthropicProvider
+from core.models.providers import (
+    FailoverModelProvider,
+    OpenAIProvider,
+    AnthropicProvider,
+)
 from core.models.interface import ModelParameters
 from core.sandbox.docker_sandbox import DockerSandbox
+
 
 class TestSprint11SecurityAndRuntime(unittest.TestCase):
     def setUp(self) -> None:
@@ -20,11 +25,13 @@ class TestSprint11SecurityAndRuntime(unittest.TestCase):
     def test_secret_manager_masking(self) -> None:
         # Register a temporary secret
         self.secret_mgr.set_secret("TEST_SECRET_KEY", "super_secret_password_123")
-        
+
         # Test masking in raw text
-        log_message = "Attempted connection with password super_secret_password_123 on database."
+        log_message = (
+            "Attempted connection with password super_secret_password_123 on database."
+        )
         masked = self.secret_mgr.mask_secrets(log_message)
-        
+
         self.assertNotIn("super_secret_password_123", masked)
         self.assertIn("[MASKED_TEST_SECRET_KEY]", masked)
 
@@ -55,7 +62,7 @@ class TestSprint11SecurityAndRuntime(unittest.TestCase):
     def test_runtime_policy_path_and_file(self) -> None:
         # Test path traversal prevention
         self.assertFalse(self.policy_mgr.validate_path("../../outside_workspace.py"))
-        
+
         # Test protected configuration files
         self.assertTrue(self.policy_mgr.is_protected_file("tsconfig.json"))
         self.assertTrue(self.policy_mgr.is_protected_file("package.json"))
@@ -72,7 +79,7 @@ class TestSprint11SecurityAndRuntime(unittest.TestCase):
             "open('../outside_dir.txt')\n"
         )
         findings = self.audit_engine.audit_code(unsafe_code, "test_file.py")
-        
+
         categories = [f.category for f in findings]
         self.assertIn("SECRET_EXPOSURE", categories)
         self.assertIn("UNSAFE_SHELL", categories)
@@ -82,17 +89,17 @@ class TestSprint11SecurityAndRuntime(unittest.TestCase):
         # Create a mock provider that always crashes
         mock1 = MagicMock()
         mock1.generate.side_effect = RuntimeError("Service Unavailable")
-        
+
         # Create a mock provider that succeeds
         mock2 = MagicMock()
         mock2.generate.return_value = "OpenAI response"
 
         failover_provider = FailoverModelProvider([mock1, mock2])
         params = ModelParameters()
-        
+
         res = failover_provider.generate("Hello", "You are assistant", params)
         self.assertEqual(res, "OpenAI response")
-        
+
         # Ensure both were called (mock1 failed, mock2 was invoked)
         mock1.generate.assert_called_once()
         mock2.generate.assert_called_once()
@@ -104,12 +111,13 @@ class TestSprint11SecurityAndRuntime(unittest.TestCase):
             cpu_limit="2.0",
             memory_limit="1024m",
             network_disabled=True,
-            read_only_root=True
+            read_only_root=True,
         )
         self.assertEqual(sandbox.cpu_limit, "2.0")
         self.assertEqual(sandbox.memory_limit, "1024m")
         self.assertTrue(sandbox.network_disabled)
         self.assertTrue(sandbox.read_only_root)
+
 
 if __name__ == "__main__":
     unittest.main()

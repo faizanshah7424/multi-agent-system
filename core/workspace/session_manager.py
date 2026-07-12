@@ -5,32 +5,48 @@ from core.workspace.interface import IWorkspaceSessionManager, SessionState
 from core.di import DIContainer
 from core.workspace.interface import IWorkspaceManager
 
+
 # SQLAlchemy database schema representing session tracking records
 class DBSessionState(Base):
-    __tablename__ = 'workspace_sessions'
-    
+    __tablename__ = "workspace_sessions"
+
     task_id = Column(String(50), primary_key=True)
     workspace_path = Column(String(512), nullable=False)
     container_id = Column(String(100), nullable=True)
     git_branch = Column(String(100), nullable=False)
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
-    last_active = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    created_at = Column(
+        DateTime,
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
+    )
+    last_active = Column(
+        DateTime,
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
+    )
+
 
 # Dynamically initialize tables
 Base.metadata.create_all(bind=engine)
+
 
 class WorkspaceSessionManager(IWorkspaceSessionManager):
     """
     Concrete Session Manager implementing session persistence in SQLite database
     to prevent resource leaks.
     """
+
     def start_session(self, task_id: str) -> SessionState:
         """
         Initializes and registers a tracking session structure.
         """
         # 1. Check if session already exists
         with get_db_session() as session:
-            record = session.query(DBSessionState).filter(DBSessionState.task_id == task_id).first()
+            record = (
+                session.query(DBSessionState)
+                .filter(DBSessionState.task_id == task_id)
+                .first()
+            )
             if record:
                 return SessionState(
                     task_id=record.task_id,
@@ -38,7 +54,7 @@ class WorkspaceSessionManager(IWorkspaceSessionManager):
                     container_id=record.container_id,
                     git_branch=record.git_branch,
                     created_at=record.created_at,
-                    last_active=record.last_active
+                    last_active=record.last_active,
                 )
 
         # 2. Retrieve WorkspaceManager from DIContainer to allocate worktree
@@ -53,7 +69,7 @@ class WorkspaceSessionManager(IWorkspaceSessionManager):
             container_id=None,
             git_branch=git_branch,
             created_at=datetime.now(timezone.utc).replace(tzinfo=None),
-            last_active=datetime.now(timezone.utc).replace(tzinfo=None)
+            last_active=datetime.now(timezone.utc).replace(tzinfo=None),
         )
 
         with get_db_session() as session:
@@ -63,7 +79,7 @@ class WorkspaceSessionManager(IWorkspaceSessionManager):
                 container_id=state.container_id,
                 git_branch=state.git_branch,
                 created_at=state.created_at,
-                last_active=state.last_active
+                last_active=state.last_active,
             )
             session.add(db_record)
 
@@ -77,7 +93,11 @@ class WorkspaceSessionManager(IWorkspaceSessionManager):
         container_id = None
 
         with get_db_session() as session:
-            record = session.query(DBSessionState).filter(DBSessionState.task_id == task_id).first()
+            record = (
+                session.query(DBSessionState)
+                .filter(DBSessionState.task_id == task_id)
+                .first()
+            )
             if record:
                 workspace_path = record.workspace_path
                 container_id = record.container_id
@@ -87,6 +107,7 @@ class WorkspaceSessionManager(IWorkspaceSessionManager):
         if container_id:
             try:
                 from core.sandbox.interface import ISandbox
+
                 sandbox = DIContainer.get(ISandbox)
                 # Assign active container id to terminate it
                 if hasattr(sandbox, "container_id"):

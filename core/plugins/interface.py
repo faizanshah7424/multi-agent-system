@@ -1,10 +1,12 @@
 from typing import Any, Dict, Protocol, runtime_checkable
 
+
 @runtime_checkable
 class IPlugin(Protocol):
     """
     Interface for third-party extensions utilizing platform lifecycle hooks.
     """
+
     def on_startup(self, config: Dict[str, Any]) -> None:
         """Executed during API/Worker startup bootstrap sequences."""
         ...
@@ -13,7 +15,9 @@ class IPlugin(Protocol):
         """Executed when a worker runtime claims a task."""
         ...
 
-    def on_step_complete(self, task_id: str, step_id: int, result_payload: Dict[str, Any]) -> None:
+    def on_step_complete(
+        self, task_id: str, step_id: int, result_payload: Dict[str, Any]
+    ) -> None:
         """Executed on successful workflow step completion."""
         ...
 
@@ -21,11 +25,13 @@ class IPlugin(Protocol):
         """Executed on system shutdown."""
         ...
 
+
 @runtime_checkable
 class IPluginManager(Protocol):
     """
     Interface managing and dispatching events to active plugins.
     """
+
     def register_plugin(self, name: str, plugin: IPlugin) -> None:
         """Registers a plugin instance."""
         ...
@@ -38,7 +44,9 @@ class IPluginManager(Protocol):
         """Broadcasts task claim hooks."""
         ...
 
-    def trigger_step_complete(self, task_id: str, step_id: int, result_payload: Dict[str, Any]) -> None:
+    def trigger_step_complete(
+        self, task_id: str, step_id: int, result_payload: Dict[str, Any]
+    ) -> None:
         """Broadcasts step completion hooks."""
         ...
 

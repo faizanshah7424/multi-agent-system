@@ -1,6 +1,10 @@
 import os
 import unittest
-from core.autonomous_repository.repository_memory import RepositoryMemory, RepositoryRecord
+from core.autonomous_repository.repository_memory import (
+    RepositoryMemory,
+    RepositoryRecord,
+)
+
 
 class TestRepositoryMemory(unittest.TestCase):
     def setUp(self):
@@ -28,7 +32,7 @@ class TestRepositoryMemory(unittest.TestCase):
             confidence=0.90,
             validation_results={"success": True},
             rollback_snapshot="snap_1",
-            execution_duration_seconds=1.23
+            execution_duration_seconds=1.23,
         )
         self.memory.add_record(record)
 

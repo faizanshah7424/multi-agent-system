@@ -31,4 +31,3 @@ __all__ = [
 
 # Run dynamic discovery to auto-register any external/custom plugin agents placed in this folder
 discover_agents()
-

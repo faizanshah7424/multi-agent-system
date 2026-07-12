@@ -4,11 +4,13 @@ from pathlib import Path
 from typing import Dict, List, Optional
 from core.registry.interface import ISkillRegistry
 
+
 class SkillRegistry(ISkillRegistry):
     """
     Concrete implementation of ISkillRegistry.
     Loads and indexes markdown procedural guidelines from disk, parsing frontmatter version/category.
     """
+
     def __init__(self) -> None:
         # Maps skill name to absolute file path
         self._skills: Dict[str, str] = {}
@@ -25,15 +27,15 @@ class SkillRegistry(ISkillRegistry):
 
         content = path.read_text(encoding="utf-8", errors="replace")
         meta = self._parse_frontmatter(content)
-        
+
         # Override name if specified in frontmatter
         skill_name = meta.get("name") or name
-        
+
         self._skills[skill_name] = str(path)
         self._metadata[skill_name] = {
             "version": meta.get("version", "1.0.0"),
             "category": meta.get("category", "general"),
-            "description": meta.get("description", "")
+            "description": meta.get("description", ""),
         }
 
     def get_skill_instructions(self, name: str) -> str:
@@ -42,7 +44,7 @@ class SkillRegistry(ISkillRegistry):
         """
         if name not in self._skills:
             raise KeyError(f"Skill '{name}' is not registered.")
-        
+
         path = Path(self._skills[name])
         return path.read_text(encoding="utf-8", errors="replace")
 
@@ -56,7 +58,11 @@ class SkillRegistry(ISkillRegistry):
 
     def get_skills_by_category(self, category: str) -> List[str]:
         """Filters registered skill names by category."""
-        return [name for name, meta in self._metadata.items() if meta["category"] == category]
+        return [
+            name
+            for name, meta in self._metadata.items()
+            if meta["category"] == category
+        ]
 
     def _parse_frontmatter(self, content: str) -> Dict[str, str]:
         meta = {}

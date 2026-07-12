@@ -2,11 +2,13 @@ from typing import Dict, Type, TypeVar, Any
 
 T = TypeVar("T")
 
+
 class DIContainer:
     """
-    A simple, runtime-safe Dependency Injection container to decouple 
+    A simple, runtime-safe Dependency Injection container to decouple
     interfaces from concrete provider implementations.
     """
+
     _registry: Dict[Type[Any], Any] = {}
 
     @classmethod
@@ -20,12 +22,14 @@ class DIContainer:
     def get(cls, interface: Type[T]) -> T:
         """
         Retrieves the registered implementation instance for a given interface type.
-        
+
         Raises:
             KeyError: If the interface has not been registered.
         """
         if interface not in cls._registry:
-            raise KeyError(f"Interface {interface.__name__} is not registered in DIContainer.")
+            raise KeyError(
+                f"Interface {interface.__name__} is not registered in DIContainer."
+            )
         return cls._registry[interface]
 
     @classmethod

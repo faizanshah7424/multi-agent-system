@@ -13,6 +13,7 @@ from core.diagnostics.metrics import MetricsCollector, RunMetrics, LatencyBreakd
 from core.diagnostics.doc_audit import DocumentationAudit
 from core.diagnostics.version import VersionManager
 
+
 class TestSprint13DiagnosticsAndCLI(unittest.TestCase):
     def setUp(self) -> None:
         bootstrap_di()
@@ -39,7 +40,7 @@ class TestSprint13DiagnosticsAndCLI(unittest.TestCase):
         # Test recovery ping
         db_ok = self.recovery_mgr.check_and_recover_db()
         self.assertTrue(db_ok)
-        
+
         # Test crash report creation
         error = ValueError("Simulation failure for diagnostics verification.")
         report_path = CrashReportGenerator.generate_report(
@@ -47,18 +48,18 @@ class TestSprint13DiagnosticsAndCLI(unittest.TestCase):
             active_agent="developer",
             current_task="Test Sprint 13 E2E recovery",
             sandbox_id="temp_sandbox_1",
-            model_name="gemini-2.5-flash"
+            model_name="gemini-2.5-flash",
         )
-        
+
         path = Path(report_path)
         self.assertTrue(path.exists())
-        
+
         # Read the file to check keys
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
             self.assertEqual(data["error_type"], "ValueError")
             self.assertEqual(data["active_agent"], "developer")
-            
+
         # Cleanup
         path.unlink()
 
@@ -66,18 +67,24 @@ class TestSprint13DiagnosticsAndCLI(unittest.TestCase):
         with TemporaryDirectory() as temp_dir:
             file_path = Path(temp_dir) / "metrics.json"
             collector = MetricsCollector(persist_path=str(file_path))
-            
+
             # Record a run metric
-            latencies = LatencyBreakdown(planning=0.1, execution=1.2, repair=0.0, consensus=0.5, memory_lookup=0.05)
+            latencies = LatencyBreakdown(
+                planning=0.1,
+                execution=1.2,
+                repair=0.0,
+                consensus=0.5,
+                memory_lookup=0.05,
+            )
             run = RunMetrics(
                 task_id="task_test_metrics",
                 success=True,
                 latencies=latencies,
                 tokens_used=1500,
-                cost_usd=0.02
+                cost_usd=0.02,
             )
             collector.record_run(run)
-            
+
             # Verify persistence and loading
             self.assertTrue(file_path.exists())
             summary = collector.get_summary()
@@ -95,6 +102,7 @@ class TestSprint13DiagnosticsAndCLI(unittest.TestCase):
         self.assertEqual(info["version"], "1.0.0")
         self.assertEqual(info["architecture_version"], "2.2")
         self.assertEqual(info["sprint_version"], "13")
+
 
 if __name__ == "__main__":
     unittest.main()

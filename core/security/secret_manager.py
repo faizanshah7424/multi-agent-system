@@ -1,12 +1,14 @@
 import os
 from typing import Dict
 
+
 class SecretManager:
     """
     Enterprise-grade Secret Manager subsystem.
     Handles storage of credentials, environment validations, secret rotation interfaces,
     and log masking to prevent leaks in telemetry.
     """
+
     def __init__(self) -> None:
         self._secrets: Dict[str, str] = {}
         self.load_secrets()
@@ -18,7 +20,7 @@ class SecretManager:
             "OPENAI_API_KEY",
             "ANTHROPIC_API_KEY",
             "POSTGRES_PASSWORD",
-            "AWS_SECRET_ACCESS_KEY"
+            "AWS_SECRET_ACCESS_KEY",
         ]:
             val = os.getenv(key, "")
             if val:
@@ -39,7 +41,7 @@ class SecretManager:
         return {
             "GEMINI_API_KEY": bool(self.get_secret("GEMINI_API_KEY")),
             "OPENAI_API_KEY": bool(self.get_secret("OPENAI_API_KEY")),
-            "ANTHROPIC_API_KEY": bool(self.get_secret("ANTHROPIC_API_KEY"))
+            "ANTHROPIC_API_KEY": bool(self.get_secret("ANTHROPIC_API_KEY")),
         }
 
     def mask_secrets(self, text: str) -> str:

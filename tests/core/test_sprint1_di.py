@@ -4,6 +4,7 @@ from typing import List
 from core.di import DIContainer
 from core.sandbox.interface import ISandbox, SandboxExecutionResult
 
+
 # Concrete implementation to test protocol compliance and DI registration
 class MockSandbox:
     def start(self) -> None:
@@ -15,7 +16,7 @@ class MockSandbox:
             stdout="success",
             stderr="",
             duration_seconds=0.1,
-            timeout_exceeded=False
+            timeout_exceeded=False,
         )
 
     def copy_in(self, local_path: str, remote_path: str) -> None:
@@ -26,6 +27,7 @@ class MockSandbox:
 
     def terminate(self) -> None:
         pass
+
 
 class TestDIAndInterfaces(unittest.TestCase):
     def setUp(self) -> None:

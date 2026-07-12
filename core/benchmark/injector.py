@@ -4,10 +4,12 @@ from core.benchmark.schemas import InjectableBug
 
 logger = get_logger("FailureInjectionEngine")
 
+
 class FailureInjectionEngine:
     """
     Deterministic bug injection engine modifying and reverting benchmark code files.
     """
+
     def __init__(self) -> None:
         pass
 
@@ -22,7 +24,9 @@ class FailureInjectionEngine:
 
         content = file_path.read_text(encoding="utf-8")
         if bug.target_content not in content:
-            logger.warning(f"Target content snippet not found in {bug.file_path}. Incomplete injection.")
+            logger.warning(
+                f"Target content snippet not found in {bug.file_path}. Incomplete injection."
+            )
             return False
 
         injected_content = content.replace(bug.target_content, bug.bug_content)

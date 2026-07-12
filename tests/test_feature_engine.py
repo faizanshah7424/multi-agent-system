@@ -8,6 +8,7 @@ from core.feature_engine.feature_engine import AutonomousFeatureEngine
 from core.feature_engine.feature_memory import FeatureMemory
 from core.feature_engine.migration_manager import MigrationManager
 
+
 class TestFeatureEngine(unittest.TestCase):
     def setUp(self):
         self.graph = InMemoryGraphEngine()
@@ -29,18 +30,16 @@ class TestFeatureEngine(unittest.TestCase):
 
     def test_develop_feature_success(self):
         self.graph.nodes["core/database.py"] = Node(
-            id="core/database.py",
-            type=NodeType.FILE,
-            name="database.py"
+            id="core/database.py", type=NodeType.FILE, name="database.py"
         )
         self.graph.nodes["core/auth/security.py"] = Node(
-            id="core/auth/security.py",
-            type=NodeType.FILE,
-            name="security.py"
+            id="core/auth/security.py", type=NodeType.FILE, name="security.py"
         )
 
         apply_mock = MagicMock()
-        res = self.engine.develop_feature("Build a Login System", apply_feature_fn=apply_mock)
+        res = self.engine.develop_feature(
+            "Build a Login System", apply_feature_fn=apply_mock
+        )
 
         self.assertTrue(res["success"])
         self.assertIsNone(res["failures"])

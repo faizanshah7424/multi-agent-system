@@ -4,11 +4,13 @@ from core.models.providers import calculate_usd_cost
 from core.registry.interface import IPromptLibrary
 from core.queue.scheduler import PlanDAG, IDAGScheduler
 
+
 class PlanningEngine:
     """
     Planning Engine utilizing PromptLibrary and ModelProvider to generate
     and validate topological task DAG execution plans.
     """
+
     def __init__(self) -> None:
         pass
 
@@ -24,11 +26,7 @@ class PlanningEngine:
 
         # 2. Format the prompt using versioned template
         prompt = prompt_library.get_prompt(
-            "planner_v1",
-            {
-                "user_request": user_request,
-                "tech_stack": repo_report
-            }
+            "planner_v1", {"user_request": user_request, "tech_stack": repo_report}
         )
 
         system_instruction = (
@@ -37,18 +35,14 @@ class PlanningEngine:
             "All step IDs must be unique integers. Dependencies must refer only to other step IDs in the list."
         )
 
-        params = ModelParameters(
-            temperature=0.1,
-            max_tokens=4096,
-            retries=2
-        )
+        params = ModelParameters(temperature=0.1, max_tokens=4096, retries=2)
 
         # 3. Generate structured output conforming to PlanDAG schema
         plan_dag = model_provider.generate_structured(
             prompt=prompt,
             schema=PlanDAG,
             system_instruction=system_instruction,
-            params=params
+            params=params,
         )
 
         # 4. Validate the generated DAG

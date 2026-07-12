@@ -8,18 +8,25 @@ from typing import Any, Dict, List, Optional
 from core.logging import get_logger
 from core.di import DIContainer
 from core.benchmark.interface import IBenchmarkManager
-from core.benchmark.schemas import BenchmarkProject, InjectableBug, BenchmarkMetric, BenchmarkReport
+from core.benchmark.schemas import (
+    BenchmarkProject,
+    InjectableBug,
+    BenchmarkMetric,
+    BenchmarkReport,
+)
 from core.benchmark.injector import FailureInjectionEngine
 from core.queue.scheduler import PlanStep, PlanDAG
 from core.queue.execution_runtime import IPlanExecutor
 
 logger = get_logger("BenchmarkManager")
 
+
 class BenchmarkManager(IBenchmarkManager):
     """
     Concrete manager orchestrating E2E capability benchmarking executions,
     metrics aggregation, and score outputs.
     """
+
     def __init__(self) -> None:
         self.injector = FailureInjectionEngine()
         self.projects = self._load_default_projects()
@@ -34,10 +41,10 @@ class BenchmarkManager(IBenchmarkManager):
                 {
                     "name": p.name,
                     "category": p.category,
-                    "bugs": [b.bug_id for b in p.injectable_bugs]
+                    "bugs": [b.bug_id for b in p.injectable_bugs],
                 }
                 for p in self.projects.values()
-            ]
+            ],
         }
 
     def run_benchmark(self, project_name: str, bug_id: str) -> Dict[str, Any]:
@@ -54,11 +61,11 @@ class BenchmarkManager(IBenchmarkManager):
             raise ValueError(f"Bug '{bug_id}' not found in project '{project_name}'.")
 
         start_time = time.time()
-        
+
         # 1. Establish isolated workspace environment (Never polluting original repo)
         with TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            
+
             # Write base project files
             for rel_path, content in project.files.items():
                 target_file = temp_path / rel_path
@@ -76,19 +83,19 @@ class BenchmarkManager(IBenchmarkManager):
                 step_id=1,
                 dependencies=[],
                 assigned_agent="developer",
-                description=f"RUN: python -c \"print('Executing build validation')\""
+                description=f"RUN: python -c \"print('Executing build validation')\"",
             )
             dag = PlanDAG(steps=[s1])
 
             # Trigger plan executor on the temporary path
             plan_executor = DIContainer.get(IPlanExecutor)
             task_id = f"benchmark_{project_name}_{bug_id}"
-            
+
             # Resolve plan E2E (Self-healing will attempt repair if sandbox validates lints)
             success = plan_executor.execute_plan(task_id, dag)
 
             duration = time.time() - start_time
-            
+
             # 4. Aggregate metrics
             metrics = BenchmarkMetric(
                 detection_accuracy=1.0 if success else 0.5,
@@ -98,7 +105,7 @@ class BenchmarkManager(IBenchmarkManager):
                 average_repair_time=duration if success else 0.0,
                 repair_attempts=1 if success else 3,
                 files_modified=1,
-                false_repairs=0
+                false_repairs=0,
             )
 
             scores = {
@@ -107,7 +114,7 @@ class BenchmarkManager(IBenchmarkManager):
                 "Execution": 0.93,
                 "Self-Healing": 0.88 if success else 0.20,
                 "Human Collaboration": 0.90,
-                "Overall Engineering Score": 0.91 if success else 0.60
+                "Overall Engineering Score": 0.91 if success else 0.60,
             }
 
             report = BenchmarkReport(
@@ -117,7 +124,7 @@ class BenchmarkManager(IBenchmarkManager):
                 status="SUCCESS" if success else "FAILED",
                 duration_seconds=duration,
                 metrics=metrics,
-                scores=scores
+                scores=scores,
             )
 
             # 5. Generate Markdown reports
@@ -216,17 +223,17 @@ class BenchmarkManager(IBenchmarkManager):
             category="Python",
             files={
                 "core.py": "def add(x, y):\n    return x + y\n",
-                "test_core.py": "from core import add\ndef test_add():\n    assert add(2, 3) == 5\n"
+                "test_core.py": "from core import add\ndef test_add():\n    assert add(2, 3) == 5\n",
             },
             injectable_bugs=[
                 InjectableBug(
                     bug_id="syntax_bug",
                     file_path="core.py",
                     target_content="return x + y",
-                    bug_content="return x +", # Syntax error
-                    category="SYNTAX_ERROR"
+                    bug_content="return x +",  # Syntax error
+                    category="SYNTAX_ERROR",
                 )
-            ]
+            ],
         )
 
         python_cli_project = BenchmarkProject(
@@ -234,7 +241,7 @@ class BenchmarkManager(IBenchmarkManager):
             category="Python CLI",
             files={
                 "cli.py": "import sys\ndef run():\n    print('CLI args:', sys.argv[1:])\n",
-                "test_cli.py": "from cli import run\ndef test_cli():\n    assert run() is None\n"
+                "test_cli.py": "from cli import run\ndef test_cli():\n    assert run() is None\n",
             },
             injectable_bugs=[
                 InjectableBug(
@@ -242,9 +249,9 @@ class BenchmarkManager(IBenchmarkManager):
                     file_path="cli.py",
                     target_content="import sys",
                     bug_content="import sys_missing",
-                    category="IMPORT_ERROR"
+                    category="IMPORT_ERROR",
                 )
-            ]
+            ],
         )
 
         fastapi_project = BenchmarkProject(
@@ -258,10 +265,10 @@ class BenchmarkManager(IBenchmarkManager):
                     bug_id="import_bug",
                     file_path="main.py",
                     target_content="from fastapi import FastAPI",
-                    bug_content="from fastapi_missing import FastAPI", # Import error
-                    category="IMPORT_ERROR"
+                    bug_content="from fastapi_missing import FastAPI",  # Import error
+                    category="IMPORT_ERROR",
                 )
-            ]
+            ],
         )
 
         nextjs_ts_project = BenchmarkProject(
@@ -269,17 +276,17 @@ class BenchmarkManager(IBenchmarkManager):
             category="NextJS TypeScript",
             files={
                 "app/page.tsx": "export default function Page() {\n  const title: string = 'Welcome to Next.js';\n  return <h1>{title}</h1>;\n}\n",
-                "tsconfig.json": "{\"compilerOptions\": {\"strict\": true}}\n"
+                "tsconfig.json": '{"compilerOptions": {"strict": true}}\n',
             },
             injectable_bugs=[
                 InjectableBug(
                     bug_id="typescript_bug",
                     file_path="app/page.tsx",
                     target_content="const title: string = 'Welcome to Next.js';",
-                    bug_content="const title: number = 'Welcome to Next.js';", # Type mismatch
-                    category="TYPESCRIPT_ERROR"
+                    bug_content="const title: number = 'Welcome to Next.js';",  # Type mismatch
+                    category="TYPESCRIPT_ERROR",
                 )
-            ]
+            ],
         )
 
         react_project = BenchmarkProject(
@@ -293,10 +300,10 @@ class BenchmarkManager(IBenchmarkManager):
                     bug_id="unclosed_tag",
                     file_path="src/App.jsx",
                     target_content="return <div>Hello React</div>;",
-                    bug_content="return <div>Hello React;", # Broken JSX
-                    category="SYNTAX_ERROR"
+                    bug_content="return <div>Hello React;",  # Broken JSX
+                    category="SYNTAX_ERROR",
                 )
-            ]
+            ],
         )
 
         hospital_sys_project = BenchmarkProject(
@@ -304,7 +311,7 @@ class BenchmarkManager(IBenchmarkManager):
             category="Hospital Management System",
             files={
                 "hospital/models.py": "class Patient:\n    def __init__(self, name: str):\n        self.name = name\n",
-                "hospital/api.py": "from hospital.models import Patient\ndef checkin(name):\n    p = Patient(name)\n    return {'status': 'checked_in', 'patient': p.name}\n"
+                "hospital/api.py": "from hospital.models import Patient\ndef checkin(name):\n    p = Patient(name)\n    return {'status': 'checked_in', 'patient': p.name}\n",
             },
             injectable_bugs=[
                 InjectableBug(
@@ -312,9 +319,9 @@ class BenchmarkManager(IBenchmarkManager):
                     file_path="hospital/api.py",
                     target_content="from hospital.models import Patient",
                     bug_content="from hospital.models_missing import Patient",
-                    category="IMPORT_ERROR"
+                    category="IMPORT_ERROR",
                 )
-            ]
+            ],
         )
 
         ecommerce_sys_project = BenchmarkProject(
@@ -328,10 +335,10 @@ class BenchmarkManager(IBenchmarkManager):
                     bug_id="index_error",
                     file_path="shop/cart.py",
                     target_content="self.items.append(item)",
-                    bug_content="self.items.append(item)\n        print(self.items[10])", # Force IndexError
-                    category="RUNTIME_ERROR"
+                    bug_content="self.items.append(item)\n        print(self.items[10])",  # Force IndexError
+                    category="RUNTIME_ERROR",
                 )
-            ]
+            ],
         )
 
         return {
@@ -341,6 +348,5 @@ class BenchmarkManager(IBenchmarkManager):
             "nextjs_ts": nextjs_ts_project,
             "react_web": react_project,
             "hospital_sys": hospital_sys_project,
-            "ecommerce_sys": ecommerce_sys_project
+            "ecommerce_sys": ecommerce_sys_project,
         }
-

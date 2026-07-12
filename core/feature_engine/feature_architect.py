@@ -1,10 +1,12 @@
 from typing import List, Dict, Any
 from core.feature_engine.feature_parser import FeatureSpec
 
+
 class FeatureArchitect:
     """
     Validates architectural fit, locates reusable modules, and prevents duplicate feature logic.
     """
+
     def analyze_architecture_fit(self, spec: FeatureSpec) -> Dict[str, Any]:
         reusable_modules = []
         new_modules = []
@@ -21,7 +23,9 @@ class FeatureArchitect:
         # Check for duplication in existing APIs
         for api in spec.apis:
             if "/auth" in api["path"]:
-                duplications_detected.append(f"API endpoint {api['path']} matches pattern in api/auth_routes.py")
+                duplications_detected.append(
+                    f"API endpoint {api['path']} matches pattern in api/auth_routes.py"
+                )
 
         # Propose new module layouts
         goals_str = spec.goals[0].lower() if spec.goals else ""
@@ -37,5 +41,5 @@ class FeatureArchitect:
             "reusable_modules": reusable_modules,
             "new_modules": new_modules,
             "duplications_detected": duplications_detected,
-            "recommendation": "Integrate endpoints in modular routers and reuse session contexts."
+            "recommendation": "Integrate endpoints in modular routers and reuse session contexts.",
         }

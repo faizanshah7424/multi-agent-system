@@ -5,17 +5,19 @@ from pathlib import Path
 from typing import List, Optional
 from core.workspace.interface import IWorkspaceManager, FileChange
 
+
 class WorkspaceManager(IWorkspaceManager):
     """
     Concrete Workspace Manager providing transactional isolation via Git worktrees.
     Dispatches CLI subprocesses to manage branch and worktree allocations.
     """
+
     def __init__(self, main_repo_path: Optional[str] = None) -> None:
         if main_repo_path:
             self.main_repo_path = Path(main_repo_path).resolve()
         else:
             self.main_repo_path = Path(__file__).parent.parent.parent.resolve()
-            
+
         self.worktrees_root = self.main_repo_path / "worktrees"
         self.worktrees_root.mkdir(exist_ok=True)
 
@@ -27,10 +29,12 @@ class WorkspaceManager(IWorkspaceManager):
             capture_output=True,
             text=True,
             encoding="utf-8",
-            errors="replace"
+            errors="replace",
         )
         if res.returncode != 0:
-            raise RuntimeError(f"Git {' '.join(args)} failed in {target_cwd}: {res.stderr.strip()}")
+            raise RuntimeError(
+                f"Git {' '.join(args)} failed in {target_cwd}: {res.stderr.strip()}"
+            )
         return res.stdout.strip()
 
     def create_workspace(self, task_id: str) -> str:
@@ -39,7 +43,7 @@ class WorkspaceManager(IWorkspaceManager):
         """
         branch_name = f"task_{task_id}"
         worktree_path = self.worktrees_root / branch_name
-        
+
         # Resolve base branch to branch off of
         try:
             base_branch = self._run_git(["branch", "--show-current"])
@@ -62,8 +66,10 @@ class WorkspaceManager(IWorkspaceManager):
                 shutil.rmtree(worktree_path, ignore_errors=True)
 
         # Create Git worktree
-        self._run_git(["worktree", "add", "-b", branch_name, str(worktree_path), base_branch])
-        
+        self._run_git(
+            ["worktree", "add", "-b", branch_name, str(worktree_path), base_branch]
+        )
+
         return str(worktree_path).replace("\\", "/")
 
     def stage_changes(self, task_id: str, changes: List[FileChange]) -> None:
@@ -73,14 +79,16 @@ class WorkspaceManager(IWorkspaceManager):
         branch_name = f"task_{task_id}"
         worktree_path = self.worktrees_root / branch_name
         if not worktree_path.exists():
-            raise FileNotFoundError(f"Isolated worktree path does not exist: {worktree_path}")
+            raise FileNotFoundError(
+                f"Isolated worktree path does not exist: {worktree_path}"
+            )
 
         for change in changes:
             file_path = worktree_path / change.file_path
-            
+
             # Ensure parent directories exist
             file_path.parent.mkdir(parents=True, exist_ok=True)
-            
+
             if change.action in ("add", "modify"):
                 file_path.write_text(change.content, encoding="utf-8")
             elif change.action == "delete":
@@ -100,7 +108,9 @@ class WorkspaceManager(IWorkspaceManager):
         branch_name = f"task_{task_id}"
         worktree_path = self.worktrees_root / branch_name
         if not worktree_path.exists():
-            raise FileNotFoundError(f"Isolated worktree path does not exist: {worktree_path}")
+            raise FileNotFoundError(
+                f"Isolated worktree path does not exist: {worktree_path}"
+            )
 
         # Git diff against current HEAD of the worktree branch
         # This will capture both staged and unstaged differences
@@ -116,15 +126,20 @@ class WorkspaceManager(IWorkspaceManager):
         branch_name = f"task_{task_id}"
         worktree_path = self.worktrees_root / branch_name
         if not worktree_path.exists():
-            raise FileNotFoundError(f"Isolated worktree path does not exist: {worktree_path}")
+            raise FileNotFoundError(
+                f"Isolated worktree path does not exist: {worktree_path}"
+            )
 
         try:
             # 1. Commit changes inside the isolated worktree
             # Check if there are changes to commit
             status = self._run_git(["status", "--porcelain"], cwd=worktree_path)
             if status:
-                self._run_git(["commit", "-m", f"Task completion commit: {task_id}"], cwd=worktree_path)
-            
+                self._run_git(
+                    ["commit", "-m", f"Task completion commit: {task_id}"],
+                    cwd=worktree_path,
+                )
+
             # 2. Get active branch in main repository
             try:
                 main_branch = self._run_git(["branch", "--show-current"])
@@ -150,7 +165,7 @@ class WorkspaceManager(IWorkspaceManager):
                 self._run_git(["worktree", "remove", str(worktree_path), "--force"])
             except Exception:
                 pass
-            
+
             # Clean up directory leftovers if force remove didn't purge it
             if worktree_path.exists():
                 shutil.rmtree(worktree_path, ignore_errors=True)

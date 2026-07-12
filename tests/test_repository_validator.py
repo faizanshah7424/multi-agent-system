@@ -2,6 +2,7 @@ import unittest
 from core.knowledge.engine import InMemoryGraphEngine
 from core.autonomous_repository.repository_validator import RepositoryValidator
 
+
 class TestRepositoryValidator(unittest.TestCase):
     def setUp(self):
         self.graph = InMemoryGraphEngine()

@@ -5,23 +5,25 @@ from tools.dir_scanner import DirScannerTool
 from tools.file_reader import FileReaderTool
 from core.registry import register_agent
 
+
 @register_agent(
     name="repository_engineer",
     role="Repository Engineer",
     description="Analyzes the codebase structure, scans dependencies, tracks imports, and outlines repository impact.",
     capabilities=["repository_analysis", "dependencies"],
-    tools=["dir_scanner", "file_reader"]
+    tools=["dir_scanner", "file_reader"],
 )
 class RepositoryEngineerAgent(BaseAgent):
     """
     Repository Engineer Agent responsible for analyzing code structure and dependencies.
     """
+
     def __init__(self, role: str, memory: Any):
         super().__init__(
             role=role,
             memory=memory,
             model=settings.default_model,
-            tools=[DirScannerTool(), FileReaderTool()]
+            tools=[DirScannerTool(), FileReaderTool()],
         )
 
     def run(self, task: str = "") -> str:

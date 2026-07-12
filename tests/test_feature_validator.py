@@ -3,6 +3,7 @@ from core.knowledge.engine import InMemoryGraphEngine
 from core.knowledge.entities import Node, NodeType
 from core.feature_engine.feature_validator import FeatureValidator
 
+
 class TestFeatureValidator(unittest.TestCase):
     def setUp(self):
         self.graph = InMemoryGraphEngine()
@@ -10,9 +11,7 @@ class TestFeatureValidator(unittest.TestCase):
 
     def test_validate_feature_success(self):
         self.graph.nodes["core/database.py"] = Node(
-            id="core/database.py",
-            type=NodeType.FILE,
-            name="database.py"
+            id="core/database.py", type=NodeType.FILE, name="database.py"
         )
         res = self.validator.validate_feature(["core/database.py"])
         self.assertTrue(res["success"])

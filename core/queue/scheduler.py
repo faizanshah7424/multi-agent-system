@@ -2,28 +2,36 @@ from typing import Any, Dict, List, Protocol, Set, runtime_checkable
 from pydantic import BaseModel, Field
 from core.models.profiles import AgentProfileRegistry
 
+
 class PlanStep(BaseModel):
     """
     Schema representing a single scheduled step in an execution DAG.
     """
+
     step_id: int
     dependencies: List[int] = Field(default_factory=list)
     assigned_agent: str
     status: str = "pending"
     description: str = Field(default="", description="Task detail description.")
-    files: List[str] = Field(default_factory=list, description="Files affected by this step.")
+    files: List[str] = Field(
+        default_factory=list, description="Files affected by this step."
+    )
+
 
 class PlanDAG(BaseModel):
     """
     Data model encapsulating the set of PlanSteps that form the directed acyclic graph.
     """
+
     steps: List[PlanStep]
+
 
 @runtime_checkable
 class IDAGScheduler(Protocol):
     """
     Interface for resolving task sequencing and parallel step scheduling.
     """
+
     def validate_dag(self, plan: PlanDAG) -> List[str]:
         """
         Runs DFS cycle-detection and reference checks to validate plan safety.
@@ -36,11 +44,13 @@ class IDAGScheduler(Protocol):
         """
         ...
 
+
 class DAGScheduler(IDAGScheduler):
     """
     Concrete implementation of IDAGScheduler.
     Performs validation checks and resolves topological execution orders.
     """
+
     def validate_dag(self, plan: PlanDAG) -> List[str]:
         errors: List[str] = []
         step_ids = [s.step_id for s in plan.steps]
@@ -50,13 +60,20 @@ class DAGScheduler(IDAGScheduler):
             errors.append("Step IDs must be unique.")
 
         step_map = {s.step_id: s for s in plan.steps}
-        
+
         # Load valid agents from registry configuration
         try:
             profile_reg = AgentProfileRegistry()
             valid_agents = set(profile_reg.list_profiles())
         except Exception:
-            valid_agents = {"planner", "researcher", "developer", "reviewer", "repository_engineer", "product_builder"}
+            valid_agents = {
+                "planner",
+                "researcher",
+                "developer",
+                "reviewer",
+                "repository_engineer",
+                "product_builder",
+            }
 
         for step in plan.steps:
             # 2. Check assigned agent validity
@@ -64,7 +81,7 @@ class DAGScheduler(IDAGScheduler):
                 errors.append(
                     f"Step {step.step_id}: Assigned agent '{step.assigned_agent}' is not a registered agent profile."
                 )
-                
+
             # 3. Check dependency references
             for dep in step.dependencies:
                 if dep not in step_map:
@@ -82,7 +99,7 @@ class DAGScheduler(IDAGScheduler):
                     adj[dep].append(step.step_id)
 
             visited: Dict[int, int] = {}  # 0: unvisited, 1: visiting, 2: visited
-            
+
             def has_cycle(u: int) -> bool:
                 visited[u] = 1
                 for v in adj.get(u, []):
@@ -97,7 +114,9 @@ class DAGScheduler(IDAGScheduler):
             for s_id in step_ids:
                 if visited.get(s_id, 0) == 0:
                     if has_cycle(s_id):
-                        errors.append("PlanDAG contains circular dependencies (is not a valid DAG).")
+                        errors.append(
+                            "PlanDAG contains circular dependencies (is not a valid DAG)."
+                        )
                         break
 
         return errors
@@ -108,7 +127,9 @@ class DAGScheduler(IDAGScheduler):
         """
         errors = self.validate_dag(plan)
         if errors:
-            raise ValueError(f"Cannot resolve execution order. Invalid DAG: {'; '.join(errors)}")
+            raise ValueError(
+                f"Cannot resolve execution order. Invalid DAG: {'; '.join(errors)}"
+            )
 
         step_ids = [s.step_id for s in plan.steps]
         step_map = {s.step_id: s for s in plan.steps}
@@ -126,7 +147,7 @@ class DAGScheduler(IDAGScheduler):
         queue = [s_id for s_id in step_ids if in_degree[s_id] == 0]
         # Sort queue to ensure deterministic behavior (lower step IDs run first when independent)
         queue.sort()
-        
+
         order = []
         while queue:
             u = queue.pop(0)
@@ -139,6 +160,8 @@ class DAGScheduler(IDAGScheduler):
             queue.sort()
 
         if len(order) != len(step_ids):
-            raise ValueError("PlanDAG contains circular dependencies (is not a valid DAG).")
+            raise ValueError(
+                "PlanDAG contains circular dependencies (is not a valid DAG)."
+            )
 
         return order

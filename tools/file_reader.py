@@ -5,11 +5,12 @@ from core.logging import get_logger
 
 logger = get_logger("FileReaderTool")
 
+
 class FileReaderInput(BaseModel):
     file_path: str = Field(
-        ..., 
-        description="The absolute or relative path to the file to be read."
+        ..., description="The absolute or relative path to the file to be read."
     )
+
 
 class FileReaderTool(BaseTool):
     name: str = "file_reader"
@@ -24,22 +25,22 @@ class FileReaderTool(BaseTool):
             path = validate_safe_path(file_path)
         except ValueError as ve:
             return f"Error: {ve}"
-            
+
         logger.info(f"Reading file: {path}")
-        
+
         if not path.exists():
             return f"Error: File '{file_path}' does not exist at path '{path}'"
-            
+
         if not path.is_file():
             return f"Error: Path '{file_path}' is a directory, not a file."
-            
+
         # Enforce maximum file size limit (10MB) to prevent memory exhaustion
         try:
             if path.stat().st_size > 10 * 1024 * 1024:
                 return f"Error: File '{file_path}' size ({path.stat().st_size} bytes) exceeds the maximum permitted read limit of 10MB."
         except Exception as e:
             logger.warning(f"Could not check file size for {file_path}: {e}")
-            
+
         try:
             # Safely open file with UTF-8 encoding
             return path.read_text(encoding="utf-8")

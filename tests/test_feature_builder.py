@@ -3,6 +3,7 @@ from core.feature_engine.feature_parser import FeatureParser
 from core.feature_engine.feature_planner import FeaturePlanner
 from core.feature_engine.feature_builder import FeatureBuilder
 
+
 class TestFeatureBuilder(unittest.TestCase):
     def setUp(self):
         self.parser = FeatureParser()

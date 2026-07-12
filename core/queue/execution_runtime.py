@@ -8,22 +8,28 @@ from core.logging import get_logger
 
 logger = get_logger("ExecutionRuntime")
 
+
 @runtime_checkable
 class IAgentExecutor(Protocol):
     """
     Interface for dispatching steps to autonomous agent loops (Sprint 6).
     """
-    def execute_step(self, task_id: str, step: PlanStep, workspace_path: str, sandbox: ISandbox) -> bool:
+
+    def execute_step(
+        self, task_id: str, step: PlanStep, workspace_path: str, sandbox: ISandbox
+    ) -> bool:
         """
         Runs the agent loop for a given step inside the provided workspace/sandbox.
         """
         ...
+
 
 @runtime_checkable
 class IPlanExecutor(Protocol):
     """
     Interface for orchestrating the step-by-step execution of a PlanDAG.
     """
+
     def execute_plan(self, task_id: str, plan: PlanDAG) -> bool:
         """
         Executes a PlanDAG topologically. Returns True if all steps succeed,
@@ -31,23 +37,25 @@ class IPlanExecutor(Protocol):
         """
         ...
 
+
 class EngineeringExecutionRuntime(IPlanExecutor):
     """
     Orchestration runtime for executing PlanDAGs topologically.
     Provisions workspaces and sandboxes per step and routes task execution to agents.
     """
+
     def __init__(self) -> None:
         pass
 
     def execute_plan(self, task_id: str, plan: PlanDAG) -> bool:
         scheduler = DIContainer.get(IDAGScheduler)
-        
+
         # 1. Retrieve HITL orchestrator and event broker
         try:
             hitl_orchestrator = DIContainer.get("hitl_orchestrator")
         except Exception:
             hitl_orchestrator = None
-            
+
         try:
             broker = DIContainer.get(IEventBroker)
         except Exception:
@@ -65,7 +73,9 @@ class EngineeringExecutionRuntime(IPlanExecutor):
         try:
             order = scheduler.get_execution_order(plan)
         except ValueError as e:
-            logger.error(f"Failed to resolve execution order for task {task_id}: {str(e)}")
+            logger.error(
+                f"Failed to resolve execution order for task {task_id}: {str(e)}"
+            )
             return False
 
         # Build step mapping
@@ -73,7 +83,7 @@ class EngineeringExecutionRuntime(IPlanExecutor):
 
         # 3. Get Workspace Session Manager
         session_mgr = DIContainer.get(IWorkspaceSessionManager)
-        
+
         # Start a workspace session for the task (creates Git worktree)
         session_state = session_mgr.start_session(task_id)
         workspace_path = session_state.workspace_path
@@ -87,41 +97,52 @@ class EngineeringExecutionRuntime(IPlanExecutor):
         try:
             for step_id in order:
                 step = step_map[step_id]
-                
+
                 # Skip already completed steps (support resumption)
                 if step.status == "completed":
                     continue
-                
+
                 # Check Human-in-the-Loop approval gate
                 if hitl_orchestrator:
                     approval_type = hitl_orchestrator.check_step_needs_approval(step)
                     # If approval is needed and it hasn't been approved yet
                     if approval_type and step.status != "approved":
                         hitl_orchestrator.request_approval(task_id, step, approval_type)
-                        logger.info(f"Step {step_id} requires {approval_type}. Execution suspended.")
+                        logger.info(
+                            f"Step {step_id} requires {approval_type}. Execution suspended."
+                        )
                         # Release sandbox and workspace resources during pause
                         return False
 
-                logger.info(f"Starting execution of Step {step_id} (Agent: {step.assigned_agent})")
+                logger.info(
+                    f"Starting execution of Step {step_id} (Agent: {step.assigned_agent})"
+                )
                 step.status = "running"
                 if hitl_orchestrator:
                     hitl_orchestrator.register_plan(task_id, plan)
 
                 if broker:
-                    broker.publish("task_progress", {
-                        "task_id": task_id,
-                        "step_id": step.step_id,
-                        "event": "step_started",
-                        "assigned_agent": step.assigned_agent,
-                        "description": step.description
-                    })
-                
+                    broker.publish(
+                        "task_progress",
+                        {
+                            "task_id": task_id,
+                            "step_id": step.step_id,
+                            "event": "step_started",
+                            "assigned_agent": step.assigned_agent,
+                            "description": step.description,
+                        },
+                    )
+
                 # Execute the step
-                step_success = self._execute_step(task_id, step, workspace_path, sandbox)
-                
+                step_success = self._execute_step(
+                    task_id, step, workspace_path, sandbox
+                )
+
                 # If execution failed, attempt self-healing before halting
                 if not step_success:
-                    logger.info(f"Step {step_id} failed. Checking self-healing options...")
+                    logger.info(
+                        f"Step {step_id} failed. Checking self-healing options..."
+                    )
                     try:
                         self_healing_engine = DIContainer.get("self_healing_engine")
                         # Run linter/test to gather failure log context
@@ -131,13 +152,15 @@ class EngineeringExecutionRuntime(IPlanExecutor):
                         else:
                             res_test = sandbox.execute(["pytest"])
                             error_log = res_test.stdout + "\n" + res_test.stderr
-                            
+
                         # Attempt self-healing
                         repaired = self_healing_engine.repair_failure(
                             task_id, step, error_log, workspace_path, sandbox
                         )
                         if repaired:
-                            logger.info(f"Self-healing successfully repaired Step {step_id}!")
+                            logger.info(
+                                f"Self-healing successfully repaired Step {step_id}!"
+                            )
                             step_success = True
                     except Exception as e:
                         logger.warning(f"Self-healing lookup or execution failed: {e}")
@@ -148,30 +171,39 @@ class EngineeringExecutionRuntime(IPlanExecutor):
                     if hitl_orchestrator:
                         hitl_orchestrator.register_plan(task_id, plan)
                     if broker:
-                        broker.publish("task_progress", {
-                            "task_id": task_id,
-                            "step_id": step.step_id,
-                            "event": "step_completed"
-                        })
+                        broker.publish(
+                            "task_progress",
+                            {
+                                "task_id": task_id,
+                                "step_id": step.step_id,
+                                "event": "step_completed",
+                            },
+                        )
                 else:
                     step.status = "failed"
                     logger.error(f"Step {step_id} failed. Halting plan execution.")
                     success = False
-                    
+
                     # Mark all downstream pending steps as cancelled
                     for remaining_id in order:
                         rem_step = step_map[remaining_id]
-                        if rem_step.status == "pending" or rem_step.status == "waiting_for_approval":
+                        if (
+                            rem_step.status == "pending"
+                            or rem_step.status == "waiting_for_approval"
+                        ):
                             rem_step.status = "cancelled"
-                            
+
                     if hitl_orchestrator:
                         hitl_orchestrator.register_plan(task_id, plan)
                     if broker:
-                        broker.publish("task_progress", {
-                            "task_id": task_id,
-                            "step_id": step.step_id,
-                            "event": "step_failed"
-                        })
+                        broker.publish(
+                            "task_progress",
+                            {
+                                "task_id": task_id,
+                                "step_id": step.step_id,
+                                "event": "step_failed",
+                            },
+                        )
                     break
         finally:
             # 5. Clean up sandbox and session allocations
@@ -186,7 +218,9 @@ class EngineeringExecutionRuntime(IPlanExecutor):
 
         return success
 
-    def _execute_step(self, task_id: str, step: PlanStep, workspace_path: str, sandbox: ISandbox) -> bool:
+    def _execute_step(
+        self, task_id: str, step: PlanStep, workspace_path: str, sandbox: ISandbox
+    ) -> bool:
         """
         Executes a single PlanStep using the assigned agent loop.
         """
@@ -194,16 +228,19 @@ class EngineeringExecutionRuntime(IPlanExecutor):
             agent_executor = DIContainer.get(IAgentExecutor)
             return agent_executor.execute_step(task_id, step, workspace_path, sandbox)
         except Exception:
-            logger.warning(f"No IAgentExecutor registered in DI. Running fallback step execution.")
-            
+            logger.warning(
+                f"No IAgentExecutor registered in DI. Running fallback step execution."
+            )
+
             # Simple fallback: if description contains a command to run, execute it in sandbox!
             # E.g. "RUN: python -c \"print('test')\""
             if step.description.startswith("RUN: "):
                 import shlex
+
                 cmd = shlex.split(step.description[5:])
                 res = sandbox.execute(cmd)
                 return res.exit_code == 0
-            
+
             # Default fallback: simulate success
             time.sleep(0.05)
             return True

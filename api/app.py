@@ -7,19 +7,23 @@ from core.logging import get_logger
 
 logger = get_logger("API_App")
 
+
 def create_app() -> FastAPI:
     """
     FastAPI Application Factory.
     Configures server settings, registers routers, and sets up middleware.
     """
     from core.di_setup import bootstrap_di
+
     bootstrap_di()
 
     from contextlib import asynccontextmanager
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        logger.info("Task queue system initialized in multi-process decoupled mode. FastAPI will only write/read tasks to SQLite.")
+        logger.info(
+            "Task queue system initialized in multi-process decoupled mode. FastAPI will only write/read tasks to SQLite."
+        )
         yield
         logger.info("FastAPI shut down complete.")
 
@@ -30,7 +34,7 @@ def create_app() -> FastAPI:
             "tracking, and state memory persistence via Gemini API."
         ),
         version="1.0.0",
-        lifespan=lifespan
+        lifespan=lifespan,
     )
 
     # Enable CORS for external developer panels or frontends
@@ -44,10 +48,11 @@ def create_app() -> FastAPI:
 
     # In-memory rate limiting state
     from collections import defaultdict
+
     client_requests = defaultdict(list)
-    RATE_LIMIT_WINDOW = 60 # seconds
-    RATE_LIMIT_MAX_REQUESTS = 100 # requests per window
-    MAX_PAYLOAD_SIZE = 10 * 1024 * 1024 # 10MB
+    RATE_LIMIT_WINDOW = 60  # seconds
+    RATE_LIMIT_MAX_REQUESTS = 100  # requests per window
+    MAX_PAYLOAD_SIZE = 10 * 1024 * 1024  # 10MB
 
     # Register HTTP middleware for logging correlation and performance metrics
     @app.middleware("http")
@@ -65,7 +70,9 @@ def create_app() -> FastAPI:
                 if int(content_length) > MAX_PAYLOAD_SIZE:
                     return JSONResponse(
                         status_code=413,
-                        content={"detail": "Request payload too large. Maximum size allowed is 10MB."}
+                        content={
+                            "detail": "Request payload too large. Maximum size allowed is 10MB."
+                        },
                     )
             except ValueError:
                 pass
@@ -77,31 +84,39 @@ def create_app() -> FastAPI:
                 if len(body) > MAX_PAYLOAD_SIZE:
                     return JSONResponse(
                         status_code=413,
-                        content={"detail": "Request payload too large. Maximum size allowed is 10MB."}
+                        content={
+                            "detail": "Request payload too large. Maximum size allowed is 10MB."
+                        },
                     )
             except Exception as e:
                 return JSONResponse(
                     status_code=400,
-                    content={"detail": f"Error reading request payload: {str(e)}"}
+                    content={"detail": f"Error reading request payload: {str(e)}"},
                 )
 
         # 2. Enforce IP-based Rate Limiting (429 Too Many Requests)
         client_ip = request.client.host if request.client else "127.0.0.1"
         now = time.time()
-        
+
         # Clean older requests from bucket
-        client_requests[client_ip] = [t for t in client_requests[client_ip] if now - t < RATE_LIMIT_WINDOW]
-        
+        client_requests[client_ip] = [
+            t for t in client_requests[client_ip] if now - t < RATE_LIMIT_WINDOW
+        ]
+
         # Periodic cleanup of client_requests dict to prevent memory leak of inactive IPs
         if len(client_requests) > 1000:
-            inactive_ips = [ip for ip, reqs in client_requests.items() if not any(now - t < RATE_LIMIT_WINDOW for t in reqs)]
+            inactive_ips = [
+                ip
+                for ip, reqs in client_requests.items()
+                if not any(now - t < RATE_LIMIT_WINDOW for t in reqs)
+            ]
             for ip in inactive_ips:
                 del client_requests[ip]
-                
+
         if len(client_requests[client_ip]) >= RATE_LIMIT_MAX_REQUESTS:
             return JSONResponse(
                 status_code=429,
-                content={"detail": "Too many requests. Please try again later."}
+                content={"detail": "Too many requests. Please try again later."},
             )
         client_requests[client_ip].append(now)
 
@@ -118,12 +133,12 @@ def create_app() -> FastAPI:
 
         # 2. Configure logging context
         set_correlation_context(
-            task_id=session_id, 
-            workflow_id=session_id, 
-            agent_name="api", 
+            task_id=session_id,
+            workflow_id=session_id,
+            agent_name="api",
             execution_id=request_id,
             request_id=request_id,
-            session_id=session_id
+            session_id=session_id,
         )
 
         # 3. Track request and latency
@@ -147,6 +162,7 @@ def create_app() -> FastAPI:
     from api.admin_routes import router as admin_router
     from api.notification_routes import router as notification_router
     from api.hospital_routes import router as hospital_router
+
     app.include_router(auth_router)
     app.include_router(admin_router)
     app.include_router(notification_router)
@@ -160,11 +176,12 @@ def create_app() -> FastAPI:
             "name": "Multi-Agent AI System API",
             "status": "online",
             "default_model": settings.default_model,
-            "persist_directory": str(settings.persist_path.resolve())
+            "persist_directory": str(settings.persist_path.resolve()),
         }
 
     logger.info("FastAPI application instance created successfully.")
     return app
+
 
 # Main app instance
 app = create_app()

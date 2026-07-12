@@ -10,8 +10,11 @@ from core.logging import get_logger
 
 logger = get_logger("MetricsCollector")
 
+
 # Configurable Pricing Model per 1 Million Tokens
-def calculate_cost(model_name: str, prompt_tokens: int, completion_tokens: int) -> float:
+def calculate_cost(
+    model_name: str, prompt_tokens: int, completion_tokens: int
+) -> float:
     """
     Computes total cost in USD for a given prompt/completion token count and model.
     """
@@ -23,21 +26,25 @@ def calculate_cost(model_name: str, prompt_tokens: int, completion_tokens: int) 
             if key in model_name:
                 pricing = val
                 break
-                
+
     if not pricing:
         # Fallback to flash pricing
-        pricing = pricing_model.get("gemini-2.5-flash", {"input": 0.075 / 1_000_000, "output": 0.30 / 1_000_000})
-        
+        pricing = pricing_model.get(
+            "gemini-2.5-flash", {"input": 0.075 / 1_000_000, "output": 0.30 / 1_000_000}
+        )
+
     return (prompt_tokens * pricing["input"]) + (completion_tokens * pricing["output"])
+
 
 class MetricsCollector:
     """
     Central Metrics Service to monitor, store, and audit system consumption.
     Thread-safe and designed for Grafana/Prometheus dashboard responses.
     """
+
     def __init__(self) -> None:
         self._lock = threading.Lock()
-        
+
         # General activity counters
         self.requests = 0
         self.agent_executions = 0
@@ -45,7 +52,7 @@ class MetricsCollector:
         self.tool_executions = 0
         self.retries = 0
         self.failures = 0
-        
+
         # Token and cost registries
         self.llm_calls: List[Dict[str, Any]] = []
         self.total_cost = 0.0
@@ -53,11 +60,11 @@ class MetricsCollector:
         self.task_costs: Dict[str, float] = {}
         self.workflow_costs: Dict[str, float] = {}
         self.request_costs: Dict[str, float] = {}
-        
+
         # Performance monitoring lists
-        self.latencies: List[float] = [] # Workflow response latencies (s)
-        self.queue_wait_times: List[float] = [] # Task queue latency waits (s)
-        self.request_latencies: List[float] = [] # API request latencies (s)
+        self.latencies: List[float] = []  # Workflow response latencies (s)
+        self.queue_wait_times: List[float] = []  # Task queue latency waits (s)
+        self.request_latencies: List[float] = []  # API request latencies (s)
 
     def record_request(self) -> None:
         with self._lock:
@@ -97,24 +104,25 @@ class MetricsCollector:
             self.queue_wait_times.append(duration_s)
 
     def record_llm_call(
-        self, 
-        model_name: str, 
-        prompt_tokens: int, 
-        completion_tokens: int, 
-        total_tokens: int, 
-        execution_time_ms: float
+        self,
+        model_name: str,
+        prompt_tokens: int,
+        completion_tokens: int,
+        total_tokens: int,
+        execution_time_ms: float,
     ) -> None:
         cost = calculate_cost(model_name, prompt_tokens, completion_tokens)
-        
+
         # Pull correlation parameters from thread context
         from core.logging import get_correlation_context
+
         context = get_correlation_context()
         task_id = context.get("task_id", "N/A")
         workflow_id = context.get("workflow_id", "N/A")
         agent_name = context.get("agent_name", "N/A")
         request_id = context.get("request_id", "N/A")
         session_id = context.get("session_id", "N/A")
-        
+
         entry = {
             "model_name": model_name,
             "prompt_tokens": prompt_tokens,
@@ -127,22 +135,28 @@ class MetricsCollector:
             "agent_name": agent_name,
             "request_id": request_id,
             "session_id": session_id,
-            "timestamp": datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
+            "timestamp": datetime.now(timezone.utc).replace(tzinfo=None).isoformat(),
         }
-        
+
         with self._lock:
             self.llm_calls.append(entry)
             self.total_cost += cost
-            
+
             # Sub-accounting
             if agent_name != "N/A":
-                self.agent_costs[agent_name] = self.agent_costs.get(agent_name, 0.0) + cost
+                self.agent_costs[agent_name] = (
+                    self.agent_costs.get(agent_name, 0.0) + cost
+                )
             if task_id != "N/A":
                 self.task_costs[task_id] = self.task_costs.get(task_id, 0.0) + cost
             if workflow_id != "N/A":
-                self.workflow_costs[workflow_id] = self.workflow_costs.get(workflow_id, 0.0) + cost
+                self.workflow_costs[workflow_id] = (
+                    self.workflow_costs.get(workflow_id, 0.0) + cost
+                )
             if request_id != "N/A":
-                self.request_costs[request_id] = self.request_costs.get(request_id, 0.0) + cost
+                self.request_costs[request_id] = (
+                    self.request_costs.get(request_id, 0.0) + cost
+                )
 
     def get_costs(self) -> Dict[str, Any]:
         with self._lock:
@@ -151,7 +165,7 @@ class MetricsCollector:
                 "cost_per_agent_usd": self.agent_costs,
                 "cost_per_task_usd": self.task_costs,
                 "cost_per_workflow_usd": self.workflow_costs,
-                "cost_per_request_usd": self.request_costs
+                "cost_per_request_usd": self.request_costs,
             }
 
     def get_tokens(self) -> Dict[str, Any]:
@@ -159,7 +173,7 @@ class MetricsCollector:
             total_prompt = sum(x["prompt_tokens"] for x in self.llm_calls)
             total_completion = sum(x["completion_tokens"] for x in self.llm_calls)
             total_tokens = sum(x["total_tokens"] for x in self.llm_calls)
-            
+
             by_agent = {}
             by_task = {}
             by_workflow = {}
@@ -186,46 +200,66 @@ class MetricsCollector:
                 "tokens_by_task": by_task,
                 "tokens_by_workflow": by_workflow,
                 "tokens_by_session": by_session,
-                "llm_calls_count": len(self.llm_calls)
+                "llm_calls_count": len(self.llm_calls),
             }
 
     def get_performance(self) -> Dict[str, Any]:
         with self._lock:
-            avg_latency = sum(self.latencies) / len(self.latencies) if self.latencies else 0.0
-            
+            avg_latency = (
+                sum(self.latencies) / len(self.latencies) if self.latencies else 0.0
+            )
+
             p95 = 0.0
             if self.latencies:
                 sorted_lat = sorted(self.latencies)
                 idx = int(len(sorted_lat) * 0.95)
                 p95 = sorted_lat[min(idx, len(sorted_lat) - 1)]
-                
-            avg_queue_wait = sum(self.queue_wait_times) / len(self.queue_wait_times) if self.queue_wait_times else 0.0
-            
-            avg_request_latency = sum(self.request_latencies) / len(self.request_latencies) if self.request_latencies else 0.0
+
+            avg_queue_wait = (
+                sum(self.queue_wait_times) / len(self.queue_wait_times)
+                if self.queue_wait_times
+                else 0.0
+            )
+
+            avg_request_latency = (
+                sum(self.request_latencies) / len(self.request_latencies)
+                if self.request_latencies
+                else 0.0
+            )
             p95_request_latency = 0.0
             if self.request_latencies:
                 sorted_req_lat = sorted(self.request_latencies)
                 idx_req = int(len(sorted_req_lat) * 0.95)
-                p95_request_latency = sorted_req_lat[min(idx_req, len(sorted_req_lat) - 1)]
-                
+                p95_request_latency = sorted_req_lat[
+                    min(idx_req, len(sorted_req_lat) - 1)
+                ]
+
             memory_usage_bytes = 0
             try:
                 import psutil
+
                 process = psutil.Process(os.getpid())
                 memory_usage_bytes = process.memory_info().rss
             except Exception:
                 pass
-                
+
             active_workers = 0
             total_workers = 0
             try:
                 from core.queue import worker_pool
-                active_workers = sum(1 for w in worker_pool.get_status() if w.get("current_task") is not None)
+
+                active_workers = sum(
+                    1
+                    for w in worker_pool.get_status()
+                    if w.get("current_task") is not None
+                )
                 total_workers = len(worker_pool.workers)
             except Exception:
                 pass
-            worker_utilization = active_workers / total_workers if total_workers > 0 else 0.0
-            
+            worker_utilization = (
+                active_workers / total_workers if total_workers > 0 else 0.0
+            )
+
             return {
                 "average_workflow_latency_seconds": avg_latency,
                 "p95_workflow_latency_seconds": p95,
@@ -233,21 +267,22 @@ class MetricsCollector:
                 "p95_request_latency_seconds": p95_request_latency,
                 "average_queue_wait_time_seconds": avg_queue_wait,
                 "worker_utilization_rate": worker_utilization,
-                "memory_usage_bytes": memory_usage_bytes
+                "memory_usage_bytes": memory_usage_bytes,
             }
 
     def get_all_metrics(self) -> Dict[str, Any]:
         costs = self.get_costs()
         tokens = self.get_tokens()
         performance = self.get_performance()
-        
+
         qsize = 0
         try:
             from core.queue import task_queue
+
             qsize = task_queue.qsize()
         except Exception:
             pass
-            
+
         return {
             "requests_count": self.requests,
             "agent_executions_count": self.agent_executions,
@@ -259,7 +294,7 @@ class MetricsCollector:
             "costs": costs,
             "tokens": tokens,
             "performance": performance,
-            "timestamp": datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
+            "timestamp": datetime.now(timezone.utc).replace(tzinfo=None).isoformat(),
         }
 
     def clear(self) -> None:
@@ -279,5 +314,6 @@ class MetricsCollector:
             self.latencies.clear()
             self.queue_wait_times.clear()
             self.request_latencies.clear()
+
 
 metrics_collector = MetricsCollector()

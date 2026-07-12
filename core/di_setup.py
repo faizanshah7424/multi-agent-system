@@ -43,22 +43,23 @@ from core.benchmark.manager import BenchmarkManager
 from core.memory.interface import IEngineeringMemoryEngine
 from core.memory.engine import EngineeringMemoryEngine
 
+
 def bootstrap_di() -> None:
     """
     Initializes DI Container mapping interfaces to concrete implementations.
     """
     # 1. Register Indexer (Sprint 2)
     DIContainer.register(ICodeIndexer, CodeIndexer())
-    
+
     # 2. Register Model Provider (Sprint 3)
     DIContainer.register(IModelProvider, GeminiProvider())
-    
+
     # 3. Register Tool Registry (Sprint 3)
     DIContainer.register(IToolRegistry, ToolRegistry())
-    
+
     # 4. Register Skill Registry (Sprint 3)
     DIContainer.register(ISkillRegistry, SkillRegistry())
-    
+
     # 5. Register Prompt Library (Sprint 3)
     prompts_dir = Path(__file__).parent / "prompts"
     DIContainer.register(IPromptLibrary, PromptLibrary(str(prompts_dir)))
@@ -121,5 +122,3 @@ def bootstrap_di() -> None:
     DIContainer.register(MetricsCollector, MetricsCollector())
     DIContainer.register(DocumentationAudit, DocumentationAudit())
     DIContainer.register(VersionManager, VersionManager())
-
-

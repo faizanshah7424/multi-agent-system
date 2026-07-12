@@ -3,10 +3,12 @@ import sqlite3
 from datetime import datetime, timezone
 from typing import List
 
+
 class MigrationManager:
     """
     Handles schema migrations, version tracking, validation, and rollback procedures.
     """
+
     def __init__(self, db_path: str = "data/learning.db"):
         self.db_path = os.path.abspath(db_path)
         os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
@@ -26,7 +28,9 @@ class MigrationManager:
         conn.commit()
         conn.close()
 
-    def apply_migration(self, version: str, sql_script: str, rollback_script: str) -> bool:
+    def apply_migration(
+        self, version: str, sql_script: str, rollback_script: str
+    ) -> bool:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         try:
@@ -34,10 +38,18 @@ class MigrationManager:
             if cleaned_sql and not cleaned_sql.startswith("--"):
                 cursor.executescript(cleaned_sql)
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT OR REPLACE INTO schema_migrations (version, sql_script, rollback_script, applied_at)
                 VALUES (?, ?, ?, ?)
-            """, (version, sql_script, rollback_script, datetime.now(timezone.utc).isoformat()))
+            """,
+                (
+                    version,
+                    sql_script,
+                    rollback_script,
+                    datetime.now(timezone.utc).isoformat(),
+                ),
+            )
 
             conn.commit()
             return True
@@ -52,7 +64,10 @@ class MigrationManager:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         try:
-            cursor.execute("SELECT rollback_script FROM schema_migrations WHERE version = ?", (version,))
+            cursor.execute(
+                "SELECT rollback_script FROM schema_migrations WHERE version = ?",
+                (version,),
+            )
             row = cursor.fetchone()
             if not row:
                 return False
@@ -62,7 +77,9 @@ class MigrationManager:
             if cleaned_rollback and not cleaned_rollback.startswith("--"):
                 cursor.executescript(cleaned_rollback)
 
-            cursor.execute("DELETE FROM schema_migrations WHERE version = ?", (version,))
+            cursor.execute(
+                "DELETE FROM schema_migrations WHERE version = ?", (version,)
+            )
             conn.commit()
             return True
         except Exception as e:

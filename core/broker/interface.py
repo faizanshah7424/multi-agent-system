@@ -1,10 +1,12 @@
 from typing import Any, Dict, Protocol, runtime_checkable
 
+
 @runtime_checkable
 class IEventBroker(Protocol):
     """
     Interface for real-time WebSocket messaging and Pub/Sub event streams.
     """
+
     def publish(self, channel: str, message: Dict[str, Any]) -> None:
         """
         Publishes a message to all active subscribers on a channel.

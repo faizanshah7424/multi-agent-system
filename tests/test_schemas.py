@@ -2,25 +2,33 @@ import unittest
 from pydantic import ValidationError
 
 from core.schemas import (
-    PlanStep, PlannerPlan, AgentAction, ToolRequest, ToolResponse,
-    VectorMemoryConfig, DAGWorkflowPlan, MultiAgentCollaborationConfig, HumanApprovalWorkflow
+    PlanStep,
+    PlannerPlan,
+    AgentAction,
+    ToolRequest,
+    ToolResponse,
+    VectorMemoryConfig,
+    DAGWorkflowPlan,
+    MultiAgentCollaborationConfig,
+    HumanApprovalWorkflow,
 )
 from core.workflow import WorkflowEngine, TaskStep
 from core.memory import SharedMemory
 from core.registry import AgentRegistry, AgentMetadata
+
 
 class TestSchemasAndWorkflowValidation(unittest.TestCase):
     def setUp(self):
         # Setup clean AgentRegistry for testing
         self.registry = AgentRegistry()
         self.registry._registry.clear()
-        
+
         # Register standard mock agents for dependency verification
         for agent_name in ["researcher", "developer", "reviewer", "planner"]:
             meta = AgentMetadata(
                 name=agent_name,
                 role=f"Mock {agent_name.capitalize()}",
-                description="Mock agent description"
+                description="Mock agent description",
             )
             # Register a dummy class
             self.registry.register(meta, object)
@@ -37,7 +45,7 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
             assigned_agent="researcher",
             description="Gather task specifications",
             dependencies=[],
-            priority="high"
+            priority="high",
         )
         step2 = PlanStep(
             step_id=2,
@@ -45,14 +53,11 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
             assigned_agent="developer",
             description="Develop core FastAPI routes",
             dependencies=[1],
-            priority="high"
+            priority="high",
         )
-        
-        plan = PlannerPlan(
-            project_title="FastAPI Integration",
-            steps=[step1, step2]
-        )
-        
+
+        plan = PlannerPlan(project_title="FastAPI Integration", steps=[step1, step2])
+
         self.assertEqual(plan.project_title, "FastAPI Integration")
         self.assertEqual(len(plan.steps), 2)
         self.assertEqual(plan.steps[0].step_id, 1)
@@ -64,7 +69,7 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
                 step_id="not_an_int",
                 title="Bad Step",
                 assigned_agent="developer",
-                description="Failed type parsing"
+                description="Failed type parsing",
             )
 
     def test_agent_action_schema(self):
@@ -73,16 +78,16 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
             thought="I need to scan the root folder.",
             action="call_tool",
             tool="dir_scanner",
-            arguments={"path": "."}
+            arguments={"path": "."},
         )
         self.assertEqual(action1.action, "call_tool")
         self.assertEqual(action1.tool, "dir_scanner")
-        
+
         # Valid final response
         action2 = AgentAction(
             thought="I have finished generating the implementation plan.",
             action="respond",
-            final_answer="Here is the final python file script code."
+            final_answer="Here is the final python file script code.",
         )
         self.assertEqual(action2.action, "respond")
         self.assertIsNotNone(action2.final_answer)
@@ -91,15 +96,13 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
         # Valid request
         req = ToolRequest(
             tool_name="web_search",
-            arguments={"query": "Gemini native structured outputs"}
+            arguments={"query": "Gemini native structured outputs"},
         )
         self.assertEqual(req.tool_name, "web_search")
-        
+
         # Valid response
         res = ToolResponse(
-            tool_name="web_search",
-            status="success",
-            result="Found documentation."
+            tool_name="web_search", status="success", result="Found documentation."
         )
         self.assertEqual(res.status, "success")
         self.assertIsNone(res.error)
@@ -115,7 +118,7 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
                     assigned_agent="researcher",
                     description="Desc A",
                     dependencies=[],
-                    priority="high"
+                    priority="high",
                 ),
                 PlanStep(
                     step_id=2,
@@ -123,7 +126,7 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
                     assigned_agent="developer",
                     description="Desc B",
                     dependencies=[1],
-                    priority="medium"
+                    priority="medium",
                 ),
                 PlanStep(
                     step_id=3,
@@ -131,9 +134,9 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
                     assigned_agent="reviewer",
                     description="Desc C",
                     dependencies=[2],
-                    priority="low"
-                )
-            ]
+                    priority="low",
+                ),
+            ],
         )
         errors = self.engine.validate_plan_graph(plan)
         self.assertEqual(len(errors), 0, f"Expected valid DAG, got errors: {errors}")
@@ -149,7 +152,7 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
                     assigned_agent="researcher",
                     description="Desc A",
                     dependencies=[3],
-                    priority="high"
+                    priority="high",
                 ),
                 PlanStep(
                     step_id=2,
@@ -157,7 +160,7 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
                     assigned_agent="developer",
                     description="Desc B",
                     dependencies=[1],
-                    priority="medium"
+                    priority="medium",
                 ),
                 PlanStep(
                     step_id=3,
@@ -165,9 +168,9 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
                     assigned_agent="reviewer",
                     description="Desc C",
                     dependencies=[2],
-                    priority="low"
-                )
-            ]
+                    priority="low",
+                ),
+            ],
         )
         errors = self.engine.validate_plan_graph(plan)
         self.assertGreater(len(errors), 0)
@@ -184,7 +187,7 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
                     assigned_agent="researcher",
                     description="Desc A",
                     dependencies=[],
-                    priority="high"
+                    priority="high",
                 ),
                 PlanStep(
                     step_id=2,
@@ -192,9 +195,9 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
                     assigned_agent="developer",
                     description="Desc B",
                     dependencies=[5],
-                    priority="medium"
-                )
-            ]
+                    priority="medium",
+                ),
+            ],
         )
         errors = self.engine.validate_plan_graph(plan)
         self.assertGreater(len(errors), 0)
@@ -211,9 +214,9 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
                     assigned_agent="alien_agent",
                     description="Desc A",
                     dependencies=[],
-                    priority="high"
+                    priority="high",
                 )
-            ]
+            ],
         )
         errors = self.engine.validate_plan_graph(plan)
         self.assertGreater(len(errors), 0)
@@ -225,7 +228,7 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
             collection_name="long_term_memories",
             dimension=768,
             embedding_model="text-embedding-004",
-            distance_metric="cosine"
+            distance_metric="cosine",
         )
         self.assertEqual(vector_cfg.dimension, 768)
 
@@ -234,9 +237,10 @@ class TestSchemasAndWorkflowValidation(unittest.TestCase):
             step_id=3,
             status="approved",
             approved_by="senior_engineer",
-            comments="Code styling and correctness checked."
+            comments="Code styling and correctness checked.",
         )
         self.assertEqual(approval.status, "approved")
+
 
 if __name__ == "__main__":
     unittest.main()

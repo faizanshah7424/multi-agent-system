@@ -9,11 +9,13 @@ from unittest.mock import MagicMock, patch
 # Set temporary directory for persistence during tests
 if not os.environ.get("PERSIST_DIR"):
     import tempfile
+
     os.environ["PERSIST_DIR"] = tempfile.mkdtemp()
 
 temp_dir = os.environ["PERSIST_DIR"]
 
 from config import settings
+
 settings.persist_dir = temp_dir
 
 from fastapi.testclient import TestClient
@@ -21,6 +23,7 @@ from api.app import app
 from core.metrics import metrics_collector, calculate_cost
 from core.cache import llm_cache, tool_cache
 from core.logging import set_correlation_context, get_correlation_context
+
 
 class TestObservabilityLayer(unittest.TestCase):
     @classmethod
@@ -30,6 +33,7 @@ class TestObservabilityLayer(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         from core.database import engine
+
         engine.dispose()
 
     def setUp(self):
@@ -55,7 +59,10 @@ class TestObservabilityLayer(unittest.TestCase):
 
     def test_configurable_pricing(self):
         # Override pricing in settings
-        with patch.dict(settings.model_pricing, {"custom-model": {"input": 1.0 / 1_000_000, "output": 2.0 / 1_000_000}}):
+        with patch.dict(
+            settings.model_pricing,
+            {"custom-model": {"input": 1.0 / 1_000_000, "output": 2.0 / 1_000_000}},
+        ):
             cost_custom = calculate_cost("custom-model", 1000, 2000)
             expected_custom = (1000 * 1.0 / 1_000_000) + (2000 * 2.0 / 1_000_000)
             self.assertAlmostEqual(cost_custom, expected_custom)
@@ -91,7 +98,7 @@ class TestObservabilityLayer(unittest.TestCase):
             agent_name="researcher",
             execution_id="exec_789",
             request_id="req_999",
-            session_id="session_abc"
+            session_id="session_abc",
         )
 
         metrics_collector.record_llm_call(
@@ -99,7 +106,7 @@ class TestObservabilityLayer(unittest.TestCase):
             prompt_tokens=500,
             completion_tokens=250,
             total_tokens=750,
-            execution_time_ms=120.0
+            execution_time_ms=120.0,
         )
 
         # Audit costs
@@ -123,14 +130,23 @@ class TestObservabilityLayer(unittest.TestCase):
 
     def test_llm_cache(self):
         # Put into cache
-        llm_cache.set("Hello", "Be helpful", "gemini-2.5-flash", "Response text", schema="SchemaStr", ttl=60.0)
-        
+        llm_cache.set(
+            "Hello",
+            "Be helpful",
+            "gemini-2.5-flash",
+            "Response text",
+            schema="SchemaStr",
+            ttl=60.0,
+        )
+
         # Retrieval
         val = llm_cache.get("Hello", "Be helpful", "gemini-2.5-flash", "SchemaStr")
         self.assertEqual(val, "Response text")
-        
+
         # Miss checks
-        val_miss = llm_cache.get("Hello2", "Be helpful", "gemini-2.5-flash", "SchemaStr")
+        val_miss = llm_cache.get(
+            "Hello2", "Be helpful", "gemini-2.5-flash", "SchemaStr"
+        )
         self.assertIsNone(val_miss)
 
         metrics = llm_cache.get_metrics()
@@ -144,10 +160,12 @@ class TestObservabilityLayer(unittest.TestCase):
 
     def test_llm_cache_ttl(self):
         # Cache with 0.01s TTL
-        llm_cache.set("Hello", "Be helpful", "gemini-2.5-flash", "Response text", ttl=0.01)
+        llm_cache.set(
+            "Hello", "Be helpful", "gemini-2.5-flash", "Response text", ttl=0.01
+        )
         time.sleep(0.02)
         val = llm_cache.get("Hello", "Be helpful", "gemini-2.5-flash")
-        self.assertIsNone(val) # Expired
+        self.assertIsNone(val)  # Expired
 
     def test_tool_cache(self):
         # Read-only tool should cache
@@ -177,10 +195,11 @@ class TestObservabilityLayer(unittest.TestCase):
         self.assertGreater(perf["p95_workflow_latency_seconds"], 2.0)
         self.assertAlmostEqual(perf["average_queue_wait_time_seconds"], 0.5)
         self.assertAlmostEqual(perf["average_request_latency_seconds"], 0.2)
-        
+
         # Memory usage is best-effort depending on psutil presence
         try:
             import psutil
+
             self.assertGreater(perf["memory_usage_bytes"], 0)
         except ImportError:
             self.assertEqual(perf["memory_usage_bytes"], 0)
@@ -194,7 +213,9 @@ class TestObservabilityLayer(unittest.TestCase):
         res = self.client.get("/metrics")
         self.assertEqual(res.status_code, 200)
         data = res.json()
-        self.assertEqual(data["requests_count"], 2)  # 1 from manual, 1 from this API request via middleware
+        self.assertEqual(
+            data["requests_count"], 2
+        )  # 1 from manual, 1 from this API request via middleware
         self.assertIn("performance", data)
         self.assertIn("costs", data)
         self.assertIn("tokens", data)
@@ -221,10 +242,14 @@ class TestObservabilityLayer(unittest.TestCase):
         self.assertIn("tool_cache", res.json())
 
     def test_api_middleware_trace_headers(self):
-        response = self.client.get("/metrics", headers={"x-request-id": "my_req_id", "x-session-id": "my_sess_id"})
+        response = self.client.get(
+            "/metrics",
+            headers={"x-request-id": "my_req_id", "x-session-id": "my_sess_id"},
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers.get("x-request-id"), "my_req_id")
         self.assertEqual(response.headers.get("x-session-id"), "my_sess_id")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -2,6 +2,7 @@ from typing import List
 from pydantic import BaseModel, Field
 from core.autonomous_repository.repository_context import RepositoryContext
 
+
 class RepositoryTaskPlan(BaseModel):
     requirements: List[str] = Field(default_factory=list)
     architecture_fit: str = "Fits existing FastAPI Hexagonal architecture"
@@ -16,18 +17,31 @@ class RepositoryTaskPlan(BaseModel):
     estimated_effort: str = "6 hours"
     confidence: float = 0.95
 
+
 class RepositoryPlanner:
     """
     Formulates a comprehensive engineering execution plan matching natural-language goals.
     """
+
     def create_plan(self, goal: str, context: RepositoryContext) -> RepositoryTaskPlan:
         plan = RepositoryTaskPlan()
         goal_lower = goal.lower()
 
         if "login" in goal_lower or "auth" in goal_lower:
-            plan.requirements = ["Implement signup", "Implement login", "Implement refreshes"]
-            plan.database_changes = ["Add user columns (role, is_verified)", "Create refresh_tokens table"]
-            plan.api_changes = ["POST /auth/signup", "POST /auth/login", "POST /auth/refresh"]
+            plan.requirements = [
+                "Implement signup",
+                "Implement login",
+                "Implement refreshes",
+            ]
+            plan.database_changes = [
+                "Add user columns (role, is_verified)",
+                "Create refresh_tokens table",
+            ]
+            plan.api_changes = [
+                "POST /auth/signup",
+                "POST /auth/login",
+                "POST /auth/refresh",
+            ]
             plan.frontend_changes = ["Create Login screen", "Mount views in Layout"]
             plan.testing_strategy = ["Verify auth flows in tests/test_auth_system.py"]
             plan.documentation_changes = ["Update api documentation"]

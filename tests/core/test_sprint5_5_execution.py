@@ -4,24 +4,33 @@ from typing import Dict, List
 from core.di import DIContainer
 from core.di_setup import bootstrap_di
 from core.queue.scheduler import PlanStep, PlanDAG
-from core.queue.execution_runtime import IPlanExecutor, IAgentExecutor, EngineeringExecutionRuntime
+from core.queue.execution_runtime import (
+    IPlanExecutor,
+    IAgentExecutor,
+    EngineeringExecutionRuntime,
+)
 from core.sandbox.interface import ISandbox
 from core.workspace.session_manager import DBSessionState
 from core.database import get_db_session
+
 
 class MockAgentExecutor(IAgentExecutor):
     """
     Mock agent executor that fails on specific step IDs to test halting and cancellation.
     """
+
     def __init__(self, fail_on_step_ids: List[int]) -> None:
         self.fail_on_step_ids = fail_on_step_ids
         self.executed_steps: List[int] = []
 
-    def execute_step(self, task_id: str, step: PlanStep, workspace_path: str, sandbox: ISandbox) -> bool:
+    def execute_step(
+        self, task_id: str, step: PlanStep, workspace_path: str, sandbox: ISandbox
+    ) -> bool:
         self.executed_steps.append(step.step_id)
         if step.step_id in self.fail_on_step_ids:
             return False
         return True
+
 
 class TestExecutionRuntime(unittest.TestCase):
     def setUp(self) -> None:
@@ -31,10 +40,15 @@ class TestExecutionRuntime(unittest.TestCase):
 
         # Clean DB session states to prevent leaks
         with get_db_session() as session:
-            session.query(DBSessionState).filter(DBSessionState.task_id == self.task_id).delete()
+            session.query(DBSessionState).filter(
+                DBSessionState.task_id == self.task_id
+            ).delete()
             try:
                 from core.queue.hitl import DBTaskPlan
-                session.query(DBTaskPlan).filter(DBTaskPlan.task_id == self.task_id).delete()
+
+                session.query(DBTaskPlan).filter(
+                    DBTaskPlan.task_id == self.task_id
+                ).delete()
             except Exception:
                 pass
 
@@ -42,6 +56,7 @@ class TestExecutionRuntime(unittest.TestCase):
         # Clean workspace session
         try:
             from core.workspace.interface import IWorkspaceSessionManager
+
             session_mgr = DIContainer.get(IWorkspaceSessionManager)
             session_mgr.end_session(self.task_id)
         except Exception:
@@ -52,9 +67,18 @@ class TestExecutionRuntime(unittest.TestCase):
 
     def test_execution_all_success(self) -> None:
         # Step 1 -> Step 2 -> Step 3
-        s1 = PlanStep(step_id=1, dependencies=[], assigned_agent="developer", description="Step 1")
-        s2 = PlanStep(step_id=2, dependencies=[1], assigned_agent="reviewer", description="Step 2")
-        s3 = PlanStep(step_id=3, dependencies=[2], assigned_agent="developer", description="Step 3")
+        s1 = PlanStep(
+            step_id=1, dependencies=[], assigned_agent="developer", description="Step 1"
+        )
+        s2 = PlanStep(
+            step_id=2, dependencies=[1], assigned_agent="reviewer", description="Step 2"
+        )
+        s3 = PlanStep(
+            step_id=3,
+            dependencies=[2],
+            assigned_agent="developer",
+            description="Step 3",
+        )
         dag = PlanDAG(steps=[s1, s2, s3])
 
         # Mock agent executor to prevent real LLM network queries
@@ -72,9 +96,18 @@ class TestExecutionRuntime(unittest.TestCase):
 
     def test_execution_failure_and_halt(self) -> None:
         # Step 1 -> Step 2 -> Step 3 (Step 2 will fail)
-        s1 = PlanStep(step_id=1, dependencies=[], assigned_agent="developer", description="Step 1")
-        s2 = PlanStep(step_id=2, dependencies=[1], assigned_agent="reviewer", description="Step 2")
-        s3 = PlanStep(step_id=3, dependencies=[2], assigned_agent="developer", description="Step 3")
+        s1 = PlanStep(
+            step_id=1, dependencies=[], assigned_agent="developer", description="Step 1"
+        )
+        s2 = PlanStep(
+            step_id=2, dependencies=[1], assigned_agent="reviewer", description="Step 2"
+        )
+        s3 = PlanStep(
+            step_id=3,
+            dependencies=[2],
+            assigned_agent="developer",
+            description="Step 3",
+        )
         dag = PlanDAG(steps=[s1, s2, s3])
 
         # Register MockAgentExecutor failing on Step 2
@@ -87,7 +120,9 @@ class TestExecutionRuntime(unittest.TestCase):
         # Assert execution halting statuses
         self.assertEqual(s1.status, "completed")
         self.assertEqual(s2.status, "failed")
-        self.assertEqual(s3.status, "cancelled")  # Downstream cancelled because parent failed
+        self.assertEqual(
+            s3.status, "cancelled"
+        )  # Downstream cancelled because parent failed
 
         # Verify only step 1 and 2 were actually executed (step 3 was cancelled)
         self.assertIn(1, mock_agent.executed_steps)
@@ -100,7 +135,7 @@ class TestExecutionRuntime(unittest.TestCase):
             step_id=1,
             dependencies=[],
             assigned_agent="developer",
-            description="RUN: python -c \"print('Hello from test')\""
+            description="RUN: python -c \"print('Hello from test')\"",
         )
         dag = PlanDAG(steps=[s1])
 

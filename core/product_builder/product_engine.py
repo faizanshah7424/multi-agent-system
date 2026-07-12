@@ -16,10 +16,12 @@ from core.product_builder.deployment_planner import DeploymentPlanner
 from core.product_builder.documentation_generator import DocumentationGenerator
 from core.product_builder.product_memory import ProductMemory, ProductRecord
 
+
 class AutonomousProductBuilder:
     """
     Orchestrates the Product Builder Pipeline: Idea -> Domain Spec -> DDL Schema -> APIs -> React components -> Debates -> Docs -> memory logging.
     """
+
     def __init__(self, graph: Optional[InMemoryGraphEngine] = None):
         self.graph = graph or InMemoryGraphEngine()
         self.debate_engine = DebateEngine()
@@ -71,21 +73,18 @@ class AutonomousProductBuilder:
         deployment_plan = self.deploy_planner.plan_deployment()
 
         # 11. Multi-Agent debate rounds
-        debate_summary = self.debate_engine.run_debate({
-            "idea": idea,
-            "domain": specs.domain,
-            "entities": domain.entities
-        })
+        debate_summary = self.debate_engine.run_debate(
+            {"idea": idea, "domain": specs.domain, "entities": domain.entities}
+        )
 
         # 12. Knowledge Graph Updates
         for entity in domain.entities:
             node_id = f"entity_{entity.lower()}"
             if node_id not in self.graph.nodes:
-                self.graph.add_node(node_id, {
-                    "type": "database_entity",
-                    "product": product_id,
-                    "label": entity
-                })
+                self.graph.add_node(
+                    node_id,
+                    {"type": "database_entity", "product": product_id, "label": entity},
+                )
 
         # 13. Documentation Generation (creates 10 spec files)
         doc_data = {
@@ -97,7 +96,7 @@ class AutonomousProductBuilder:
             "frontend_plan": fe_plan.model_dump(),
             "backend_plan": be_plan.model_dump(),
             "testing_plan": testing_plan.model_dump(),
-            "deployment_plan": deployment_plan.model_dump()
+            "deployment_plan": deployment_plan.model_dump(),
         }
         docs_paths = self.doc_gen.generate_documentation(doc_data)
 
@@ -107,7 +106,7 @@ class AutonomousProductBuilder:
             "architecture_consistency": True,
             "kg_integrity": True,
             "dependency_consistency": True,
-            "planning_completeness": True
+            "planning_completeness": True,
         }
 
         duration = time.perf_counter() - t_start
@@ -120,12 +119,12 @@ class AutonomousProductBuilder:
             requirements=reqs.model_dump(),
             architecture={
                 "db_tables": domain.db_tables,
-                "api_endpoints_count": len(api_design.endpoints)
+                "api_endpoints_count": len(api_design.endpoints),
             },
             generated_documents=docs_paths,
             confidence=0.98,
             debate_results=debate_summary,
-            execution_duration_seconds=duration
+            execution_duration_seconds=duration,
         )
         self.memory.add_record(record)
 
@@ -146,5 +145,5 @@ class AutonomousProductBuilder:
             "deployment_plan": deployment_plan.model_dump(),
             "debate": debate_summary,
             "documents": docs_paths,
-            "validation": val_results
+            "validation": val_results,
         }

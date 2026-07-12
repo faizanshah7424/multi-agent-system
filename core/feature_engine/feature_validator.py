@@ -1,10 +1,12 @@
 from typing import Dict, Any, List
 from core.knowledge.engine import InMemoryGraphEngine
 
+
 class FeatureValidator:
     """
     Verifies code building, ruff lints, type checks, unit tests, and Knowledge Graph integrity.
     """
+
     def __init__(self, graph: InMemoryGraphEngine):
         self.graph = graph
 
@@ -15,7 +17,7 @@ class FeatureValidator:
             "typing": True,
             "pytest": True,
             "graph_integrity": True,
-            "architectural_consistency": True
+            "architectural_consistency": True,
         }
 
         # Validate graph node existence
@@ -24,7 +26,4 @@ class FeatureValidator:
                 results["graph_integrity"] = False
 
         success = all(results.values())
-        return {
-            "success": success,
-            "results": results
-        }
+        return {"success": success, "results": results}

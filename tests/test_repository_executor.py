@@ -3,6 +3,7 @@ from core.knowledge.engine import InMemoryGraphEngine
 from core.autonomous_repository.repository_planner import RepositoryTaskPlan
 from core.autonomous_repository.repository_executor import RepositoryExecutor
 
+
 class TestRepositoryExecutor(unittest.TestCase):
     def setUp(self):
         self.graph = InMemoryGraphEngine()
@@ -11,7 +12,7 @@ class TestRepositoryExecutor(unittest.TestCase):
             requirements=["req1"],
             database_changes=["core/database.py"],
             api_changes=["POST /auth/login"],
-            testing_strategy=["tests/test_auth_system.py"]
+            testing_strategy=["tests/test_auth_system.py"],
         )
 
     def test_run_impact_analysis(self):

@@ -3,11 +3,13 @@ from core.memory import SharedMemory
 from core.workflow import WorkflowEngine
 from core.registry import AgentRegistry
 
+
 class ManagerAgent:
     """
     Manager Agent acts as the entry point and coordinator for the Multi-Agent system.
     Orchestrates the workflow execution plan by calling the Workflow Engine.
     """
+
     def __init__(self, session_id: Optional[str] = "default_session"):
         # Shared memory instance
         self.memory = SharedMemory(session_id=session_id)
@@ -34,10 +36,10 @@ class ManagerAgent:
     def execute(self, task: str) -> Dict[str, Any]:
         """
         Coordinates and runs the multi-agent workflow to solve a given task.
-        
+
         Args:
             task: Task description or prompt to solve.
-            
+
         Returns:
             The memory state dictionary representation.
         """

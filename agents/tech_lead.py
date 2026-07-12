@@ -4,23 +4,25 @@ from config import settings
 from tools.file_reader import FileReaderTool
 from core.registry import register_agent
 
+
 @register_agent(
     name="tech_lead",
     role="Tech Lead",
     description="Moderates technical disputes, votes on approvals, coordinates consensus, and ensures engineering quality.",
     capabilities=["moderation", "consensus", "dispute_resolution"],
-    tools=["file_reader"]
+    tools=["file_reader"],
 )
 class TechLeadAgent(BaseAgent):
     """
     Tech Lead Agent responsible for moderating debates, resolving conflicts, and signing off on code modifications.
     """
+
     def __init__(self, role: str, memory: Any):
         super().__init__(
             role=role,
             memory=memory,
             model=settings.default_model,
-            tools=[FileReaderTool()]
+            tools=[FileReaderTool()],
         )
 
     def run(self, task: str = "") -> str:

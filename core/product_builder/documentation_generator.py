@@ -1,10 +1,12 @@
 import os
 from typing import Dict, Any
 
+
 class DocumentationGenerator:
     """
     Generates 10 structured product specification reports inside docs/product_specs.
     """
+
     def __init__(self, output_dir: str = "docs/product_specs"):
         self.output_dir = os.path.abspath(output_dir)
         os.makedirs(self.output_dir, exist_ok=True)
@@ -21,7 +23,7 @@ class DocumentationGenerator:
             "testing_strategy.md": "# Testing Strategy & Mock Setup\n\nUnit tests:\n{testing_plan[unit_tests]}\n",
             "deployment_plan.md": "# Infrastructure & Continuous Integration Setup\n\nEnvironments:\n{deployment_plan[environments]}\n",
             "implementation_plan.md": "# Phased Implementation Plan\n\nPhase 1: Database setups\nPhase 2: API integrations\nPhase 3: Frontends.\n",
-            "executive_summary.md": "# Executive Summary\n\nSuccessfully planned product setup specs for: {idea}.\n"
+            "executive_summary.md": "# Executive Summary\n\nSuccessfully planned product setup specs for: {idea}.\n",
         }
 
         # Format mappings safely
@@ -35,7 +37,7 @@ class DocumentationGenerator:
                 frontend_plan=data.get("frontend_plan", {}),
                 backend_plan=data.get("backend_plan", {}),
                 testing_plan=data.get("testing_plan", {}),
-                deployment_plan=data.get("deployment_plan", {})
+                deployment_plan=data.get("deployment_plan", {}),
             )
             file_path = os.path.join(self.output_dir, filename)
             with open(file_path, "w", encoding="utf-8") as f:
