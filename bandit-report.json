@@ -1,0 +1,1467 @@
+{
+  "errors": [
+    {
+      "filename": ".\\agents\\__init__.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\agents\\architect.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\agents\\base_agent.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\agents\\developer.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\agents\\manager.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\agents\\planner.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\agents\\product_builder.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\agents\\repository_engineer.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\agents\\researcher.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\agents\\reviewer.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\agents\\tech_lead.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\agents\\tool_agent.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\agents\\writer.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\api\\admin_routes.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\api\\app.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\api\\auth_routes.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\api\\hospital_routes.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\api\\models.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\api\\notification_routes.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\api\\routes.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\api\\webhooks.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\codeorbit.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\config.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\auth\\dependencies.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\auth\\security.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\autonomous_execution\\rollback_manager.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\autonomous_repository\\repository_context.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\autonomous_repository\\repository_engine.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\autonomous_repository\\repository_executor.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\autonomous_repository\\repository_history.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\autonomous_repository\\repository_memory.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\autonomous_repository\\repository_planner.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\autonomous_repository\\repository_report.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\autonomous_repository\\repository_validator.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\benchmark\\injector.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\benchmark\\interface.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\benchmark\\manager.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\benchmark\\schemas.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\broker\\events.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\broker\\interface.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\cache.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\config\\database.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\config\\manager.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\database.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\debate\\__init__.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\debate\\consensus_engine.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\debate\\debate_engine.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\di.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\di_setup.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\diagnostics\\__init__.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\diagnostics\\doc_audit.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\diagnostics\\health.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\diagnostics\\metrics.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\diagnostics\\recovery.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\diagnostics\\version.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\feature_engine\\feature_architect.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\feature_engine\\feature_builder.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\feature_engine\\feature_engine.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\feature_engine\\feature_memory.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\feature_engine\\feature_parser.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\feature_engine\\feature_planner.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\feature_engine\\feature_validator.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\feature_engine\\migration_manager.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\indexer\\ast_parser.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\indexer\\code_indexer.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\indexer\\graph_db.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\indexer\\interface.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\indexer\\report_generator.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\indexer\\repository_scanner.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\knowledge\\engine.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\knowledge\\entities.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\llm.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\logging.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\memory\\__init__.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\memory\\compaction.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\memory\\engine.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\memory\\interface.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\metrics.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\models\\interface.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\models\\profiles.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\models\\providers.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\models\\session.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\notifications.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\plugins\\interface.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\product_builder\\api_designer.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\product_builder\\backend_architect.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\product_builder\\business_analyzer.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\product_builder\\database_designer.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\product_builder\\deployment_planner.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\product_builder\\documentation_generator.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\product_builder\\domain_modeler.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\product_builder\\frontend_architect.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\product_builder\\product_engine.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\product_builder\\product_memory.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\product_builder\\requirements_engine.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\product_builder\\testing_planner.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\product_builder\\ui_planner.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\queue\\__init__.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\queue\\agent_executor.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\queue\\execution_runtime.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\queue\\hitl.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\queue\\planning_engine.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\queue\\scheduler.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\queue\\self_healing.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\registry\\__init__.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\registry\\interface.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\registry\\prompt_library.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\registry\\skill_registry.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\registry\\tool_registry.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\repositories.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\sandbox\\docker_sandbox.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\sandbox\\interface.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\sandbox\\local_sandbox.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\sandbox\\sandbox_factory.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\schemas.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\security\\__init__.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\security\\audit.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\security\\policy_manager.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\security\\secret_manager.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\telemetry.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\worker.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\worker\\runtime.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\workflow.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\workspace\\interface.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\workspace\\session_manager.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\core\\workspace\\workspace_manager.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\create_check_file.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\examples\\ecommerce\\main.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\examples\\ecommerce\\test_ecommerce.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\examples\\fastapi-crud\\main.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\examples\\fastapi-crud\\test_main.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\examples\\hospital\\patients.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\examples\\hospital\\test_hospital.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\examples\\python-cli\\cli.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\examples\\python-cli\\test_cli.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\hello.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\main.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\scratch\\audit_backend_imports.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\scratch\\demo_self_healing.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\scripts\\create_demo_repos.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\scripts\\load_test.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\scripts\\migrate_json_to_sqlite.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\scripts\\validate_sprints.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\test.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\tools\\__init__.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\tools\\base.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\tools\\dir_scanner.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\tools\\file_reader.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\tools\\file_writer.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\tools\\memory_tool.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\tools\\python_executor.py",
+      "reason": "exception while scanning file"
+    },
+    {
+      "filename": ".\\tools\\web_search.py",
+      "reason": "exception while scanning file"
+    }
+  ],
+  "generated_at": "2026-07-12T18:46:44Z",
+  "metrics": {
+    ".\\agents\\__init__.py": {
+      "loc": 28,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\agents\\architect.py": {
+      "loc": 35,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\agents\\base_agent.py": {
+      "loc": 126,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\agents\\developer.py": {
+      "loc": 52,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\agents\\manager.py": {
+      "loc": 32,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\agents\\planner.py": {
+      "loc": 91,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\agents\\product_builder.py": {
+      "loc": 36,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\agents\\repository_engineer.py": {
+      "loc": 36,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\agents\\researcher.py": {
+      "loc": 38,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\agents\\reviewer.py": {
+      "loc": 46,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\agents\\tech_lead.py": {
+      "loc": 35,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\agents\\tool_agent.py": {
+      "loc": 44,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\agents\\writer.py": {
+      "loc": 38,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\api\\admin_routes.py": {
+      "loc": 167,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\api\\app.py": {
+      "loc": 150,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\api\\auth_routes.py": {
+      "loc": 211,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\api\\hospital_routes.py": {
+      "loc": 494,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\api\\models.py": {
+      "loc": 117,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\api\\notification_routes.py": {
+      "loc": 229,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\api\\routes.py": {
+      "loc": 625,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\api\\webhooks.py": {
+      "loc": 298,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\codeorbit.py": {
+      "loc": 406,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\config.py": {
+      "loc": 50,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\auth\\dependencies.py": {
+      "loc": 123,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\auth\\security.py": {
+      "loc": 49,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\autonomous_execution\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 0,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\autonomous_execution\\rollback_manager.py": {
+      "loc": 26,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\autonomous_repository\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 0,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\autonomous_repository\\repository_context.py": {
+      "loc": 59,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\autonomous_repository\\repository_engine.py": {
+      "loc": 116,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\autonomous_repository\\repository_executor.py": {
+      "loc": 36,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\autonomous_repository\\repository_history.py": {
+      "loc": 28,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\autonomous_repository\\repository_memory.py": {
+      "loc": 93,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\autonomous_repository\\repository_planner.py": {
+      "loc": 57,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\autonomous_repository\\repository_report.py": {
+      "loc": 42,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\autonomous_repository\\repository_validator.py": {
+      "loc": 24,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\benchmark\\injector.py": {
+      "loc": 42,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\benchmark\\interface.py": {
+      "loc": 18,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\benchmark\\manager.py": {
+      "loc": 304,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\benchmark\\schemas.py": {
+      "loc": 62,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\broker\\events.py": {
+      "loc": 54,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\broker\\interface.py": {
+      "loc": 21,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\cache.py": {
+      "loc": 161,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\config\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 0,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\config\\database.py": {
+      "loc": 8,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\config\\manager.py": {
+      "loc": 73,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\database.py": {
+      "loc": 1359,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\debate\\__init__.py": {
+      "loc": 6,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\debate\\consensus_engine.py": {
+      "loc": 358,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\debate\\debate_engine.py": {
+      "loc": 23,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\di.py": {
+      "loc": 32,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\di_setup.py": {
+      "loc": 66,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\diagnostics\\__init__.py": {
+      "loc": 21,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\diagnostics\\doc_audit.py": {
+      "loc": 47,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\diagnostics\\health.py": {
+      "loc": 176,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\diagnostics\\metrics.py": {
+      "loc": 73,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\diagnostics\\recovery.py": {
+      "loc": 87,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\diagnostics\\version.py": {
+      "loc": 45,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\feature_engine\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 0,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\feature_engine\\feature_architect.py": {
+      "loc": 35,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\feature_engine\\feature_builder.py": {
+      "loc": 68,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\feature_engine\\feature_engine.py": {
+      "loc": 98,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\feature_engine\\feature_memory.py": {
+      "loc": 89,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\feature_engine\\feature_parser.py": {
+      "loc": 87,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\feature_engine\\feature_planner.py": {
+      "loc": 47,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\feature_engine\\feature_validator.py": {
+      "loc": 22,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\feature_engine\\migration_manager.py": {
+      "loc": 89,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\indexer\\ast_parser.py": {
+      "loc": 200,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\indexer\\code_indexer.py": {
+      "loc": 96,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\indexer\\graph_db.py": {
+      "loc": 94,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\indexer\\interface.py": {
+      "loc": 37,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\indexer\\report_generator.py": {
+      "loc": 235,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\indexer\\repository_scanner.py": {
+      "loc": 289,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\knowledge\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 0,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\knowledge\\engine.py": {
+      "loc": 10,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\knowledge\\entities.py": {
+      "loc": 11,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\llm.py": {
+      "loc": 216,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\logging.py": {
+      "loc": 122,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\memory\\__init__.py": {
+      "loc": 465,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\memory\\compaction.py": {
+      "loc": 45,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\memory\\engine.py": {
+      "loc": 298,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\memory\\interface.py": {
+      "loc": 51,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\metrics.py": {
+      "loc": 265,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\models\\interface.py": {
+      "loc": 70,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\models\\profiles.py": {
+      "loc": 56,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\models\\providers.py": {
+      "loc": 403,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\models\\session.py": {
+      "loc": 72,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\notifications.py": {
+      "loc": 170,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\plugins\\interface.py": {
+      "loc": 42,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 0,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\api_designer.py": {
+      "loc": 85,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\backend_architect.py": {
+      "loc": 29,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\business_analyzer.py": {
+      "loc": 86,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\database_designer.py": {
+      "loc": 18,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\deployment_planner.py": {
+      "loc": 26,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\documentation_generator.py": {
+      "loc": 40,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\domain_modeler.py": {
+      "loc": 52,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\frontend_architect.py": {
+      "loc": 30,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\product_engine.py": {
+      "loc": 113,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\product_memory.py": {
+      "loc": 97,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\requirements_engine.py": {
+      "loc": 45,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\testing_planner.py": {
+      "loc": 25,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\product_builder\\ui_planner.py": {
+      "loc": 40,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\queue\\__init__.py": {
+      "loc": 439,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\queue\\agent_executor.py": {
+      "loc": 180,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\queue\\execution_runtime.py": {
+      "loc": 191,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\queue\\hitl.py": {
+      "loc": 174,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\queue\\planning_engine.py": {
+      "loc": 41,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\queue\\scheduler.py": {
+      "loc": 127,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\queue\\self_healing.py": {
+      "loc": 251,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\registry\\__init__.py": {
+      "loc": 248,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\registry\\interface.py": {
+      "loc": 58,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\registry\\prompt_library.py": {
+      "loc": 41,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\registry\\skill_registry.py": {
+      "loc": 60,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\registry\\tool_registry.py": {
+      "loc": 53,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\repositories.py": {
+      "loc": 350,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\sandbox\\docker_sandbox.py": {
+      "loc": 110,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\sandbox\\interface.py": {
+      "loc": 48,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\sandbox\\local_sandbox.py": {
+      "loc": 125,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\sandbox\\sandbox_factory.py": {
+      "loc": 22,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\schemas.py": {
+      "loc": 131,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\security\\__init__.py": {
+      "loc": 9,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\security\\audit.py": {
+      "loc": 113,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\security\\policy_manager.py": {
+      "loc": 107,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\security\\secret_manager.py": {
+      "loc": 46,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\telemetry.py": {
+      "loc": 156,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\worker.py": {
+      "loc": 283,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\worker\\runtime.py": {
+      "loc": 12,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\workflow.py": {
+      "loc": 267,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\workspace\\interface.py": {
+      "loc": 79,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\workspace\\session_manager.py": {
+      "loc": 99,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\core\\workspace\\workspace_manager.py": {
+      "loc": 136,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\create_check_file.py": {
+      "loc": 9,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\examples\\ecommerce\\main.py": {
+      "loc": 2,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\examples\\ecommerce\\test_ecommerce.py": {
+      "loc": 4,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\examples\\fastapi-crud\\main.py": {
+      "loc": 22,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\examples\\fastapi-crud\\test_main.py": {
+      "loc": 15,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\examples\\hospital\\patients.py": {
+      "loc": 13,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\examples\\hospital\\test_hospital.py": {
+      "loc": 10,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\examples\\python-cli\\cli.py": {
+      "loc": 11,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\examples\\python-cli\\test_cli.py": {
+      "loc": 5,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\hello.py": {
+      "loc": 1,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\main.py": {
+      "loc": 36,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\scratch\\audit_backend_imports.py": {
+      "loc": 59,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\scratch\\demo_self_healing.py": {
+      "loc": 73,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\scripts\\create_demo_repos.py": {
+      "loc": 81,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\scripts\\load_test.py": {
+      "loc": 114,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\scripts\\migrate_json_to_sqlite.py": {
+      "loc": 196,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\scripts\\validate_sprints.py": {
+      "loc": 219,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\test.py": {
+      "loc": 3,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\tools\\__init__.py": {
+      "loc": 27,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\tools\\base.py": {
+      "loc": 123,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\tools\\dir_scanner.py": {
+      "loc": 74,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\tools\\file_reader.py": {
+      "loc": 42,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\tools\\file_writer.py": {
+      "loc": 51,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\tools\\memory_tool.py": {
+      "loc": 57,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\tools\\python_executor.py": {
+      "loc": 248,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\tools\\web_search.py": {
+      "loc": 69,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "_totals": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 17061,
+      "nosec": 0,
+      "skipped_tests": 0
+    }
+  },
+  "results": []
+}

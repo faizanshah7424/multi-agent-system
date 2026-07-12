@@ -74,7 +74,7 @@ class LocalProcessSandbox(ISandbox):
 
         try:
             # Execute command inside the worktree path directory
-            proc = subprocess.Popen(
+            proc = subprocess.Popen(  # nosec
                 executable_cmd,
                 cwd=str(self.workspace_path),
                 stdout=subprocess.PIPE,

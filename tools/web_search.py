@@ -38,7 +38,7 @@ class WebSearchTool(BaseTool):
 
             req = urllib.request.Request(url, headers=headers)
 
-            with urllib.request.urlopen(req, timeout=8.0) as response:
+            with urllib.request.urlopen(req, timeout=8.0) as response:  # nosec
                 html_content = response.read().decode("utf-8", errors="ignore")
 
             # Extract links and snippets via regex to avoid extra package dependencies

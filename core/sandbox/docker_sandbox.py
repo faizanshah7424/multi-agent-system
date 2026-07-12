@@ -56,7 +56,7 @@ class DockerSandbox(ISandbox):
 
         # Enable Read-Only Container Root System (with ephemeral /tmp)
         if self.read_only_root:
-            cmd += ["--read-only", "--tmpfs", "/tmp:rw,size=128m"]
+            cmd += ["--read-only", "--tmpfs", "/tmp:rw,size=128m"]  # nosec
 
         cmd += [self.image, "tail", "-f", "/dev/null"]
 

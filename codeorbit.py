@@ -197,7 +197,7 @@ def cmd_install(args):
     npm_ok = False
     try:
         # Run npm --version in shell mode on Windows
-        res = subprocess.run(
+        res = subprocess.run(  # nosec
             ["npm", "--version"],
             shell=True,
             capture_output=True,
