@@ -357,10 +357,11 @@ def cmd_logs(args):
 def cmd_demo(args):
     """Runs a simulated end-to-end multi-agent software engineering workflow walkthrough."""
     import time
+
     print("========================================")
     print("CODEORBIT AI: END-TO-END DEMO SIMULATION")
     print("========================================")
-    
+
     # 1. Scan Phase
     print("[1/8] SCANNING repository codebase...")
     time.sleep(0.6)
@@ -368,19 +369,23 @@ def cmd_demo(args):
     print("  -> Extracting class/method dependency graph...")
     print("  -> Exported 28 core nodes to local index.")
     print("  [OK] Scan phase complete.\n")
-    
+
     # 2. Plan Phase
     print("[2/8] PLANNING execution graph...")
     time.sleep(0.6)
-    print("  -> Task: 'Fix import error and add vitals validation in examples/hospital'")
+    print(
+        "  -> Task: 'Fix import error and add vitals validation in examples/hospital'"
+    )
     print("  -> Decomposing goal into Directed Acyclic Graph (DAG):")
     print("     - Step 1: Scan and map dependencies. (Successor: Step 2)")
-    print("     - Step 2: Inject vitals range checks in patients.py. (Successor: Step 3)")
+    print(
+        "     - Step 2: Inject vitals range checks in patients.py. (Successor: Step 3)"
+    )
     print("     - Step 3: Run pytest validation checks. (Successor: Step 4)")
     print("     - Step 4: Submit file diffs for Reviewer approval. (Successor: None)")
     print("  -> DAG verified for cycles: No cycles detected.")
     print("  [OK] Plan phase complete.\n")
-    
+
     # 3. Consensus Phase
     print("[3/8] CONSENSUS audit starting...")
     time.sleep(0.6)
@@ -388,14 +393,16 @@ def cmd_demo(args):
     print("     - Tech Lead: APPROVED")
     print("     - Architect: APPROVED")
     print("  [OK] Consensus phase complete.\n")
-    
+
     # 4. Execute Phase
     print("[4/8] EXECUTING scheduled task steps...")
     time.sleep(0.6)
     print("  -> Initializing isolated Git worktree: session_demo_branch")
-    print("  -> Developer Agent writing code changes to examples/hospital/patients.py...")
+    print(
+        "  -> Developer Agent writing code changes to examples/hospital/patients.py..."
+    )
     print("  [OK] Execution phase complete.\n")
-    
+
     # 5. Self-Heal Phase
     print("[5/8] SELF-HEALING validation loop...")
     time.sleep(0.6)
@@ -407,7 +414,7 @@ def cmd_demo(args):
     time.sleep(0.4)
     print("  -> Re-executing tests: All tests passed.")
     print("  [OK] Self-Heal phase complete.\n")
-    
+
     # 6. Review Phase
     print("[6/8] REVIEWING modifications...")
     time.sleep(0.6)
@@ -418,14 +425,14 @@ def cmd_demo(args):
     print("     - Code styling: Verified.")
     print("  -> Reviewer Status: APPROVED (100% confidence score).")
     print("  [OK] Review phase complete.\n")
-    
+
     # 7. Merge Phase
     print("[7/8] MERGING code changes...")
     time.sleep(0.6)
     print("  -> Merging session_demo_branch to protected main branch.")
     print("  -> Tearing down isolated worktree session...")
     print("  [OK] Merge phase complete.\n")
-    
+
     # 8. Complete Phase
     print("[8/8] COMPLETE: Task finished successfully.")
     print("========================================")
@@ -477,7 +484,9 @@ def main():
     )
 
     # demo
-    subparsers.add_parser("demo", help="Run official CodeOrbit AI end-to-end simulation flow.")
+    subparsers.add_parser(
+        "demo", help="Run official CodeOrbit AI end-to-end simulation flow."
+    )
 
     args = parser.parse_args()
 

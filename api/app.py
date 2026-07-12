@@ -28,6 +28,7 @@ def create_app() -> FastAPI:
         logger.info("FastAPI shut down complete.")
 
     from core.diagnostics.version import VersionManager
+
     v_mgr = VersionManager()
 
     app = FastAPI(
@@ -176,6 +177,7 @@ def create_app() -> FastAPI:
     def read_root() -> dict:
         """Root API health check and environment status endpoint."""
         from core.diagnostics.version import VersionManager
+
         v_mgr = VersionManager()
         return {
             "name": "CodeOrbit AI API",

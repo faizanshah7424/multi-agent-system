@@ -7,6 +7,8 @@ def check_patient_status(vitals: dict) -> str:
 
     if heart_rate < 40 or heart_rate > 130 or temperature < 94.0 or temperature > 104.0:
         return "CRITICAL"
-    elif heart_rate < 60 or heart_rate > 100 or temperature < 96.5 or temperature > 100.4:
+    elif (
+        heart_rate < 60 or heart_rate > 100 or temperature < 96.5 or temperature > 100.4
+    ):
         return "WARNING"
     return "STABLE"
