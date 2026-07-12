@@ -1,0 +1,56 @@
+{
+  "planner": {
+    "role": "Planner",
+    "permissions": ["read_only"],
+    "allowed_tools": ["dir_scanner", "file_reader"],
+    "prompt_template_name": "planner_v1",
+    "model": "gemini-2.5-flash",
+    "temperature": 0.2,
+    "max_tokens": 4096
+  },
+  "researcher": {
+    "role": "Researcher",
+    "permissions": ["read_only"],
+    "allowed_tools": ["dir_scanner", "file_reader", "symbol_search"],
+    "prompt_template_name": "researcher_v1",
+    "model": "gemini-2.5-flash",
+    "temperature": 0.1,
+    "max_tokens": 4096
+  },
+  "developer": {
+    "role": "Developer",
+    "permissions": ["read_only", "write"],
+    "allowed_tools": ["file_reader", "file_writer", "python_executor"],
+    "prompt_template_name": "developer_v1",
+    "model": "gemini-2.5-flash",
+    "temperature": 0.2,
+    "max_tokens": 4096
+  },
+  "reviewer": {
+    "role": "Reviewer",
+    "permissions": ["read_only"],
+    "allowed_tools": ["file_reader"],
+    "prompt_template_name": "reviewer_v1",
+    "model": "gemini-2.5-flash",
+    "temperature": 0.1,
+    "max_tokens": 4096
+  },
+  "repository_engineer": {
+    "role": "Repository Engineer",
+    "permissions": ["read_only"],
+    "allowed_tools": ["dir_scanner", "file_reader"],
+    "prompt_template_name": "repository_engineer_v1",
+    "model": "gemini-2.5-flash",
+    "temperature": 0.0,
+    "max_tokens": 4096
+  },
+  "product_builder": {
+    "role": "Product Builder",
+    "permissions": ["read_only", "write"],
+    "allowed_tools": ["*"],
+    "prompt_template_name": "product_builder_v1",
+    "model": "gemini-2.5-flash",
+    "temperature": 0.2,
+    "max_tokens": 4096
+  }
+}

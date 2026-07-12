@@ -137,7 +137,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     } finally {
       setLoading(false);
     }
-  }, [useMockData, apiUrl]);
+  }, [useMockData]);
 
   // Run periodic auto-refresh of states
   useEffect(() => {

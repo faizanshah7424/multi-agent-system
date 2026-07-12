@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Lightbulb, Settings, FileText, CheckCircle, Terminal, HelpCircle, Layers, Users, Zap, Clock } from 'lucide-react';
+import { Lightbulb, Terminal, Users, Zap, Clock } from 'lucide-react';
 
 interface ProductRecord {
     id: string;
@@ -25,11 +25,31 @@ interface ProductRecord {
     timestamp: string;
 }
 
+interface ProductBuildResult {
+    product_id: string;
+    idea: string;
+    success: boolean;
+    duration_s: number;
+    business_specs?: unknown;
+    requirements?: unknown;
+    domain_model?: unknown;
+    database_design?: unknown;
+    api_design?: unknown;
+    frontend_plan?: unknown;
+    ui_plan?: unknown;
+    backend_plan?: unknown;
+    testing_plan?: unknown;
+    deployment_plan?: unknown;
+    debate?: unknown;
+    documents: Record<string, string>;
+    validation?: unknown;
+}
+
 export const ProductBuilderView: React.FC = () => {
     const [idea, setIdea] = useState<string>('Hospital Management System');
     const [isRunning, setIsRunning] = useState<boolean>(false);
     const [records, setRecords] = useState<ProductRecord[]>([]);
-    const [activeResult, setActiveResult] = useState<any>(null);
+    const [activeResult, setActiveResult] = useState<ProductBuildResult | null>(null);
     const [logs, setLogs] = useState<string[]>([]);
     const [progress, setProgress] = useState<string>('idle'); // idle, analyzing, requirements, domain, DDL, api, layout, ui, backend, debate, docs, done
 
@@ -106,7 +126,7 @@ export const ProductBuilderView: React.FC = () => {
             } else {
                 setLogs(prev => [...prev, '[ERROR] Server failed to execute product building pipeline.']);
             }
-        } catch (e) {
+        } catch {
             setLogs(prev => [...prev, '[ERROR] Network connection failed.']);
         }
 
@@ -156,7 +176,7 @@ export const ProductBuilderView: React.FC = () => {
                         </h2>
                         <div className="bg-black/60 font-mono text-xs p-4 rounded-lg border border-white/5 h-44 overflow-y-auto space-y-1">
                             {logs.length === 0 ? (
-                                <span className="text-muted-foreground">// Awaiting business input...</span>
+                                <span className="text-muted-foreground">{"// Awaiting business input..."}</span>
                             ) : (
                                 logs.map((log, idx) => (
                                     <div key={idx} className={

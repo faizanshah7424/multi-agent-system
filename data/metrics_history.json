@@ -1,0 +1,100 @@
+[
+  {
+    "timestamp": "2026-07-11T17:49:00.920006+00:00",
+    "task_id": "val_python_cli_3d483a",
+    "success": true,
+    "latencies": {
+      "planning": 0.08,
+      "execution": 0.8331178665161132,
+      "repair": 0.0,
+      "consensus": 0.3570505142211914,
+      "memory_lookup": 0.02
+    },
+    "tokens_used": 2400,
+    "cost_usd": 0.003
+  },
+  {
+    "timestamp": "2026-07-11T17:49:01.821976+00:00",
+    "task_id": "val_fastapi_api_9ea684",
+    "success": true,
+    "latencies": {
+      "planning": 0.08,
+      "execution": 0.6292515516281127,
+      "repair": 0.0,
+      "consensus": 0.26967923641204833,
+      "memory_lookup": 0.02
+    },
+    "tokens_used": 2400,
+    "cost_usd": 0.003
+  },
+  {
+    "timestamp": "2026-07-11T17:49:02.433627+00:00",
+    "task_id": "val_nextjs_ts_9bb347",
+    "success": true,
+    "latencies": {
+      "planning": 0.08,
+      "execution": 0.42572503089904784,
+      "repair": 0.0,
+      "consensus": 0.1824535846710205,
+      "memory_lookup": 0.02
+    },
+    "tokens_used": 2400,
+    "cost_usd": 0.003
+  },
+  {
+    "timestamp": "2026-07-11T17:49:02.947293+00:00",
+    "task_id": "val_react_web_1d830b",
+    "success": true,
+    "latencies": {
+      "planning": 0.08,
+      "execution": 0.3575088500976562,
+      "repair": 0.0,
+      "consensus": 0.15321807861328124,
+      "memory_lookup": 0.02
+    },
+    "tokens_used": 2400,
+    "cost_usd": 0.003
+  },
+  {
+    "timestamp": "2026-07-11T17:49:03.663691+00:00",
+    "task_id": "val_hospital_sys_c929a4",
+    "success": true,
+    "latencies": {
+      "planning": 0.08,
+      "execution": 0.49954247474670405,
+      "repair": 0.0,
+      "consensus": 0.21408963203430176,
+      "memory_lookup": 0.02
+    },
+    "tokens_used": 2400,
+    "cost_usd": 0.003
+  },
+  {
+    "timestamp": "2026-07-11T17:49:04.312178+00:00",
+    "task_id": "val_ecommerce_sys_274dbf",
+    "success": true,
+    "latencies": {
+      "planning": 0.08,
+      "execution": 0.45132541656494135,
+      "repair": 0.0,
+      "consensus": 0.19342517852783203,
+      "memory_lookup": 0.02
+    },
+    "tokens_used": 2400,
+    "cost_usd": 0.003
+  },
+  {
+    "timestamp": "2026-07-11T17:55:00.453758+00:00",
+    "task_id": "showcase_938df1",
+    "success": true,
+    "latencies": {
+      "planning": 0.1,
+      "execution": 1.1,
+      "repair": 0.0,
+      "consensus": 0.45,
+      "memory_lookup": 0.02
+    },
+    "tokens_used": 3500,
+    "cost_usd": 0.004
+  }
+]

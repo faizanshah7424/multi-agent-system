@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Terminal, Play, CheckCircle, XCircle, Clock, BookOpen, AlertTriangle, Layers, Shield, FileText } from 'lucide-react';
+import { Terminal, Play, CheckCircle, Clock, Layers, Shield } from 'lucide-react';
 
 interface RepositoryRecord {
     id: string;
@@ -21,11 +21,25 @@ interface RepositoryRecord {
     timestamp: string;
 }
 
+interface RepositoryExecutionResult {
+    execution_id: string;
+    goal: string;
+    success: boolean;
+    failures: string | null;
+    duration_s: number;
+    reports: Record<string, string>;
+    artifacts?: Record<string, string>;
+    context: {
+        frameworks: string[];
+        [key: string]: unknown;
+    };
+}
+
 export const RepositoryView: React.FC = () => {
     const [goal, setGoal] = useState<string>('Create Login System');
     const [isRunning, setIsRunning] = useState<boolean>(false);
     const [records, setRecords] = useState<RepositoryRecord[]>([]);
-    const [activeResult, setActiveResult] = useState<any>(null);
+    const [activeResult, setActiveResult] = useState<RepositoryExecutionResult | null>(null);
     const [logs, setLogs] = useState<string[]>([]);
     const [progress, setProgress] = useState<string>('idle'); // idle, scanning, planning, debating, executing, validating, done
 
@@ -109,7 +123,7 @@ export const RepositoryView: React.FC = () => {
                     '[SUCCESS] Codebase restored to safe state.'
                 ]);
             }
-        } catch (e) {
+        } catch {
             setLogs(prev => [...prev, '[ERROR] Network connection failed.']);
         }
 
@@ -159,7 +173,7 @@ export const RepositoryView: React.FC = () => {
                         </h2>
                         <div className="bg-black/60 font-mono text-xs p-4 rounded-lg border border-white/5 h-44 overflow-y-auto space-y-1">
                             {logs.length === 0 ? (
-                                <span className="text-muted-foreground">// Awaiting goal triggers...</span>
+                                <span className="text-muted-foreground">{"// Awaiting goal triggers..."}</span>
                             ) : (
                                 logs.map((log, idx) => (
                                     <div key={idx} className={

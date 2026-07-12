@@ -27,7 +27,14 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function parseJwt(token: string): Record<string, unknown> | null {
+interface JwtClaims {
+  uid?: string;
+  sub?: string;
+  role?: string;
+  exp?: number;
+}
+
+function parseJwt(token: string): JwtClaims | null {
   try {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -37,7 +44,7 @@ function parseJwt(token: string): Record<string, unknown> | null {
         .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     );
-    return JSON.parse(jsonPayload);
+    return JSON.parse(jsonPayload) as JwtClaims;
   } catch {
     return null;
   }

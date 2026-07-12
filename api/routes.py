@@ -539,3 +539,76 @@ def trigger_product_build(
     engine = AutonomousProductBuilder()
     res = engine.build_product(idea)
     return res
+
+@router.get("/security/secrets")
+def get_secrets_status():
+    """Exposes environmental keys verification status dynamically."""
+    from core.di import DIContainer
+    from core.security.secret_manager import SecretManager
+    try:
+        secret_mgr = DIContainer.get(SecretManager)
+        return secret_mgr.validate_environment()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/security/policies")
+def get_runtime_policies():
+    """Exposes command registry and configuration protections."""
+    from core.di import DIContainer
+    from core.security.policy_manager import RuntimePolicyManager
+    try:
+        policy_mgr = DIContainer.get(RuntimePolicyManager)
+        return {
+            "allowed_prefixes": list(policy_mgr.allowed_command_prefixes),
+            "protected_configs": list(policy_mgr.protected_configs),
+            "workspace_root": str(policy_mgr.workspace_path)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/security/audit")
+def run_security_audit(code_content: str, file_path: str = "custom_file.py"):
+    """Performs an on-demand security scan on any code content block."""
+    from core.di import DIContainer
+    from core.security.audit import SecurityAuditEngine
+    try:
+        audit_engine = DIContainer.get(SecurityAuditEngine)
+        findings = audit_engine.audit_code(code_content, file_path)
+        return [f.model_dump() for f in findings]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/benchmark/summary")
+def get_benchmark_summary():
+    """Exposes active benchmark project configurations."""
+    from core.di import DIContainer
+    from core.benchmark.interface import IBenchmarkManager
+    try:
+        manager = DIContainer.get(IBenchmarkManager)
+        return manager.list_projects()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/sandbox/status")
+def get_sandbox_status():
+    """Exposes docker status and environment isolation capabilities."""
+    import subprocess
+    docker_available = False
+    details = "Docker daemon info call crashed."
+    try:
+        res = subprocess.run(["docker", "info"], capture_output=True, timeout=2.0)
+        docker_available = (res.returncode == 0)
+        details = "Docker Daemon is online." if docker_available else res.stderr.decode().strip()
+    except Exception as e:
+        details = str(e)
+    return {
+        "docker_available": docker_available,
+        "details": details,
+        "resource_allocation": {
+            "cpu_limit": "1.0 CPU Core",
+            "memory_limit": "512MB RAM",
+            "network_policy": "ISOLATED (none)",
+            "root_mount": "READ-ONLY"
+        }
+    }
+

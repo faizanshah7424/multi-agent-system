@@ -15,10 +15,13 @@ import { EngineeringView } from './EngineeringView';
 import { FeatureView } from './FeatureView';
 import { RepositoryView } from './RepositoryView';
 import { ProductBuilderView } from './ProductBuilderView';
+import { AdminPanelView } from './AdminPanelView';
+import { NotificationsView } from './NotificationsView';
+import { HospitalView } from './HospitalView';
 import { 
   Activity, Users, CreditCard, Cpu, Database, 
   Layers, Zap, Settings, Sun, Moon, 
-  Menu, X, RefreshCw, Lightbulb, LogOut
+  Menu, X, RefreshCw, Lightbulb, LogOut, Shield, Bell, Heart
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -35,7 +38,10 @@ type ViewType =
   | 'queue' 
   | 'costs' 
   | 'cache' 
-  | 'settings';
+  | 'settings'
+  | 'admin_panel'
+  | 'notifications'
+  | 'hospital';
 
 const DashboardContent: React.FC = () => {
   const [activeView, setActiveView] = useState<ViewType>('overview');
@@ -56,8 +62,14 @@ const DashboardContent: React.FC = () => {
     { id: 'queue', name: 'Queue Monitor', icon: Layers },
     { id: 'costs', name: 'Cost Analytics', icon: CreditCard },
     { id: 'cache', name: 'Cache Analytics', icon: Zap },
+    { id: 'notifications', name: 'Notifications Center', icon: Bell },
+    { id: 'hospital', name: 'Hospital Hub', icon: Heart },
     { id: 'settings', name: 'Settings', icon: Settings },
   ];
+
+  if (user && user.role === 'admin') {
+    menuItems.push({ id: 'admin_panel', name: 'Admin Panel', icon: Shield });
+  }
 
   const renderView = () => {
     switch (activeView) {
@@ -74,6 +86,9 @@ const DashboardContent: React.FC = () => {
       case 'costs': return <CostsView />;
       case 'cache': return <CacheView />;
       case 'settings': return <SettingsView />;
+      case 'admin_panel': return <AdminPanelView />;
+      case 'notifications': return <NotificationsView />;
+      case 'hospital': return <HospitalView />;
       default: return <OverviewView />;
     }
   };
