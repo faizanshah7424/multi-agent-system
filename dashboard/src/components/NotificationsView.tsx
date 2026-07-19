@@ -366,7 +366,7 @@ export const NotificationsView: React.FC = () => {
                   <p className="text-xs text-zinc-600">We&apos;ll alert you here when tasks execute or logins occur.</p>
                 </div>
               ) : (
-                <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                <div className="space-y-3">
                   {notifications.map(notif => (
                     <div
                       key={notif.id}

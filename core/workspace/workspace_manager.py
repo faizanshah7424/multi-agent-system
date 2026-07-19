@@ -1,5 +1,6 @@
 import os
 import shutil
+import tempfile
 import subprocess
 from pathlib import Path
 from typing import List, Optional
@@ -9,7 +10,7 @@ from core.workspace.interface import IWorkspaceManager, FileChange
 class WorkspaceManager(IWorkspaceManager):
     """
     Concrete Workspace Manager providing transactional isolation via Git worktrees.
-    Dispatches CLI subprocesses to manage branch and worktree allocations.
+    Dispatches CLI subprocesses to manage branch and worktree allocations outside the platform repository.
     """
 
     def __init__(self, main_repo_path: Optional[str] = None) -> None:
@@ -18,8 +19,16 @@ class WorkspaceManager(IWorkspaceManager):
         else:
             self.main_repo_path = Path(__file__).parent.parent.parent.resolve()
 
-        self.worktrees_root = self.main_repo_path / "worktrees"
-        self.worktrees_root.mkdir(exist_ok=True)
+        # Place all worktree runs outside the platform repository in the temp directory
+        self.worktrees_root = Path(tempfile.gettempdir()) / "codeorbit_runs"
+        self.worktrees_root.mkdir(parents=True, exist_ok=True)
+
+    def _get_worktree_path(self, task_id: str) -> Path:
+        """
+        Resolves the platform-specific isolated workspace path for a given task.
+        Target structure: /tmp/codeorbit_runs/{task_id}/workspace
+        """
+        return self.worktrees_root / task_id / "workspace"
 
     def _run_git(self, args: List[str], cwd: Optional[Path] = None) -> str:
         target_cwd = cwd or self.main_repo_path
@@ -42,7 +51,7 @@ class WorkspaceManager(IWorkspaceManager):
         Creates an isolated git worktree branch for a task and returns its local host path.
         """
         branch_name = f"task_{task_id}"
-        worktree_path = self.worktrees_root / branch_name
+        worktree_path = self._get_worktree_path(task_id)
 
         # Resolve base branch to branch off of
         try:
@@ -65,19 +74,31 @@ class WorkspaceManager(IWorkspaceManager):
             if worktree_path.exists():
                 shutil.rmtree(worktree_path, ignore_errors=True)
 
+        # Ensure parent runs folder exists
+        worktree_path.parent.mkdir(parents=True, exist_ok=True)
+
         # Create Git worktree
         self._run_git(
             ["worktree", "add", "-b", branch_name, str(worktree_path), base_branch]
         )
 
+        # Register workspace destruction in CleanupCoordinator
+        from core.cleanup import CleanupCoordinator
+        CleanupCoordinator.register_resource(
+            task_id=task_id,
+            resource_type="workspace",
+            resource_identifier=str(worktree_path),
+            cleanup_callable=lambda: self.destroy_workspace(task_id)
+        )
+
         return str(worktree_path).replace("\\", "/")
+
 
     def stage_changes(self, task_id: str, changes: List[FileChange]) -> None:
         """
         Applies changes safely within the isolated branch.
         """
-        branch_name = f"task_{task_id}"
-        worktree_path = self.worktrees_root / branch_name
+        worktree_path = self._get_worktree_path(task_id)
         if not worktree_path.exists():
             raise FileNotFoundError(
                 f"Isolated worktree path does not exist: {worktree_path}"
@@ -105,15 +126,13 @@ class WorkspaceManager(IWorkspaceManager):
         """
         Retrieves the unified diff of the worktree against its parent branch.
         """
-        branch_name = f"task_{task_id}"
-        worktree_path = self.worktrees_root / branch_name
+        worktree_path = self._get_worktree_path(task_id)
         if not worktree_path.exists():
             raise FileNotFoundError(
                 f"Isolated worktree path does not exist: {worktree_path}"
             )
 
         # Git diff against current HEAD of the worktree branch
-        # This will capture both staged and unstaged differences
         try:
             return self._run_git(["diff", "HEAD"], cwd=worktree_path)
         except Exception as e:
@@ -124,7 +143,7 @@ class WorkspaceManager(IWorkspaceManager):
         Applies task modifications back to origin branch and commits.
         """
         branch_name = f"task_{task_id}"
-        worktree_path = self.worktrees_root / branch_name
+        worktree_path = self._get_worktree_path(task_id)
         if not worktree_path.exists():
             raise FileNotFoundError(
                 f"Isolated worktree path does not exist: {worktree_path}"
@@ -132,7 +151,6 @@ class WorkspaceManager(IWorkspaceManager):
 
         try:
             # 1. Commit changes inside the isolated worktree
-            # Check if there are changes to commit
             status = self._run_git(["status", "--porcelain"], cwd=worktree_path)
             if status:
                 self._run_git(
@@ -157,7 +175,7 @@ class WorkspaceManager(IWorkspaceManager):
         Tears down worktree mappings and cleans transient branches.
         """
         branch_name = f"task_{task_id}"
-        worktree_path = self.worktrees_root / branch_name
+        worktree_path = self._get_worktree_path(task_id)
 
         # 1. Remove the Git worktree allocation
         if worktree_path.exists():
@@ -170,8 +188,17 @@ class WorkspaceManager(IWorkspaceManager):
             if worktree_path.exists():
                 shutil.rmtree(worktree_path, ignore_errors=True)
 
+        # Clean up task-specific temp parent directory
+        task_runs_dir = self.worktrees_root / task_id
+        if task_runs_dir.exists():
+            try:
+                shutil.rmtree(task_runs_dir, ignore_errors=True)
+            except Exception:
+                pass
+
         # 2. Delete the transient branch
         try:
             self._run_git(["branch", "-D", branch_name])
         except Exception:
             pass
+

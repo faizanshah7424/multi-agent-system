@@ -110,7 +110,7 @@ def validate_safe_path(target_path_str: str) -> Path:
 
     workspace_root = Path(__file__).parent.parent.resolve()
     persist_root = settings.persist_path.resolve()
-    app_data_root = (Path.home() / ".gemini" / "antigravity-cli").resolve()
+    app_data_root = (Path.home() / ".gemini" / "codeorbit-cli").resolve()
 
     allowed_roots = [workspace_root, persist_root, persist_root.parent, app_data_root]
 

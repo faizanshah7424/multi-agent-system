@@ -62,11 +62,18 @@ class WorkspaceSessionManager(IWorkspaceSessionManager):
         workspace_path = workspace_mgr.create_workspace(task_id)
         git_branch = f"task_{task_id}"
 
-        # 3. Create tracking record in DB
+        # 3. Create and start sandbox using SandboxFactory
+        sandbox_factory = DIContainer.get("sandbox_factory")
+        sandbox = sandbox_factory(workspace_path, task_id)
+        sandbox.start()
+
+        container_id = getattr(sandbox, "container_id", None)
+
+        # 4. Create tracking record in DB
         state = SessionState(
             task_id=task_id,
             workspace_path=workspace_path,
-            container_id=None,
+            container_id=container_id,
             git_branch=git_branch,
             created_at=datetime.now(timezone.utc).replace(tzinfo=None),
             last_active=datetime.now(timezone.utc).replace(tzinfo=None),
@@ -103,22 +110,30 @@ class WorkspaceSessionManager(IWorkspaceSessionManager):
                 container_id = record.container_id
                 session.delete(record)
 
-        # 1. Clean container sandbox if it exists
-        if container_id:
-            try:
-                from core.sandbox.interface import ISandbox
+        # 1. Execute LIFO resource cleanup via CleanupCoordinator
+        from core.cleanup import CleanupCoordinator
+        try:
+            CleanupCoordinator.execute_cleanup(task_id)
+        except Exception:
+            pass
 
-                sandbox = DIContainer.get(ISandbox)
-                # Assign active container id to terminate it
-                if hasattr(sandbox, "container_id"):
+        # 2. Clean container sandbox if it exists (for backward compatibility / DB state recovery)
+        if workspace_path:
+            try:
+                sandbox_factory = DIContainer.get("sandbox_factory")
+                sandbox = sandbox_factory(workspace_path, task_id)
+                # Assign active container id if it is custom
+                if container_id and hasattr(sandbox, "container_id"):
                     setattr(sandbox, "container_id", container_id)
                 sandbox.terminate()
             except Exception:
                 pass
 
-        # 2. Destroy transient Git worktree and branch
+        # 3. Destroy transient Git worktree and branch
         workspace_mgr = DIContainer.get(IWorkspaceManager)
         try:
             workspace_mgr.destroy_workspace(task_id)
         except Exception:
             pass
+
+

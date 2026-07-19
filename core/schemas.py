@@ -175,3 +175,78 @@ class HumanApprovalWorkflow(BaseModel):
     comments: Optional[str] = Field(
         default=None, description="Review feedback or modification requests."
     )
+
+
+# =====================================================================
+# Context Optimization & Budgeting Schemas
+# =====================================================================
+from typing import Protocol, runtime_checkable
+from pydantic import ConfigDict
+
+
+class RetrievedCodeChunk(BaseModel):
+    """
+    Schema representing a retrieved semantic chunk of source code.
+    """
+    file_path: str = Field(..., description="File path relative to workspace.")
+    content: str = Field(..., description="Text content of the code chunk.")
+    score: float = Field(..., description="Relevance score (e.g. cosine similarity).")
+    start_line: int = Field(..., description="Start line of chunk in source file.")
+    end_line: int = Field(..., description="End line of chunk in source file.")
+    symbol_name: Optional[str] = Field(default=None, description="Optional associated symbol name.")
+
+
+class ContextBudgetConfig(BaseModel):
+    """
+    Configuration mapping for context token boundaries and dynamic allocations.
+    """
+    total_budget: int = Field(default=128000, description="Total maximum token budget allowed.")
+    system_prompt_pct: float = Field(default=0.05, description="Percentage allocated to System Prompt.")
+    reserved_response_pct: float = Field(default=0.10, description="Percentage allocated to Reserved Response.")
+    history_pct: float = Field(default=0.25, description="Percentage allocated to Conversation History.")
+    file_focus_pct: float = Field(default=0.25, description="Percentage allocated to Current File Focus.")
+    retrieved_chunks_pct: float = Field(default=0.20, description="Percentage allocated to Retrieved Chunks.")
+    tool_outputs_pct: float = Field(default=0.10, description="Percentage allocated to Tool Outputs.")
+    scratchpad_pct: float = Field(default=0.05, description="Percentage allocated to Scratchpad.")
+
+
+class ContextTelemetry(BaseModel):
+    """
+    Telemetry and observability payload representing context window utilization metrics.
+    """
+    model: str = Field(..., description="Target LLM model name.")
+    total_tokens: int = Field(..., description="Total token limit of the model context window.")
+    allocated_tokens: int = Field(..., description="Total allocated tokens for this run.")
+    remaining_tokens: int = Field(..., description="Remaining unallocated tokens.")
+    compression_ratio: float = Field(default=1.0, description="History compression ratio (original/compressed).")
+
+
+class ContextBudgetAllocation(BaseModel):
+    """
+    Allocated token count per context block. Immutable (frozen).
+    """
+    model_config = ConfigDict(frozen=True)
+
+    system_prompt: int
+    reserved_response: int
+    history: int
+    file_focus: int
+    retrieved_chunks: int
+    tool_outputs: int
+    scratchpad: int
+    total_allocated: int
+    telemetry: ContextTelemetry
+
+
+@runtime_checkable
+class ISymbolIndexer(Protocol):
+    """
+    Interface for parsing and extracting code symbols (classes, functions, imports)
+    using Tree-sitter. Batch 1 defines the interface contract only.
+    """
+    def index_file(self, file_path: str, content: str) -> List[Dict[str, Any]]:
+        """
+        Parses source code file content and returns structured symbols metadata.
+        """
+        ...
+

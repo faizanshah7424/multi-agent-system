@@ -308,6 +308,31 @@ export interface HospitalStats {
   };
 }
 
+export interface ProjectRecord {
+  product_id: string;
+  idea: string;
+  success: boolean;
+  duration_s: number;
+  business_specs?: Record<string, unknown>;
+  requirements?: Record<string, unknown>;
+  domain_model?: Record<string, unknown>;
+  database_design?: Record<string, unknown>;
+  api_design?: Record<string, unknown>;
+  frontend_plan?: Record<string, unknown>;
+  backend_plan?: Record<string, unknown>;
+  testing_plan?: Record<string, unknown>;
+  deployment_plan?: Record<string, unknown>;
+  debate?: Record<string, unknown>;
+  documents?: Record<string, string>;
+  generated_code?: {
+    project_dir: string;
+    zip_path: string;
+    zip_filename: string;
+    files: Array<{ path: string; lines: number; size_bytes: number }>;
+    total_files: number;
+  };
+}
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
 
 let isRefreshing = false;
@@ -548,4 +573,13 @@ export const api = {
   completeHospitalLabTest: (id: string, payload: { result: string; technician_notes?: string }) => 
     fetchJson<{ message: string }>(`/hospital/lab/tests/${id}/complete`, { method: 'PUT', body: JSON.stringify(payload) }),
   getHospitalStats: () => fetchJson<HospitalStats>('/hospital/stats'),
+
+  // Autonomous Project Engine Endpoints
+  buildProject: (idea: string) => fetchJson<ProjectRecord>('/projects/build', {
+    method: 'POST',
+    body: JSON.stringify({ idea }),
+  }),
+  getProjects: () => fetchJson<ProjectRecord[]>('/projects'),
+  getProject: (projectId: string) => fetchJson<ProjectRecord>(`/projects/${projectId}`),
+  getProjectDownloadUrl: (projectId: string) => `${API_BASE_URL}/projects/${projectId}/download`,
 };

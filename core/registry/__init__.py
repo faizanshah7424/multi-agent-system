@@ -297,7 +297,7 @@ def discover_agents(directory_path: Optional[str] = None) -> None:
     to execute their decorators and populate the AgentRegistry.
     """
     if directory_path is None:
-        directory_path = str(Path(__file__).parent.parent / "agents")
+        directory_path = str(Path(__file__).resolve().parent.parent.parent / "agents")
 
     path = Path(directory_path)
     if not path.exists() or not path.is_dir():

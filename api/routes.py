@@ -680,6 +680,65 @@ def trigger_product_build(
     return res
 
 
+@router.post("/projects/build")
+def build_project(payload: Dict[str, Any]):
+    """
+    Primary endpoint for building an autonomous software project from a prompt idea.
+    """
+    from core.product_builder.product_engine import AutonomousProductBuilder
+
+    idea = payload.get("idea") or payload.get("prompt") or "Custom Enterprise Software"
+    engine = AutonomousProductBuilder()
+    res = engine.build_product(idea)
+    return res
+
+
+@router.get("/projects")
+def list_projects():
+    """
+    Retrieves all real generated projects from product memory.
+    """
+    from core.product_builder.product_engine import AutonomousProductBuilder
+
+    engine = AutonomousProductBuilder()
+    records = engine.memory.list_records()
+    return [r.model_dump() for r in records]
+
+
+@router.get("/projects/{project_id}")
+def get_project(project_id: str):
+    """
+    Retrieves details for a specific project.
+    """
+    from core.product_builder.product_engine import AutonomousProductBuilder
+
+    engine = AutonomousProductBuilder()
+    record = engine.memory.get_record(project_id)
+    if not record:
+        raise HTTPException(status_code=404, detail=f"Project '{project_id}' not found.")
+    return record.model_dump()
+
+
+@router.get("/projects/{project_id}/download")
+def download_project_zip(project_id: str):
+    """
+    Serves the generated project source code ZIP archive for direct download.
+    """
+    import os
+    from fastapi.responses import FileResponse
+
+    zip_path = os.path.abspath(os.path.join("generated_projects", f"{project_id}.zip"))
+    if not os.path.exists(zip_path):
+        raise HTTPException(status_code=404, detail=f"Project ZIP archive for '{project_id}' not found.")
+
+    return FileResponse(
+        path=zip_path,
+        filename=f"{project_id}.zip",
+        media_type="application/zip"
+    )
+
+
+
 @router.get("/security/secrets")
 def get_secrets_status():
     """Exposes environmental keys verification status dynamically."""

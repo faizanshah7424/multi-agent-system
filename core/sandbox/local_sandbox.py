@@ -17,11 +17,24 @@ class LocalProcessSandbox(ISandbox):
         self.workspace_path = Path(workspace_path).resolve()
         self._active_processes: List[subprocess.Popen] = []
 
-    def start(self) -> None:
+    def create(self) -> None:
         """
         Ensures the workspace directory exists.
         """
         self.workspace_path.mkdir(parents=True, exist_ok=True)
+
+    def initialize(self) -> None:
+        """
+        Performs environment initialization (no-op for local process sandbox).
+        """
+        pass
+
+    def start(self) -> None:
+        """
+        Orchestrates creation and initialization.
+        """
+        self.create()
+        self.initialize()
 
     def execute(self, cmd: List[str], timeout: float = 30.0) -> SandboxExecutionResult:
         """
@@ -146,7 +159,7 @@ class LocalProcessSandbox(ISandbox):
         else:
             shutil.copy2(src, dest)
 
-    def terminate(self) -> None:
+    def destroy(self) -> None:
         """
         Purges active transient subprocesses.
         """
@@ -157,3 +170,16 @@ class LocalProcessSandbox(ISandbox):
             except Exception:
                 pass
         self._active_processes.clear()
+
+    def terminate(self) -> None:
+        """
+        Stops and cleans up the sandbox resources.
+        """
+        self.destroy()
+
+    def health_check(self) -> bool:
+        """
+        Local process sandbox is always healthy if workspace exists.
+        """
+        return self.workspace_path.exists()
+

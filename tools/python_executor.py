@@ -181,8 +181,45 @@ class PythonExecutorTool(BaseTool):
     )
     args_schema: type[BaseModel] = PythonExecutorInput
 
+    def _get_sandbox(self) -> tuple:
+        """
+        Resolves the active workspace path and sandbox instance for the current task session.
+        """
+        from core.database import get_db_session
+        from core.workspace.session_manager import DBSessionState
+        from core.logging import get_correlation_context
+        from core.di import DIContainer
+        from pathlib import Path
+
+        context = get_correlation_context()
+        task_id = context.get("task_id")
+        workspace_path = None
+
+        if task_id and task_id != "N/A":
+            try:
+                with get_db_session() as session:
+                    record = session.query(DBSessionState).filter(DBSessionState.task_id == task_id).first()
+                    if record:
+                        workspace_path = record.workspace_path
+            except Exception:
+                pass
+
+        if not workspace_path:
+            # Fallback to host workspace root
+            workspace_path = str(Path(__file__).parent.parent.resolve())
+
+        # Construct sandbox instance
+        try:
+            sandbox_factory = DIContainer.get("sandbox_factory")
+        except Exception:
+            from core.sandbox.sandbox_factory import SandboxFactory
+            sandbox_factory = SandboxFactory.create_sandbox
+
+        sandbox = sandbox_factory(workspace_path, task_id if task_id != "N/A" else None)
+        return sandbox, workspace_path
+
     def execute(self, code: str) -> str:
-        logger.info("Executing Python code block...")
+        logger.info("Executing Python code block inside sandbox...")
 
         # Enforce AST-based static safety analysis before running code
         try:
@@ -191,7 +228,7 @@ class PythonExecutorTool(BaseTool):
             logger.warning(f"Python script blocked by security validation: {ve}")
             return f"Security Error: {ve}"
 
-        # Write the code to a temporary file
+        # Write the code to a temporary file on the host
         try:
             fd, temp_file_path = tempfile.mkstemp(suffix=".py", text=True)
             with os.fdopen(fd, "w", encoding="utf-8") as f:
@@ -200,71 +237,45 @@ class PythonExecutorTool(BaseTool):
             logger.error(f"Failed to create temporary script file: {str(e)}")
             return f"Error: Failed to write temporary script file: {str(e)}"
 
-        proc = None
         try:
-            # Resolve the active python interpreter path
-            python_executable = sys.executable
+            # Resolve the active sandbox
+            sandbox, _ = self._get_sandbox()
 
-            # Start the script in a subprocess with piped stdout/stderr to prevent OOM
-            proc = subprocess.Popen(
-                [python_executable, temp_file_path],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-            )
+            # Copy script into the sandbox workspace
+            import uuid
+            remote_filename = f"exec_script_{uuid.uuid4().hex[:8]}.py"
+            sandbox.copy_in(temp_file_path, remote_filename)
 
-            stdout_lines: List[str] = []
-            stderr_lines: List[str] = []
-            max_bytes = 2 * 1024 * 1024  # 2MB limits per stream
+            # Execute command inside the sandbox
+            res = sandbox.execute(["python", remote_filename], timeout=30.0)
 
-            def read_stream(stream, lines_list):
-                bytes_read = 0
-                limit_hit = False
-                for line in stream:
-                    if not limit_hit:
-                        if bytes_read < max_bytes:
-                            lines_list.append(line)
-                            bytes_read += len(line.encode("utf-8", errors="replace"))
-                        else:
-                            lines_list.append("\n[OUTPUT LIMIT EXCEEDED - TRUNCATED]\n")
-                            limit_hit = True
-                    # Continue consuming and discarding line to prevent subprocess pipe blocking
+            # Try to clean up script from sandbox workspace
+            try:
+                # Use python remove snippet to make it cross-platform
+                sandbox.execute(["python", "-c", f"import os; os.path.exists('{remote_filename}') and os.remove('{remote_filename}')"])
+            except Exception:
+                pass
 
-            t1 = threading.Thread(
-                target=read_stream, args=(proc.stdout, stdout_lines), daemon=True
-            )
-            t2 = threading.Thread(
-                target=read_stream, args=(proc.stderr, stderr_lines), daemon=True
-            )
-            t1.start()
-            t2.start()
+            if res.timeout_exceeded:
+                logger.warning("Python script execution timed out (limit: 30s).")
+                return "Error: Python execution timed out (exceeded 30-second limit)."
 
-            # Wait for execution with 30-second timeout
-            start_time = time.time()
-            timeout = 30.0
-            while proc.poll() is None:
-                if time.time() - start_time > timeout:
-                    proc.kill()
-                    proc.wait()
-                    logger.warning("Python script execution timed out (limit: 30s).")
-                    return (
-                        "Error: Python execution timed out (exceeded 30-second limit)."
-                    )
-                time.sleep(0.05)
+            stdout_content = res.stdout
+            max_bytes = 2 * 1024 * 1024
+            if len(stdout_content.encode("utf-8", errors="replace")) > max_bytes:
+                stdout_bytes = stdout_content.encode("utf-8", errors="replace")
+                stdout_content = stdout_bytes[:max_bytes].decode("utf-8", errors="ignore") + "\n[OUTPUT LIMIT EXCEEDED - TRUNCATED]\n"
 
-            t1.join(timeout=1.0)
-            t2.join(timeout=1.0)
-
-            stdout_content = "".join(stdout_lines)
-            stderr_content = "".join(stderr_lines)
+            stderr_content = res.stderr
+            if len(stderr_content.encode("utf-8", errors="replace")) > max_bytes:
+                stderr_bytes = stderr_content.encode("utf-8", errors="replace")
+                stderr_content = stderr_bytes[:max_bytes].decode("utf-8", errors="ignore") + "\n[OUTPUT LIMIT EXCEEDED - TRUNCATED]\n"
 
             output_parts = []
-            if proc.returncode == 0:
+            if res.exit_code == 0:
                 output_parts.append("Execution: SUCCESS")
             else:
-                output_parts.append(f"Execution: FAILED (Exit Code {proc.returncode})")
+                output_parts.append(f"Execution: FAILED (Exit Code {res.exit_code})")
 
             if stdout_content:
                 output_parts.append(f"--- STDOUT ---\n{stdout_content.strip()}")
@@ -277,16 +288,10 @@ class PythonExecutorTool(BaseTool):
             return "\n\n".join(output_parts)
 
         except Exception as e:
-            if proc:
-                try:
-                    proc.kill()
-                    proc.wait()
-                except Exception:
-                    pass
-            logger.error(f"Error during script subprocess run: {str(e)}")
-            return f"Error: Subprocess execution failed: {str(e)}"
+            logger.error(f"Error during script sandbox run: {str(e)}")
+            return f"Error: Sandbox execution failed: {str(e)}"
         finally:
-            # Clean up the temporary file
+            # Clean up the temporary host file
             try:
                 if os.path.exists(temp_file_path):
                     os.remove(temp_file_path)
@@ -294,3 +299,4 @@ class PythonExecutorTool(BaseTool):
                 logger.warning(
                     f"Could not delete temporary script file {temp_file_path}: {str(e)}"
                 )
+

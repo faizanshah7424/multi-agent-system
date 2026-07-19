@@ -55,7 +55,7 @@ export default function SignupPage() {
           </div>
           <h2 className="text-2xl font-bold tracking-tight text-white">Create Account</h2>
           <p className="text-sm text-zinc-400 mt-1.5 text-center">
-            Register to join the Antigravity agent cluster
+            Register to join the CodeOrbit AI agent cluster
           </p>
         </div>
 

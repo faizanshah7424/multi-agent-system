@@ -431,7 +431,7 @@ export const EngineeringView: React.FC = () => {
               Security Findings Report
             </h3>
 
-            <div className="flex-1 overflow-y-auto space-y-3 min-h-[300px]">
+            <div className="space-y-3 min-h-[200px]">
               {auditFindings.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center space-y-3 text-zinc-500 py-12">
                   <CheckCircle className="h-10 w-10 text-zinc-700" />

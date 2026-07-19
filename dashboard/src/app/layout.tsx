@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Antigravity Telemetry Portal",
-  description: "Telemetry, caching, and cost analytics dashboard for Multi-Agent AI System.",
+  title: "CodeOrbit AI — Autonomous AI Software Factory",
+  description: "Autonomous AI Software Engineering Platform — Transform ideas into full-stack production software, architecture, tests, GitHub commits, and cloud deployment automatically.",
 };
 
 export default function RootLayout({

@@ -7,6 +7,12 @@ from core.sandbox.interface import ISandbox, SandboxExecutionResult
 
 # Concrete implementation to test protocol compliance and DI registration
 class MockSandbox:
+    def create(self) -> None:
+        pass
+
+    def initialize(self) -> None:
+        pass
+
     def start(self) -> None:
         pass
 
@@ -25,8 +31,14 @@ class MockSandbox:
     def copy_out(self, remote_path: str, local_path: str) -> None:
         pass
 
+    def destroy(self) -> None:
+        pass
+
     def terminate(self) -> None:
         pass
+
+    def health_check(self) -> bool:
+        return True
 
 
 class TestDIAndInterfaces(unittest.TestCase):

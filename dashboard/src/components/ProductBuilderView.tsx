@@ -174,7 +174,7 @@ export const ProductBuilderView: React.FC = () => {
                             <Terminal className="h-5 w-5 text-primary" />
                             APB Live Logs
                         </h2>
-                        <div className="bg-black/60 font-mono text-xs p-4 rounded-lg border border-white/5 h-44 overflow-y-auto space-y-1">
+                        <div className="bg-black/60 font-mono text-xs p-4 rounded-lg border border-white/5 space-y-1">
                             {logs.length === 0 ? (
                                 <span className="text-muted-foreground">{"// Awaiting business input..."}</span>
                             ) : (
@@ -249,7 +249,7 @@ export const ProductBuilderView: React.FC = () => {
                             <Clock className="h-5 w-5 text-primary" />
                             Synthesized Products
                         </h2>
-                        <div className="space-y-3 max-h-48 overflow-y-auto">
+                        <div className="space-y-3">
                             {records.map((rec, idx) => (
                                 <div key={idx} className="p-3 bg-white/5 rounded border border-white/5 text-xs space-y-1">
                                     <div className="flex justify-between font-bold">

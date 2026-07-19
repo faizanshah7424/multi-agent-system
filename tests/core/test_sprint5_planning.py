@@ -131,12 +131,48 @@ class TestPlanningAndScheduler(unittest.TestCase):
         self.assertTrue(order.index(4) > order.index(2))
         self.assertTrue(order.index(4) > order.index(3))
 
+    def test_build_execution_plan_stratification(self) -> None:
+        # Branching graph:
+        # 1 has no deps
+        # 2 depends on 1
+        # 3 depends on 1
+        # 4 depends on 2 and 3
+        s1 = PlanStep(step_id=1, dependencies=[], assigned_agent="developer")
+        s2 = PlanStep(step_id=2, dependencies=[1], assigned_agent="reviewer")
+        s3 = PlanStep(step_id=3, dependencies=[1], assigned_agent="developer")
+        s4 = PlanStep(step_id=4, dependencies=[2, 3], assigned_agent="developer")
+        dag = PlanDAG(steps=[s1, s2, s3, s4])
+
+        stages = self.scheduler.build_execution_plan(dag)
+
+        # We expect 3 stages:
+        # Stage 1: [1]
+        # Stage 2: [2, 3]
+        # Stage 3: [4]
+        self.assertEqual(len(stages), 3)
+
+        self.assertEqual(stages[0].stage_id, 1)
+        self.assertEqual(stages[0].independent_nodes, [1])
+        self.assertEqual(stages[0].dependency_count, 0)
+        self.assertEqual(stages[0].downstream_nodes, [2, 3])
+
+        self.assertEqual(stages[1].stage_id, 2)
+        self.assertEqual(stages[1].independent_nodes, [2, 3])
+        self.assertEqual(stages[1].dependency_count, 2)  # Step 2 has 1, Step 3 has 1
+        self.assertEqual(stages[1].downstream_nodes, [4])
+
+        self.assertEqual(stages[2].stage_id, 3)
+        self.assertEqual(stages[2].independent_nodes, [4])
+        self.assertEqual(stages[2].dependency_count, 2)  # Step 4 depends on 2 and 3
+        self.assertEqual(stages[2].downstream_nodes, [])
+
     def test_topological_sort_cycle_error(self) -> None:
         # Cycle: 1 -> 2 -> 3 -> 1
         s1 = PlanStep(step_id=1, dependencies=[3], assigned_agent="developer")
         s2 = PlanStep(step_id=2, dependencies=[1], assigned_agent="reviewer")
         s3 = PlanStep(step_id=3, dependencies=[2], assigned_agent="developer")
         dag = PlanDAG(steps=[s1, s2, s3])
+
 
         with self.assertRaises(ValueError):
             self.scheduler.get_execution_order(dag)

@@ -122,3 +122,38 @@ def bootstrap_di() -> None:
     DIContainer.register(MetricsCollector, MetricsCollector())
     DIContainer.register(DocumentationAudit, DocumentationAudit())
     DIContainer.register(VersionManager, VersionManager())
+
+    # 20. Register Context Optimization (Sprint 7 Batch 4)
+    from config import settings
+    from core.context.prompt_builder import PromptBuilder
+    from core.context.indexer import TreeSitterIndexer
+    from core.context.retrieval import RetrievalPipeline
+    from core.context.reranker import IReranker
+    from core.context.cross_encoder_reranker import CrossEncoderReranker
+    from core.storage.storage_adapter import IStorageAdapter
+
+    backend = settings.database_backend.lower()
+    if backend in ("postgres", "postgresql"):
+        from core.storage.postgres_adapter import PostgresStorageAdapter
+        storage = PostgresStorageAdapter()
+    else:
+        from core.storage.sqlite_adapter import SQLiteStorageAdapter
+        storage = SQLiteStorageAdapter()
+
+    from core.planning.decomposer import ITaskDecomposer, TaskDecomposer
+    from core.planning.planner import IPlanner, Planner
+
+    decomposer = TaskDecomposer()
+    planner = Planner(decomposer=decomposer)
+
+    indexer = TreeSitterIndexer()
+    reranker = CrossEncoderReranker()
+    DIContainer.register(PromptBuilder, PromptBuilder())
+    DIContainer.register(TreeSitterIndexer, indexer)
+    DIContainer.register(IReranker, reranker)
+    DIContainer.register(IStorageAdapter, storage)
+    DIContainer.register(ITaskDecomposer, decomposer)
+    DIContainer.register(IPlanner, planner)
+    DIContainer.register(RetrievalPipeline, RetrievalPipeline(indexer=indexer, reranker=reranker, storage=storage))
+
+

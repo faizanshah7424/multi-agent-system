@@ -187,6 +187,16 @@ def create_app() -> FastAPI:
             "persist_directory": str(settings.persist_path.resolve()),
         }
 
+    @app.on_event("startup")
+    def start_scavenger_daemon():
+        """Launches the background orphan container scavenger on FastAPI startup."""
+        try:
+            from core.sandbox.scavenger import start_scavenger
+            start_scavenger(interval_seconds=60)
+            logger.info("Sandbox scavenger background daemon launched on application startup.")
+        except Exception as e:
+            logger.error(f"Failed to start sandbox scavenger background daemon: {str(e)}")
+
     logger.info("FastAPI application instance created successfully.")
     return app
 

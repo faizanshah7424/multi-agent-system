@@ -83,34 +83,71 @@ class AgentExecutor(IAgentExecutor):
 
         system_instruction = prompt_library.get_prompt(template_name, var_mappings)
 
-        # 3. Initialize ReAct loop parameters
+        # 3. Initialize ReAct loop parameters and DI components
         max_iterations = 5
-        history: List[str] = [f"Initial Step Goal: {step.description}"]
         params = ModelParameters(
             temperature=profile.temperature if profile else 0.2,
             max_tokens=profile.max_tokens if profile else 4096,
         )
+
+        from core.context.prompt_builder import PromptBuilder
+        from core.context.retrieval import RetrievalPipeline
+        from core.schemas import ContextBudgetConfig
+        from config import settings
+
+        prompt_builder = DIContainer.get(PromptBuilder)
+        retrieval_pipeline = DIContainer.get(RetrievalPipeline)
+
+        history_thoughts_actions: List[str] = []
+        last_tool_output: str = ""
 
         logger.info(
             f"Starting ReAct loop for step {step.step_id} ({step.assigned_agent})"
         )
 
         for iteration in range(max_iterations):
-            history_str = "\n\n".join(history)
-            prompt = (
-                f"{history_str}\n\n"
-                "Review the history and choose your next action. "
-                "You must respond in a format matching the AgentDecision schema."
+            # 1. Dynamically retrieve relevant codebase context chunks
+            retrieval_query = step.description
+            if history_thoughts_actions:
+                latest_thought = [t for t in history_thoughts_actions if t.startswith("Thought:")]
+                if latest_thought:
+                    retrieval_query = f"{step.description} {latest_thought[-1]}"
+
+            retrieved_chunks = retrieval_pipeline.retrieve(
+                task_id=task_id,
+                query=retrieval_query,
+                workspace_path=workspace_path
+            )
+
+            # 2. Build structured prompt in mandatory order respecting token budgets
+            budget_config = ContextBudgetConfig()
+            model_name = getattr(profile, "model_name", settings.default_model) if profile else settings.default_model
+
+            constraints = (
+                "You must respond in a format matching the AgentDecision schema.\n"
+                "Write clean code, follow standard formatting, and run pytest verification."
+            )
+
+            compiled_prompt = prompt_builder.build_prompt(
+                system_instructions=system_instruction,
+                history=history_thoughts_actions,
+                retrieved_chunks=retrieved_chunks,
+                user_request=step.description,
+                tool_outputs=last_tool_output,
+                constraints=constraints,
+                config=budget_config,
+                model_name=model_name
             )
 
             try:
                 # Query LLM for next decision
                 decision: AgentDecision = model_provider.generate_structured(
-                    prompt=prompt,
+                    prompt=compiled_prompt,
                     schema=AgentDecision,
                     system_instruction=system_instruction,
                     params=params,
                 )
+
             except Exception as e:
                 logger.error(
                     f"ReAct LLM query failed at iteration {iteration}: {str(e)}"
@@ -118,7 +155,7 @@ class AgentExecutor(IAgentExecutor):
                 return False
 
             logger.info(f"Iteration {iteration} Thought: {decision.thought}")
-            history.append(f"Thought: {decision.thought}")
+            history_thoughts_actions.append(f"Thought: {decision.thought}")
 
             # Publish event to broker
             try:
@@ -141,21 +178,21 @@ class AgentExecutor(IAgentExecutor):
                 )
 
             # 4. Route Actions
+            history_thoughts_actions.append(f"Action: {decision.action} " + (decision.file_path or (decision.command and " ".join(decision.command)) or ""))
+
             if decision.action == "respond":
                 logger.info(f"Agent resolved step: {decision.final_answer}")
                 return True
 
             elif decision.action == "execute_command":
                 if not decision.command:
-                    history.append(
-                        "Error: execute_command chosen but command tokens were missing."
-                    )
+                    last_tool_output = "Error: execute_command chosen but command tokens were missing."
                     continue
                 logger.info(f"Executing sandbox command: {' '.join(decision.command)}")
                 res = sandbox.execute(decision.command)
-                history.append(
-                    f"Action: execute_command {' '.join(decision.command)}\n"
-                    f"Result Code: {res.exit_code}\n"
+                last_tool_output = (
+                    f"Command executed: {' '.join(decision.command)}\n"
+                    f"Exit Code: {res.exit_code}\n"
                     f"Stdout: {res.stdout}\n"
                     f"Stderr: {res.stderr}"
                 )
@@ -164,47 +201,33 @@ class AgentExecutor(IAgentExecutor):
 
             elif decision.action == "read_file":
                 if not decision.file_path:
-                    history.append("Error: read_file chosen but file_path was missing.")
+                    last_tool_output = "Error: read_file chosen but file_path was missing."
                     continue
                 target_path = Path(workspace_path) / decision.file_path
                 if not target_path.exists():
-                    history.append(
-                        f"Action: read_file {decision.file_path}\nResult: File not found."
-                    )
+                    last_tool_output = f"Result of read_file {decision.file_path}: File not found."
                     continue
                 try:
                     content = target_path.read_text(encoding="utf-8")
-                    history.append(
-                        f"Action: read_file {decision.file_path}\nResult Content:\n{content}"
-                    )
+                    last_tool_output = f"Result of read_file {decision.file_path}:\n{content}"
                 except Exception as e:
-                    history.append(
-                        f"Action: read_file {decision.file_path}\nResult Error: {str(e)}"
-                    )
+                    last_tool_output = f"Result of read_file {decision.file_path}: Error {str(e)}"
 
             elif decision.action == "write_file":
                 if not decision.file_path or decision.content is None:
-                    history.append(
-                        "Error: write_file chosen but file_path or content was missing."
-                    )
+                    last_tool_output = "Error: write_file chosen but file_path or content was missing."
                     continue
                 target_path = Path(workspace_path) / decision.file_path
                 try:
                     target_path.parent.mkdir(parents=True, exist_ok=True)
                     target_path.write_text(decision.content, encoding="utf-8")
-                    history.append(
-                        f"Action: write_file {decision.file_path}\nResult: Success"
-                    )
+                    last_tool_output = f"Result of write_file {decision.file_path}: Success"
                     logger.info(f"Wrote file inside workspace: {decision.file_path}")
                 except Exception as e:
-                    history.append(
-                        f"Action: write_file {decision.file_path}\nResult Error: {str(e)}"
-                    )
+                    last_tool_output = f"Result of write_file {decision.file_path}: Error {str(e)}"
 
             else:
-                history.append(
-                    f"Error: Unknown action type '{decision.action}' chosen."
-                )
+                last_tool_output = f"Error: Unknown action type '{decision.action}' chosen."
 
         logger.error(
             f"Agent failed to resolve task within {max_iterations} iterations."

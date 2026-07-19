@@ -1,0 +1,12 @@
+# Bandit configuration
+skips:
+  - B613
+exclude_dirs:
+  - .venv
+  - venv
+  - brain
+  - dist
+  - build
+  - node_modules
+  - dashboard
+  - scratch

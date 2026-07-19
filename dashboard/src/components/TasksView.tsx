@@ -223,10 +223,10 @@ export const TasksView: React.FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-8rem)]">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
       {/* Left Column: Tasks Queue Lists */}
-      <div className="bg-card rounded-xl border flex flex-col h-full shadow-sm overflow-hidden">
+      <div className="bg-card rounded-xl border flex flex-col shadow-sm">
         
         {/* New Task Creator Form */}
         <div className="p-4 border-b">
@@ -279,7 +279,7 @@ export const TasksView: React.FC = () => {
         </div>
 
         {/* Tasks List */}
-        <div className="flex-1 overflow-y-auto divide-y">
+        <div className="divide-y">
           {filteredTasks.length === 0 ? (
             <div className="p-8 text-center text-xs text-muted-foreground">No tasks matching filters.</div>
           ) : (
@@ -307,7 +307,7 @@ export const TasksView: React.FC = () => {
       </div>
 
       {/* Right 2 Columns: Selected Task Real-Time Monitor */}
-      <div className="lg:col-span-2 flex flex-col h-full bg-card rounded-xl border overflow-hidden shadow-sm">
+      <div className="lg:col-span-2 flex flex-col bg-card rounded-xl border shadow-sm">
         
         {selectedTask ? (
           <>
@@ -372,16 +372,16 @@ export const TasksView: React.FC = () => {
             )}
 
             {/* Output Panels: Terminal Logs vs Chat transcripts */}
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
               
               {/* Terminal Execution Logs */}
-              <div className="flex flex-col h-full overflow-hidden bg-zinc-950 text-zinc-100">
+              <div className="flex flex-col bg-zinc-950 text-zinc-100 min-h-[350px]">
                 <div className="px-3 py-2 bg-zinc-900 border-b border-zinc-800 flex items-center space-x-2 shrink-0">
                   <Terminal className="h-4 w-4 text-emerald-400" />
                   <span className="text-xs font-bold font-mono text-zinc-400 uppercase tracking-wider">System Terminal Trace</span>
                 </div>
                 
-                <div className="flex-1 p-3 overflow-y-auto font-mono text-xs space-y-2 select-text">
+                <div className="p-3 font-mono text-xs space-y-2 select-text">
                   {loadingDetails ? (
                     <div className="text-zinc-500">Retrieving system execution stack...</div>
                   ) : logs.length === 0 ? (
@@ -405,13 +405,13 @@ export const TasksView: React.FC = () => {
               </div>
 
               {/* Chat Transcripts */}
-              <div className="flex flex-col h-full overflow-hidden bg-background">
+              <div className="flex flex-col bg-background min-h-[350px]">
                 <div className="px-3 py-2 bg-muted/40 border-b flex items-center space-x-2 shrink-0">
                   <MessageSquare className="h-4 w-4 text-primary" />
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Agent Workspace Chatter</span>
                 </div>
                 
-                <div className="flex-1 p-4 overflow-y-auto space-y-4">
+                <div className="p-4 space-y-4">
                   {loadingDetails ? (
                     <div className="text-muted-foreground text-sm">Loading agents dialogs...</div>
                   ) : messages.length === 0 ? (

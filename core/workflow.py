@@ -7,6 +7,8 @@ from core.memory import SharedMemory
 from core.logging import get_logger
 from core.registry import AgentRegistry
 from core.schemas import PlannerPlan, PlanStep
+from core.planning.planning_models import PlannerExecutionPlan, PlanningTask
+from core.planning.planner import IPlanner
 
 logger = get_logger("WorkflowEngine")
 
@@ -39,8 +41,21 @@ class WorkflowEngine:
     tracks progress, captures step results, and manages execution errors.
     """
 
-    def __init__(self, memory: SharedMemory):
+    def __init__(
+        self,
+        memory: SharedMemory,
+        planner: Optional[IPlanner] = None,
+    ):
         self.memory = memory
+
+        if planner is None:
+            try:
+                from core.di import DIContainer
+                planner = DIContainer.get(IPlanner)
+            except Exception:
+                from core.planning.planner import Planner
+                planner = Planner()
+        self.planner = planner
 
         # Dynamically instantiate registered agents using the AgentRegistry
         self.registry = AgentRegistry()
@@ -115,12 +130,13 @@ class WorkflowEngine:
 
         return errors
 
-    def execute_workflow(self, task: str) -> Dict[str, Any]:
+    def execute_workflow(self, task: Any) -> Dict[str, Any]:
         """
         Executes a task end-to-end: plans steps, runs agents, and updates states.
+        Supports both natural language strings and pre-planned ExecutionPlan models.
 
         Args:
-            task: Task description to execute.
+            task: Task description string or a PlannerExecutionPlan instance.
 
         Returns:
             The final dictionary content of the memory session.
@@ -138,54 +154,99 @@ class WorkflowEngine:
         )
 
         self.memory.update_status("running")
-        self.memory.add_log(
-            "workflow", f"Starting workflow execution for task: '{task}'"
-        )
-
-        # Step 1: Planning
-        set_correlation_context(
-            task_id=session_id, workflow_id=session_id, agent_name="planner"
-        )
-        planner = self.agents["planner"]
-        try:
-            plan_data = planner.run(task)
-        except Exception as e:
-            err = f"Planning failed: {str(e)}"
-            logger.error(err)
-            self.memory.add_log("workflow", err, level="ERROR")
-            self.memory.update_status("failed")
-            metrics_collector.record_workflow_run(
-                time.time() - start_time, success=False
+        
+        # Check if we received an already generated plan or need to plan it
+        is_preplanned = isinstance(task, PlannerExecutionPlan)
+        
+        if is_preplanned:
+            execution_plan = task
+            project_title = execution_plan.project_title
+            steps = execution_plan.tasks
+            execution_stages = execution_plan.execution_stages
+            task_str = project_title
+            
+            self.memory.add_log(
+                "workflow", f"Starting workflow execution using pre-planned ExecutionPlan: '{project_title}'"
             )
-            return self.memory.show()
-
-        # Schema & Graph Validation
-        try:
-            validated_plan = PlannerPlan(**plan_data)
-            validation_errors = self.validate_plan_graph(validated_plan)
-            if validation_errors:
-                err_msg = (
-                    f"Workflow plan validation failed with {len(validation_errors)} error(s):\n"
-                    + "\n".join(f"- {e}" for e in validation_errors)
-                )
-                logger.error(err_msg)
-                self.memory.add_log("workflow", err_msg, level="ERROR")
-                self.memory.update_status("failed")
-                metrics_collector.record_workflow_run(
-                    time.time() - start_time, success=False
-                )
-                return self.memory.show()
-        except Exception as ve:
-            err_msg = f"Workflow plan schema validation failed: {str(ve)}"
-            logger.error(err_msg)
-            self.memory.add_log("workflow", err_msg, level="ERROR")
-            self.memory.update_status("failed")
-            metrics_collector.record_workflow_run(
-                time.time() - start_time, success=False
+        else:
+            self.memory.add_log(
+                "workflow", f"Starting workflow execution for task: '{task}'"
             )
-            return self.memory.show()
+            
+            # Step 1: Autonomous Planning
+            set_correlation_context(
+                task_id=session_id, workflow_id=session_id, agent_name="planner"
+            )
+            
+            try:
+                # Try generating plan via new autonomous IPlanner engine
+                execution_plan = self.planner.plan(task)
+                project_title = execution_plan.project_title
+                steps = execution_plan.tasks
+                execution_stages = execution_plan.execution_stages
+                task_str = task
+            except Exception as e:
+                # Fallback to the old planner agent for backward compatibility
+                logger.warning(f"Autonomous planning engine failed, falling back to agent planner: {e}")
+                planner = self.agents.get("planner")
+                if not planner:
+                    err = f"Planning failed: both autonomous planner and legacy agent are unavailable. Error: {e}"
+                    logger.error(err)
+                    self.memory.add_log("workflow", err, level="ERROR")
+                    self.memory.update_status("failed")
+                    metrics_collector.record_workflow_run(
+                        time.time() - start_time, success=False
+                    )
+                    return self.memory.show()
+                
+                try:
+                    plan_data = planner.run(task)
+                    validated_plan = PlannerPlan(**plan_data)
+                    validation_errors = self.validate_plan_graph(validated_plan)
+                    if validation_errors:
+                        raise ValueError(f"Legacy plan validation failed: {validation_errors}")
+                    
+                    project_title = plan_data.get("project_title", "System Plan")
+                    raw_steps = plan_data.get("steps", [])
+                    steps = []
+                    for rs in raw_steps:
+                        steps.append(
+                            PlanningTask(
+                                task_id=rs.get("step_id", 0),
+                                name=rs.get("title", rs.get("name", "Unnamed Step")),
+                                description=rs.get("description", ""),
+                                assigned_agent=rs.get("assigned_agent", "developer"),
+                                dependencies=rs.get("dependencies", []),
+                                priority=rs.get("priority", "medium"),
+                            )
+                        )
+                    
+                    # Compute execution stages via DAGScheduler
+                    from core.queue.scheduler import PlanDAG, PlanStep as SchedulerPlanStep, DAGScheduler
+                    dag_steps = []
+                    for s in steps:
+                        dag_steps.append(
+                            SchedulerPlanStep(
+                                step_id=s.task_id,
+                                dependencies=s.dependencies,
+                                assigned_agent=s.assigned_agent,
+                                description=s.description
+                            )
+                        )
+                    plan_dag = PlanDAG(steps=dag_steps)
+                    scheduler = DAGScheduler()
+                    execution_stages = scheduler.build_execution_plan(plan_dag)
+                    task_str = task
+                except Exception as old_e:
+                    err = f"Planning failed (both planning systems failed): {str(old_e)}"
+                    logger.error(err)
+                    self.memory.add_log("workflow", err, level="ERROR")
+                    self.memory.update_status("failed")
+                    metrics_collector.record_workflow_run(
+                        time.time() - start_time, success=False
+                    )
+                    return self.memory.show()
 
-        steps = plan_data.get("steps", [])
         if not steps:
             err = "Planning failed: No execution steps generated by the Planner."
             self.memory.add_log("workflow", err, level="ERROR")
@@ -199,97 +260,114 @@ class WorkflowEngine:
         serialized_steps = []
         for s in steps:
             step_model = TaskStep(
-                step_id=s.get("step_id", 0),
-                name=s.get("title", s.get("name", "Unnamed Step")),
-                description=s.get("description", ""),
-                assigned_agent=s.get("assigned_agent", "developer"),
-                dependencies=s.get("dependencies", []),
-                priority=s.get("priority", "medium"),
+                step_id=s.task_id,
+                name=s.name,
+                description=s.description,
+                assigned_agent=s.assigned_agent,
+                dependencies=s.dependencies,
+                priority=s.priority,
             )
             serialized_steps.append(step_model.model_dump())
 
         self.memory.set("workflow_steps", serialized_steps)
         self.memory.add_log(
             "workflow",
-            f"Plan generated: {plan_data.get('project_title', 'System Plan')}. Total steps: {len(steps)}",
+            f"Plan generated: {project_title}. Total steps: {len(steps)}",
         )
 
-        # Step 2: Step-by-Step execution
-        for step_dict in serialized_steps:
-            step_id = step_dict["step_id"]
-            step_name = step_dict["name"]
-            agent_name = step_dict["assigned_agent"]
-            description = step_dict["description"]
-
-            # Update log correlation to target active step agent
-            set_correlation_context(
-                task_id=session_id, workflow_id=session_id, agent_name=agent_name
-            )
-
+        self.memory.add_log(
+            "workflow",
+            f"Generated execution plan with {len(execution_stages)} sequential stages."
+        )
+        for stage in execution_stages:
             self.memory.add_log(
                 "workflow",
-                f"Beginning Step {step_id}: '{step_name}' -> Assigned to {agent_name}",
-            )
-            self._update_step(
-                step_id,
-                status="running",
-                started_at=datetime.now(timezone.utc).replace(tzinfo=None).isoformat(),
+                f"Stage {stage.stage_id} holds independent nodes: {stage.independent_nodes} (dependencies count: {stage.dependency_count})"
             )
 
-            # Select the assigned agent
-            agent = self.agents.get(agent_name)
-            if not agent:
-                logger.warning(
-                    f"Agent '{agent_name}' not found. Defaulting to Tool Agent."
-                )
-                agent = self.agents["tool_agent"]
-                agent_name = "tool_agent"
+        # Step 3: Sequential stage-by-stage execution
+        step_by_id = {s["step_id"]: s for s in serialized_steps}
+
+        for stage in execution_stages:
+            self.memory.add_log(
+                "workflow",
+                f"Executing Stage {stage.stage_id}..."
+            )
+            for step_id in stage.independent_nodes:
+                step_dict = step_by_id[step_id]
+                step_name = step_dict["name"]
+                agent_name = step_dict["assigned_agent"]
+                description = step_dict["description"]
+
+                # Update log correlation to target active step agent
                 set_correlation_context(
                     task_id=session_id, workflow_id=session_id, agent_name=agent_name
                 )
 
-            try:
-                agent_prompt = (
-                    f"Overall Goal: {task}\n"
-                    f"Your specific subtask: {description}\n"
-                    "Carry out this subtask using your tools and context."
-                )
-
-                # Execute agent run
-                result = agent.run(agent_prompt)
-
-                # Mark step as completed
-                self._update_step(
-                    step_id,
-                    status="completed",
-                    result=result,
-                    completed_at=datetime.now(timezone.utc)
-                    .replace(tzinfo=None)
-                    .isoformat(),
-                )
                 self.memory.add_log(
-                    "workflow", f"Step {step_id} completed successfully."
+                    "workflow",
+                    f"Beginning Step {step_id}: '{step_name}' -> Assigned to {agent_name}",
                 )
-                metrics_collector.record_agent_run(success=True)
-
-            except Exception as e:
-                err_msg = f"Step {step_id} failed: {str(e)}"
-                logger.error(err_msg, exc_info=True)
                 self._update_step(
                     step_id,
-                    status="failed",
-                    result=err_msg,
-                    completed_at=datetime.now(timezone.utc)
-                    .replace(tzinfo=None)
-                    .isoformat(),
+                    status="running",
+                    started_at=datetime.now(timezone.utc).replace(tzinfo=None).isoformat(),
                 )
-                self.memory.add_log("workflow", err_msg, level="ERROR")
-                self.memory.update_status("failed")
-                metrics_collector.record_agent_run(success=False)
-                metrics_collector.record_workflow_run(
-                    time.time() - start_time, success=False
-                )
-                return self.memory.show()
+
+                # Select the assigned agent
+                agent = self.agents.get(agent_name)
+                if not agent:
+                    logger.warning(
+                        f"Agent '{agent_name}' not found. Defaulting to Tool Agent."
+                    )
+                    agent = self.agents["tool_agent"]
+                    agent_name = "tool_agent"
+                    set_correlation_context(
+                        task_id=session_id, workflow_id=session_id, agent_name=agent_name
+                    )
+
+                try:
+                    agent_prompt = (
+                        f"Overall Goal: {task_str}\n"
+                        f"Your specific subtask: {description}\n"
+                        "Carry out this subtask using your tools and context."
+                    )
+
+                    # Execute agent run
+                    result = agent.run(agent_prompt)
+
+                    # Mark step as completed
+                    self._update_step(
+                        step_id,
+                        status="completed",
+                        result=result,
+                        completed_at=datetime.now(timezone.utc)
+                        .replace(tzinfo=None)
+                        .isoformat(),
+                    )
+                    self.memory.add_log(
+                        "workflow", f"Step {step_id} completed successfully."
+                    )
+                    metrics_collector.record_agent_run(success=True)
+
+                except Exception as e:
+                    err_msg = f"Step {step_id} failed: {str(e)}"
+                    logger.error(err_msg, exc_info=True)
+                    self._update_step(
+                        step_id,
+                        status="failed",
+                        result=err_msg,
+                        completed_at=datetime.now(timezone.utc)
+                        .replace(tzinfo=None)
+                        .isoformat(),
+                    )
+                    self.memory.add_log("workflow", err_msg, level="ERROR")
+                    self.memory.update_status("failed")
+                    metrics_collector.record_agent_run(success=False)
+                    metrics_collector.record_workflow_run(
+                        time.time() - start_time, success=False
+                    )
+                    return self.memory.show()
 
         # All steps completed successfully
         set_correlation_context(

@@ -14,12 +14,13 @@ from core.product_builder.backend_architect import BackendArchitect
 from core.product_builder.testing_planner import TestingPlanner
 from core.product_builder.deployment_planner import DeploymentPlanner
 from core.product_builder.documentation_generator import DocumentationGenerator
+from core.product_builder.code_generator import ProjectCodeGenerator
 from core.product_builder.product_memory import ProductMemory, ProductRecord
 
 
 class AutonomousProductBuilder:
     """
-    Orchestrates the Product Builder Pipeline: Idea -> Domain Spec -> DDL Schema -> APIs -> React components -> Debates -> Docs -> memory logging.
+    Orchestrates the Product Builder Pipeline: Idea -> Domain Spec -> DDL Schema -> APIs -> React components -> Debates -> Docs -> Source Code Generation -> ZIP Packaging.
     """
 
     def __init__(self, graph: Optional[InMemoryGraphEngine] = None):
@@ -36,6 +37,7 @@ class AutonomousProductBuilder:
         self.test_planner = TestingPlanner()
         self.deploy_planner = DeploymentPlanner()
         self.doc_gen = DocumentationGenerator()
+        self.code_gen = ProjectCodeGenerator()
         self.memory = ProductMemory()
 
     def build_product(self, idea: str) -> Dict[str, Any]:
@@ -100,7 +102,16 @@ class AutonomousProductBuilder:
         }
         docs_paths = self.doc_gen.generate_documentation(doc_data)
 
-        # 14. Validation verification
+        # 14. Real Code Generation & Packaging
+        build_context = {
+            "domain_model": domain.model_dump(),
+            "api_design": api_design.model_dump(),
+            "frontend_plan": fe_plan.model_dump(),
+            "backend_plan": be_plan.model_dump(),
+        }
+        code_result = self.code_gen.generate_project_files(product_id, idea, build_context)
+
+        # 15. Validation verification
         val_success = True
         val_results = {
             "architecture_consistency": True,
@@ -111,7 +122,7 @@ class AutonomousProductBuilder:
 
         duration = time.perf_counter() - t_start
 
-        # 15. Write product build details to Memory logs
+        # 16. Write product build details to Memory logs
         record = ProductRecord(
             id=product_id,
             idea=idea,
@@ -145,5 +156,6 @@ class AutonomousProductBuilder:
             "deployment_plan": deployment_plan.model_dump(),
             "debate": debate_summary,
             "documents": docs_paths,
+            "generated_code": code_result,
             "validation": val_results,
         }

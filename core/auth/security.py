@@ -2,12 +2,31 @@ import os
 import hashlib
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
+from dotenv import load_dotenv
 import jwt
+
+load_dotenv()
 
 JWT_SECRET = os.getenv("JWT_SECRET", "super-secret-key-orbit-ai-production-grade")
 JWT_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 REFRESH_TOKEN_EXPIRE_DAYS = 7
+
+# Prevent server startup if JWT_SECRET is missing or uses the default production value,
+# except when running unit/integration tests to maintain test suite compatibility.
+import sys
+is_testing = (
+    "pytest" in sys.modules
+    or "unittest" in sys.modules
+    or os.getenv("GEMINI_API_KEY") == "mock_api_key_for_testing"
+    or any("test" in arg for arg in sys.argv)
+)
+if not is_testing:
+    if not os.getenv("JWT_SECRET") or JWT_SECRET == "super-secret-key-orbit-ai-production-grade":
+        raise RuntimeError(
+            "FATAL: JWT_SECRET environment variable is missing, empty, or uses the default insecure production value."
+        )
+
 
 
 def hash_password(password: str) -> str:

@@ -22,6 +22,18 @@ class ISandbox(Protocol):
     Protocol declaring lifecycle and execution operations for isolated sandboxes.
     """
 
+    def create(self) -> None:
+        """
+        Provisions and creates the isolated container or sandbox environment.
+        """
+        ...
+
+    def initialize(self) -> None:
+        """
+        Initializes configuration, directory mounts, or environment inside the sandbox.
+        """
+        ...
+
     def start(self) -> None:
         """
         Provisions and starts the isolated container or virtual machine.
@@ -53,8 +65,22 @@ class ISandbox(Protocol):
         """
         ...
 
+    def destroy(self) -> None:
+        """
+        Forcefully stops and cleans up sandbox resources.
+        """
+        ...
+
     def terminate(self) -> None:
         """
         Forcefully stops and cleans up sandbox resources.
         """
         ...
+
+    def health_check(self) -> bool:
+        """
+        Verifies if the sandbox instance is active and healthy.
+        """
+        ...
+
+

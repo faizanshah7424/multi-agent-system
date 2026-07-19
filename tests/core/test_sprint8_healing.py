@@ -25,13 +25,16 @@ class MockSandbox(ISandbox):
         self.fail_attempts = fail_attempts
         self.call_count = 0
 
+    def create(self) -> None:
+        pass
+
+    def initialize(self) -> None:
+        pass
+
     def start(self) -> None:
         pass
 
-    def terminate(self) -> None:
-        pass
-
-    def execute(self, cmd: List[str]) -> SandboxExecutionResult:
+    def execute(self, cmd: List[str], timeout: float = 30.0) -> SandboxExecutionResult:
         if cmd[0] == "ruff":
             self.call_count += 1
 
@@ -50,6 +53,21 @@ class MockSandbox(ISandbox):
             duration_seconds=0.01,
             timeout_exceeded=False,
         )
+
+    def copy_in(self, local_path: str, remote_path: str) -> None:
+        pass
+
+    def copy_out(self, remote_path: str, local_path: str) -> None:
+        pass
+
+    def destroy(self) -> None:
+        pass
+
+    def terminate(self) -> None:
+        pass
+
+    def health_check(self) -> bool:
+        return True
 
 
 class TestSelfHealingEngine(unittest.TestCase):
