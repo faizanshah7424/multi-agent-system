@@ -1,1 +1,39 @@
-.env 
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# Database & Runtime Data Directories
+data/
+data/*
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+test_temp.db
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+
+# Node & Next.js build artifacts
+node_modules/
+dashboard/node_modules/
+dashboard/.next/
+.next/
+out/
+build/
+dist/
+
+# Logs & Persistent Runtime State
+logs/
+*.log
+brain/
+scratch/
+generated_projects/
+.bandit/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
